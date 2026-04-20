@@ -1,11 +1,33 @@
-<div align="center">
+# Production Manager - Professional Bootstrap
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Sistema de gestão de produção industrial com integração Omie e monitoramento de etapas de produção.
 
-  <h1>Built with AI Studio</h2>
+## Arquitetura
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+O projeto segue uma arquitetura orientada a **Features**, organizada nas seguintes camadas:
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+- `src/app`: Provedores globais, configurações de rotas e inicialização.
+- `src/pages`: Componentes de nível de página que agregam features.
+- `src/features`: Unidades de negócio independentes (ex: auth, products, planning).
+- `src/shared`: Componentes, hooks, APIs e utilitários reutilizáveis.
+- `docs/adr`: Architectural Decision Records.
 
-</div>
+## Tecnologias Principais
+
+- **React + TS (Vite)**
+- **Tailwind CSS**: Estilização utility-first.
+- **Zustand**: Gerenciamento de estado (Auth).
+- **TanStack Query**: Data fetching e cache.
+- **Lucide React**: Ícones.
+- **Express (Proxy)**: Ponte para contornar restrições de CORS da API externa.
+
+## Como Executar
+
+1. Instale as dependências: `npm install`
+2. Configure o `.env` (veja `.env.example`)
+3. Inicie o servidor de desenvolvimento: `npm run dev`
+4. Execute os testes: `npm run test`
+
+## Decisões de Projeto
+
+Veja a pasta `docs/adr` para detalhes sobre escolhas técnicas.

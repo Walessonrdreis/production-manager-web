@@ -1,17 +1,28 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import axios from 'axios';
+import https from 'https';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+// Criamos um agente HTTPS persistente para reutilizar conexões e evitar o aviso de MaxListeners
+const httpsAgent = new https.Agent({ 
+  keepAlive: true, 
+  maxSockets: 50,
+  timeout: 60000
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+const PORT = 3000;
 
-  // Body parser for proxy POST/PUT requests
+// Aumenta o limite global de ouvintes para evitar o aviso de memory leak em situações de alta concorrência
+process.setMaxListeners(20);
+
+// Body parser for proxy POST/PUT requests
   app.use(express.json());
 
   // Generic Proxy Route for Production Manager API
@@ -43,7 +54,8 @@ async function startServer() {
         data: req.body,
         params: req.query,
         headers: headers,
-        timeout: 10000 
+        timeout: 10000,
+        httpsAgent: httpsAgent
       });
       
       console.log(`[PROXY SUCCESS] ${targetUrl} - Status: ${response.status}`);

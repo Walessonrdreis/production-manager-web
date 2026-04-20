@@ -55,17 +55,18 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <header className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Status de Produção</h1>
-          <p className="text-zinc-500">Etapa 20 - Produtos e Vendas em Aberto</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Status de Produção</h1>
+          <p className="text-xs sm:text-sm text-zinc-500">Etapa 20 - Produtos e Vendas em Aberto</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
           {(isFetching || syncMutation.isPending) && <RefreshCw size={16} className="animate-spin text-blue-500" />}
           <Button 
             variant="outline" 
             size="sm" 
+            className="w-full sm:w-auto text-xs"
             onClick={() => syncMutation.mutate()} 
             disabled={isFetching || syncMutation.isPending}
             isLoading={syncMutation.isPending}
@@ -76,7 +77,7 @@ export function DashboardPage() {
       </header>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <Card className="border-l-4 border-l-blue-600">
           <div className="flex items-center gap-2 text-slate-500 mb-2">
             <Package size={16} />

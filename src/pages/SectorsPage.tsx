@@ -21,19 +21,19 @@ export function SectorsPage() {
   });
 
   return (
-    <div className="space-y-8">
-      <header className="flex justify-between items-center">
+    <div className="space-y-6 sm:space-y-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Setores de Produção</h1>
-          <p className="text-zinc-500">Gerencie os departamentos responsáveis pela fabricação</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Setores de Produção</h1>
+          <p className="text-xs sm:text-sm text-zinc-500">Gerencie os departamentos responsáveis pela fabricação</p>
         </div>
-        <Button onClick={() => setIsAdding(true)}>
+        <Button onClick={() => setIsAdding(true)} size="sm" className="w-full sm:w-auto text-xs h-10">
           <Plus size={16} className="mr-2" />
           Novo Setor
         </Button>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-32 bg-white animate-pulse rounded-xl border border-slate-200" />

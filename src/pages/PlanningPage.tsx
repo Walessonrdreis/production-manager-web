@@ -22,15 +22,15 @@ export function PlanningPage() {
   const products = productsList || [];
 
   return (
-    <div className="space-y-8">
-      <header className="flex justify-between items-center">
+    <div className="space-y-6 sm:space-y-8">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Planejamento de Produção</h1>
-          <p className="text-zinc-500">Selecione produtos para gerar ordens de fabricação</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Planejamento de Produção</h1>
+          <p className="text-xs sm:text-sm text-zinc-500">Selecione produtos para gerar ordens de fabricação</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
            <select 
-             className="rounded-md border border-slate-200 px-3 text-sm font-medium focus:ring-2 focus:ring-blue-500"
+             className="h-9 sm:h-auto rounded-md border border-slate-200 px-3 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-blue-500 flex-1 sm:flex-none"
              value={period}
              onChange={(e) => setPeriod(e.target.value as any)}
            >
@@ -38,15 +38,17 @@ export function PlanningPage() {
               <option value="weekly">Semanal</option>
               <option value="monthly">Mensal</option>
            </select>
-           <Button variant="outline" onClick={clear}>Limpar Lista</Button>
+           
+           <Button variant="outline" size="sm" onClick={clear} className="text-xs flex-1 sm:flex-none">Limpar</Button>
            
            <PDFDownloadLink 
              document={<PlanningPDF items={items} period={period} />} 
              fileName={`planejamento-${period}-${new Date().toISOString().split('T')[0]}.pdf`}
+             className="w-full sm:w-auto"
            >
              {({ loading }: { loading: boolean }) => (
-                <Button disabled={items.length === 0 || loading}>
-                  <Download size={16} className="mr-2" />
+                <Button disabled={items.length === 0 || loading} size="sm" className="w-full sm:w-auto text-xs">
+                  <Download size={14} className="mr-2" />
                   {loading ? 'Gerando...' : 'Gerar PDF'}
                 </Button>
              )}
@@ -54,7 +56,7 @@ export function PlanningPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Selector */}
         <Card title="Adicionar Produtos" description="Busque pelo catálogo para planejar a produção.">
           <div className="relative mb-6">

@@ -10,10 +10,10 @@ export function OrdersPage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Ordens de Venda</h1>
-        <p className="text-zinc-500">Acompanhe todos os pedidos pendentes e em produção</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Ordens de Venda</h1>
+        <p className="text-xs sm:text-sm text-zinc-500">Acompanhe todos os pedidos pendentes e em produção</p>
       </header>
 
       <Card>

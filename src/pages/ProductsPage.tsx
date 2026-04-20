@@ -156,21 +156,22 @@ export function ProductsPage() {
 
   return (
     <div className="space-y-6 pb-20">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Catálogo de Produtos</h1>
-          <p className="text-zinc-500 text-sm">
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Catálogo de Produtos</h1>
+          <p className="text-zinc-500 text-xs sm:text-sm">
             {isFetching ? 'Atualizando catálogo...' : `Exibindo ${totalItemsCount} produtos sincronizados do Omie`}
           </p>
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
+        <div className="flex gap-2 w-full sm:w-auto">
           <Button 
             onClick={() => syncMutation.mutate()} 
             isLoading={syncMutation.isPending}
             variant="outline"
-            className="flex-1 md:flex-none"
+            size="sm"
+            className="flex-1 sm:flex-none text-xs"
           >
-            <RefreshCw size={16} className="mr-2" />
+            <RefreshCw size={14} className="mr-2" />
             Sincronizar
           </Button>
         </div>
@@ -178,12 +179,12 @@ export function ProductsPage() {
 
       <Card>
         <div className="space-y-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col lg:flex-row gap-3">
             <div className="relative flex-[2]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <Input 
                 placeholder="Buscar por descrição ou código..." 
-                className="pl-10 h-11"
+                className="pl-10 h-11 text-sm"
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -192,33 +193,33 @@ export function ProductsPage() {
               />
             </div>
             
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative group">
-                <ListFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
-                <select 
-                  value={familyFilter || 'Todas'}
-                  onChange={(e) => {
-                    setFamilyFilter(e.target.value === 'Todas' ? '' : e.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
-                >
-                  {families.map(f => (
-                    <option key={f} value={f}>{f}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              <div className="flex-1 min-w-[150px]">
+                <div className="relative group">
+                  <ListFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+                  <select 
+                    value={familyFilter || 'Todas'}
+                    onChange={(e) => {
+                      setFamilyFilter(e.target.value === 'Todas' ? '' : e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full h-11 pl-10 pr-8 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
+                  >
+                    {families.map(f => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                </div>
               </div>
-            </div>
 
-            <div className="flex gap-2">
               <Button 
                 variant={showFilters ? 'secondary' : 'outline'} 
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex gap-2 h-11 px-4"
+                className="flex gap-2 h-11 px-4 text-sm whitespace-nowrap"
               >
                 <Filter size={18} />
-                <span className="hidden sm:inline">Mais Filtros</span>
+                <span>Filtros</span>
                 {showFilters ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </Button>
             </div>
@@ -232,7 +233,7 @@ export function ProductsPage() {
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Setor de Atuação</label>
                     <select 
@@ -284,34 +285,34 @@ export function ProductsPage() {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between p-3 mb-4 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-200"
+            className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 mb-4 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-200 gap-3"
           >
-            <div className="flex items-center gap-4 ml-2">
-              <span className="text-sm font-bold">{selectedIds.size} itens selecionados</span>
-              <div className="h-4 w-px bg-blue-400" />
+            <div className="flex items-center gap-3 sm:gap-4 ml-2">
+              <span className="text-xs sm:text-sm font-bold">{selectedIds.size} selecionados</span>
+              <div className="h-4 w-px bg-blue-400 hidden sm:block" />
               <button 
                 onClick={toggleSelectAll}
-                className="text-xs font-medium hover:underline flex items-center gap-1"
+                className="text-[10px] sm:text-xs font-medium hover:underline flex items-center gap-1"
               >
-                {selectedIds.size === filteredProducts.length ? 'Desmarcar Tudo' : 'Selecionar Todo o Catálogo'}
+                {selectedIds.size === filteredProducts.length ? 'Desmarcar' : 'Selecionar Tudo'}
               </button>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <Button 
                 size="sm" 
                 variant="ghost" 
-                className="text-white hover:bg-blue-700"
+                className="text-white hover:bg-blue-700 text-[10px] flex-1 sm:flex-none h-8"
                 onClick={() => setSelectedIds(new Set())}
               >
-                Limpar Seleção
+                Limpar
               </Button>
               <Button 
                 size="sm" 
-                className="bg-white text-blue-600 hover:bg-blue-50 font-bold"
-                icon={<BookmarkPlus size={16} />}
+                className="bg-white text-blue-600 hover:bg-blue-50 font-bold text-[10px] flex-[2] sm:flex-none h-8"
                 onClick={handleSaveSelected}
               >
-                Adicionar em Meus Produtos
+                <BookmarkPlus size={14} className="mr-1" />
+                Salvar Seleção
               </Button>
             </div>
           </motion.div>

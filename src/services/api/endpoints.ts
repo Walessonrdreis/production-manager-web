@@ -13,6 +13,9 @@ export const ENDPOINTS = {
   SECTORS: {
     BASE: 'sectors',
   },
+  PLANNING: {
+    BASE: 'planning',
+  },
   ORDERS: {
     BASE: 'admin/orders',
   }

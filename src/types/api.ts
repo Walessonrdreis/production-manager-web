@@ -27,6 +27,16 @@ export interface Sector {
   description?: string;
 }
 
+export interface Planning {
+  id: string;
+  name: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+  sectorId?: string;
+  [key: string]: any;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;

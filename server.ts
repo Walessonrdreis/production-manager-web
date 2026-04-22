@@ -4,6 +4,24 @@ import axios from 'axios';
 import https from 'https';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+
+// Caminho para o banco local de desenvolvimento
+const DB_PATH = path.join(process.cwd(), 'db.json');
+
+async function readDb() {
+  try {
+    const data = await fs.readFile(DB_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return { sectors: [], planning: [] };
+  }
+}
+
+async function writeDb(data: any) {
+  await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
+}
 
 // Criamos um agente HTTPS persistente para reutilizar conexões e evitar o aviso de MaxListeners
 const httpsAgent = new https.Agent({ 
@@ -33,6 +51,49 @@ process.setMaxListeners(20);
 
     try {
       const targetPath = req.path.startsWith('/') ? req.path.slice(1) : req.path;
+      
+      // INTERCEPTAÇÃO PARA BANCO LOCAL EM DESENVOLVIMENTO (Sectors e Planning)
+      if (targetPath === 'sectors' || targetPath.startsWith('sectors/') || 
+          targetPath === 'planning' || targetPath.startsWith('planning/')) {
+        
+        const db = await readDb();
+        const collection = targetPath.startsWith('sectors') ? 'sectors' : 'planning';
+        const parts = targetPath.split('/');
+        const id = parts.length > 1 ? parts[1] : null;
+
+        if (req.method === 'GET') {
+          if (id) {
+            const item = db[collection].find((i: any) => i.id === id);
+            return item ? res.json(item) : res.status(404).json({ error: 'Not found' });
+          }
+          return res.json(db[collection]);
+        }
+
+        if (req.method === 'POST') {
+          const newItem = { ...req.body, id: randomUUID(), createdAt: new Date().toISOString() };
+          db[collection].push(newItem);
+          await writeDb(db);
+          return res.status(201).json(newItem);
+        }
+
+        if (req.method === 'PATCH' || req.method === 'PUT') {
+          if (!id) return res.status(400).json({ error: 'ID required' });
+          const index = db[collection].findIndex((i: any) => i.id === id);
+          if (index === -1) return res.status(404).json({ error: 'Not found' });
+          
+          db[collection][index] = { ...db[collection][index], ...req.body, updatedAt: new Date().toISOString() };
+          await writeDb(db);
+          return res.json(db[collection][index]);
+        }
+
+        if (req.method === 'DELETE') {
+          if (!id) return res.status(400).json({ error: 'ID required' });
+          db[collection] = db[collection].filter((i: any) => i.id !== id);
+          await writeDb(db);
+          return res.status(204).send();
+        }
+      }
+
       const targetUrl = `https://production-manager-api.onrender.com/v1/${targetPath}`;
       
       // Encaminhamos o cabeçalho de autorização se presente

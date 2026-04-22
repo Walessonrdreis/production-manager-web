@@ -32,11 +32,8 @@ process.setMaxListeners(20);
     if (req.url === '/' && req.path === '/') return next();
 
     try {
-      // Usamos req.path para obter apenas a rota sem a query string (que é enviada via 'params')
       const targetPath = req.path.startsWith('/') ? req.path.slice(1) : req.path;
       const targetUrl = `https://production-manager-api.onrender.com/v1/${targetPath}`;
-      
-      console.log(`[PROXY] ${req.method} ${req.path} -> ${targetUrl}`);
       
       // Encaminhamos o cabeçalho de autorização se presente
       const headers: any = {
@@ -54,17 +51,17 @@ process.setMaxListeners(20);
         data: req.body,
         params: req.query,
         headers: headers,
-        timeout: 10000,
+        timeout: 60000,
         httpsAgent: httpsAgent
       });
       
-      console.log(`[PROXY SUCCESS] ${targetUrl} - Status: ${response.status}`);
       res.json(response.data);
     } catch (error: any) {
       console.error(`[PROXY ERROR] ${req.url}:`, error.message);
       
       // Se for um erro da API de destino, repassamos o status e o erro
       if (error.response) {
+        console.error(`[PROXY ERROR DETAIL]`, error.response.data);
         return res.status(error.response.status).json(error.response.data);
       }
       

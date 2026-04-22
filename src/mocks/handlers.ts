@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { ENDPOINTS } from '../shared/api/endpoints';
+import { ENDPOINTS } from '../services/api/endpoints';
 
 const BASE_URL = 'https://production-manager-api.onrender.com/v1';
 

@@ -1,19 +1,50 @@
 import { useDashboard } from '../../hooks/api/useDashboard';
+import { useOrders, Order } from '../../hooks/api/useOrders';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Package, RefreshCw, AlertCircle, TrendingUp, Clock, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
+import { Package, RefreshCw, AlertCircle, TrendingUp, Clock, CheckCircle2, ListFilter, Plus, Minus, CheckSquare } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import { cn } from '../../utils/cn';
+import { useLocalProduced } from '../../hooks/local/useLocalProduced';
+import { Modal } from '../../components/ui/Modal';
 
 export function HomePage() {
-  const { totals, producedRecords, isLoading, isError, error, refetchTotals, isFetching, syncStage20, toggleProduced } = useDashboard();
+  const { totals, isLoading: isApiLoading, isError, error, refetchTotals, isFetching, syncStage20 } = useDashboard();
+  const { orders, isLoading: isOrdersLoading } = useOrders();
+  const { producedRecords, toggleOrder, toggleAll, isLoading: isLocalLoading } = useLocalProduced();
+  
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  const handleToggle = (description: string, quantity: number, isProduced: boolean) => {
-    toggleProduced.mutate({
-      description,
-      quantity,
-      action: isProduced ? 'remove' : 'add'
-    });
+  const isLoading = isApiLoading || isLocalLoading || isOrdersLoading;
+
+  const currentProductData = useMemo(() => {
+    if (!selectedProduct || !totals) return null;
+    return totals.data.find(p => p.description === selectedProduct) || null;
+  }, [selectedProduct, totals]);
+
+  const ordersWithProduct = useMemo(() => {
+    if (!selectedProduct || !orders) return [];
+    return orders.filter(order => 
+      order.items.some(item => item.description === selectedProduct)
+    ).map(order => ({
+      ...order,
+      itemQuantity: order.items.find(item => item.description === selectedProduct)?.quantity || 0
+    }));
+  }, [selectedProduct, orders]);
+
+  const handleToggleProduct = (description: string, totalNeeded: number) => {
+    toggleAll(description, totalNeeded);
+  };
+
+  const handleToggleOrder = (orderId: string, description: string, quantity: number, orderNumber: string) => {
+    const id = `order-${orderId}-${description}`;
+    toggleOrder(id, description, quantity, orderId, orderNumber);
+  };
+
+  const isOrderProduced = (orderId: string, description: string) => {
+    const id = `order-${orderId}-${description}`;
+    return producedRecords.some(r => r.id === id);
   };
 
   const getProducedQuantity = (description: string) => {
@@ -22,9 +53,8 @@ export function HomePage() {
       .reduce((acc, curr) => acc + (curr.quantity || 0), 0);
   };
 
-  // Calcula o total real subtraindo o que jÃ¡ foi produzido localmente
-  const totalProducedItems = producedRecords.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
-  const adjustedTotal = Math.max(0, (totals?.totalItems || 0) - totalProducedItems);
+  const totalProducedItemsCount = producedRecords.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
+  const adjustedTotal = Math.max(0, (totals?.totalItems || 0) - totalProducedItemsCount);
 
   if (isError) {
     const axiosError = error as any;
@@ -103,7 +133,7 @@ export function HomePage() {
       </div>
 
       {/* Main Totals Table */}
-      <Card title="Planejamento Pendente" description="Totais de produtos que precisam iniciar produção.">
+      <Card title="Planejamento Pendente" description="Clique em um produto para ver detalhes por pedido.">
         {isLoading ? (
           <div className="flex h-60 items-center justify-center">
             <RefreshCw size={32} className="animate-spin text-blue-600" />
@@ -117,49 +147,77 @@ export function HomePage() {
                 <tr className="border-b border-slate-200 bg-slate-50/50">
                   <th className="pb-3 px-4 pt-3 font-semibold text-slate-900 w-12 text-center">Status</th>
                   <th className="pb-3 px-4 pt-3 font-semibold text-slate-900">Descrição do Produto</th>
-                  <th className="pb-3 px-4 pt-3 font-semibold text-slate-900 text-right">Quantidade Total</th>
+                  <th className="pb-3 px-4 pt-3 font-semibold text-slate-900 text-right">Total Pendente</th>
+                  <th className="pb-3 px-4 pt-3 font-semibold text-slate-900 text-right w-32">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {totals?.data.map((p, index) => {
                   const producedQty = getProducedQuantity(p.description);
-                  const isProduced = producedQty >= p.totalQuantity;
+                  const isFullyProduced = producedQty >= p.totalQuantity;
                   const remainingQty = Math.max(0, p.totalQuantity - producedQty);
 
                   return (
                     <tr 
                       key={index} 
                       className={cn(
-                        "group hover:bg-slate-50 transition-colors cursor-pointer",
-                        isProduced && "bg-emerald-50/30 grayscale-[0.5]"
+                        "group hover:bg-slate-50 transition-colors",
+                        isFullyProduced && "bg-emerald-50/30 grayscale-[0.5]"
                       )}
-                      onClick={() => handleToggle(p.description, p.totalQuantity, isProduced)}
                     >
-                      <td className="py-4 px-4 text-center">
+                      <td className="py-4 px-4 text-center" onClick={() => {
+                        setSelectedProduct(p.description);
+                        setShowDetailsModal(true);
+                      }}>
                         <div className={cn(
-                          "w-5 h-5 rounded border flex items-center justify-center transition-all",
-                          isProduced 
+                          "w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer",
+                          isFullyProduced 
                             ? "bg-emerald-500 border-emerald-500 text-white" 
                             : "border-slate-300 bg-white group-hover:border-blue-400"
                         )}>
-                          {isProduced && <CheckCircle2 size={14} strokeWidth={3} />}
+                          {isFullyProduced && <CheckCircle2 size={14} strokeWidth={3} />}
                         </div>
                       </td>
                       <td className={cn(
-                        "py-4 px-4 font-medium transition-all",
-                        isProduced ? "text-slate-400 line-through" : "text-slate-900"
-                      )}>
+                        "py-4 px-4 font-medium transition-all cursor-pointer",
+                        isFullyProduced ? "text-slate-400 line-through" : "text-slate-900"
+                      )} onClick={() => {
+                        setSelectedProduct(p.description);
+                        setShowDetailsModal(true);
+                      }}>
                         {p.description}
-                        {isProduced && <span className="ml-2 text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded uppercase">Produto pronto</span>}
+                        {isFullyProduced && <span className="ml-2 text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded uppercase">Concluído</span>}
                       </td>
                       <td className={cn(
                         "py-4 px-4 text-right font-bold transition-all",
-                        isProduced ? "text-slate-300" : "text-blue-600"
+                        isFullyProduced ? "text-slate-300" : "text-blue-600"
                       )}>
                         {remainingQty} <span className="text-[10px] text-slate-400 font-normal uppercase ml-1">un</span>
                         {producedQty > 0 && producedQty < p.totalQuantity && (
-                          <div className="text-[10px] text-emerald-500 font-normal">(-{producedQty} produzidos)</div>
+                          <div className="text-[10px] text-emerald-500 font-normal">(-{producedQty} marcados)</div>
                         )}
+                      </td>
+                      <td className="py-4 px-4 text-right space-x-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-slate-400 hover:text-emerald-600"
+                          title="Marcar tudo como pronto"
+                          onClick={() => handleToggleProduct(p.description, p.totalQuantity)}
+                        >
+                          <CheckSquare size={16} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-slate-400 hover:text-blue-600"
+                          onClick={() => {
+                            setSelectedProduct(p.description);
+                            setShowDetailsModal(true);
+                          }}
+                        >
+                          <ListFilter size={16} />
+                        </Button>
                       </td>
                     </tr>
                   );
@@ -169,6 +227,92 @@ export function HomePage() {
           </div>
         )}
       </Card>
+
+      {/* Details Modal */}
+      <Modal 
+        isOpen={showDetailsModal} 
+        onClose={() => setShowDetailsModal(false)}
+        title={selectedProduct || 'Detalhes do Produto'}
+      >
+        <div className="space-y-6">
+          <div className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Pendente (API)</p>
+              <p className="text-2xl font-bold text-slate-900">{currentProductData?.totalQuantity || 0} <span className="text-sm font-normal text-slate-500">unidades</span></p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Status Local</p>
+              <div className="flex items-center gap-2">
+                <p className="text-2xl font-bold text-emerald-600">{selectedProduct ? getProducedQuantity(selectedProduct) : 0}</p>
+                <div className="h-8 w-px bg-slate-200 mx-1"></div>
+                <p className="text-2xl font-bold text-slate-300">{currentProductData?.totalQuantity || 0}</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+             <div className="flex justify-between items-center mb-3">
+               <h3 className="text-sm font-bold text-slate-900">Pedidos contendo este item</h3>
+               <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-8 text-blue-600 hover:bg-blue-50"
+                onClick={() => {
+                  if (currentProductData) handleToggleProduct(currentProductData.description, currentProductData.totalQuantity);
+                }}
+               >
+                 <CheckSquare size={14} className="mr-1" />
+                 Alternar Tudo
+               </Button>
+             </div>
+             
+             {ordersWithProduct.length === 0 ? (
+               <div className="text-center py-8 text-slate-500 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                 Não encontramos pedidos detalhados para este item.
+               </div>
+             ) : (
+               <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+                 {ordersWithProduct.map((order) => {
+                   const isProduced = isOrderProduced(order.id, selectedProduct!);
+                   return (
+                     <div 
+                      key={order.id} 
+                      className={cn(
+                        "flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer",
+                        isProduced ? "bg-emerald-50 border-emerald-100" : "bg-white border-slate-200 hover:border-blue-400"
+                      )}
+                      onClick={() => handleToggleOrder(order.id, selectedProduct!, Number(order.itemQuantity), order.orderNumber)}
+                     >
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "w-5 h-5 rounded border flex items-center justify-center transition-all",
+                            isProduced ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-300 bg-white"
+                          )}>
+                            {isProduced && <CheckCircle2 size={12} strokeWidth={3} />}
+                          </div>
+                          <div>
+                            <p className={cn("text-sm font-bold", isProduced ? "text-emerald-900" : "text-slate-900")}>Pedido #{order.orderNumber}</p>
+                            <p className="text-xs text-slate-500">{order.customerName}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-slate-900">{order.itemQuantity} un</p>
+                          <p className={cn("text-[10px] uppercase font-bold", isProduced ? "text-emerald-600" : "text-slate-400")}>
+                            {isProduced ? 'Produzido' : 'Pendente'}
+                          </p>
+                        </div>
+                     </div>
+                   );
+                 })}
+               </div>
+             )}
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <Button onClick={() => setShowDetailsModal(false)}>Fechar</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

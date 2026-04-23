@@ -6,15 +6,25 @@ import { useState } from 'react';
 import { cn } from '../../utils/cn';
 
 export function HomePage() {
-  const [producedItems, setProducedItems] = useState<Record<string, boolean>>({});
-  const { totals, isLoading, isError, error, refetchTotals, isFetching, syncStage20 } = useDashboard();
+  const { totals, producedRecords, isLoading, isError, error, refetchTotals, isFetching, syncStage20, toggleProduced } = useDashboard();
 
-  const toggleProduced = (id: string) => {
-    setProducedItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+  const handleToggle = (description: string, quantity: number, isProduced: boolean) => {
+    toggleProduced.mutate({
+      description,
+      quantity,
+      action: isProduced ? 'remove' : 'add'
+    });
   };
+
+  const getProducedQuantity = (description: string) => {
+    return producedRecords
+      .filter(r => r.description === description)
+      .reduce((acc, curr) => acc + (curr.quantity || 0), 0);
+  };
+
+  // Calcula o total real subtraindo o que jÃ¡ foi produzido localmente
+  const totalProducedItems = producedRecords.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
+  const adjustedTotal = Math.max(0, (totals?.totalItems || 0) - totalProducedItems);
 
   if (isError) {
     const axiosError = error as any;
@@ -67,7 +77,7 @@ export function HomePage() {
             <span className="text-xs font-semibold uppercase tracking-wider">Total de Itens</span>
           </div>
           <div className="text-3xl font-bold text-slate-900">
-            {isLoading ? '...' : totals?.totalItems || 0}
+            {isLoading ? '...' : adjustedTotal}
           </div>
         </Card>
         
@@ -112,7 +122,10 @@ export function HomePage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {totals?.data.map((p, index) => {
-                  const isProduced = producedItems[p.description] || false;
+                  const producedQty = getProducedQuantity(p.description);
+                  const isProduced = producedQty >= p.totalQuantity;
+                  const remainingQty = Math.max(0, p.totalQuantity - producedQty);
+
                   return (
                     <tr 
                       key={index} 
@@ -120,7 +133,7 @@ export function HomePage() {
                         "group hover:bg-slate-50 transition-colors cursor-pointer",
                         isProduced && "bg-emerald-50/30 grayscale-[0.5]"
                       )}
-                      onClick={() => toggleProduced(p.description)}
+                      onClick={() => handleToggle(p.description, p.totalQuantity, isProduced)}
                     >
                       <td className="py-4 px-4 text-center">
                         <div className={cn(
@@ -137,12 +150,16 @@ export function HomePage() {
                         isProduced ? "text-slate-400 line-through" : "text-slate-900"
                       )}>
                         {p.description}
+                        {isProduced && <span className="ml-2 text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded uppercase">Produto pronto</span>}
                       </td>
                       <td className={cn(
                         "py-4 px-4 text-right font-bold transition-all",
                         isProduced ? "text-slate-300" : "text-blue-600"
                       )}>
-                        {p.totalQuantity} <span className="text-[10px] text-slate-400 font-normal uppercase ml-1">un</span>
+                        {remainingQty} <span className="text-[10px] text-slate-400 font-normal uppercase ml-1">un</span>
+                        {producedQty > 0 && producedQty < p.totalQuantity && (
+                          <div className="text-[10px] text-emerald-500 font-normal">(-{producedQty} produzidos)</div>
+                        )}
                       </td>
                     </tr>
                   );

@@ -5,6 +5,7 @@ export const ENDPOINTS = {
   DASHBOARD: {
     STAGE20_TOTALS: 'admin/orders/stage20/totals',
     SYNC_STAGE20: 'admin/omie/orders/stage20/sync',
+    PRODUCED: 'dashboard/produced'
   },
   PRODUCTS: {
     LIST: 'products',

@@ -35,13 +35,39 @@ export function useDashboard() {
     },
   });
 
+  const producedQuery = useQuery({
+    queryKey: ['dashboard-produced'],
+    queryFn: async (): Promise<any[]> => {
+      const { data } = await apiClient.get(ENDPOINTS.DASHBOARD.PRODUCED);
+      return Array.isArray(data) ? data : [];
+    }
+  });
+
+  const toggleProducedMutation = useMutation({
+    mutationFn: async ({ description, quantity, action }: { description: string, quantity: number, action: 'add' | 'remove' }) => {
+      if (action === 'add') {
+        return await apiClient.post(ENDPOINTS.DASHBOARD.PRODUCED, { description, quantity });
+      } else {
+        const item = producedQuery.data?.find(i => i.description === description);
+        if (item) {
+          return await apiClient.delete(`${ENDPOINTS.DASHBOARD.PRODUCED}/${item.id}`);
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard-produced'] });
+    }
+  });
+
   return {
     totals: totalsQuery.data,
-    isLoading: totalsQuery.isLoading,
+    producedRecords: producedQuery.data || [],
+    isLoading: totalsQuery.isLoading || producedQuery.isLoading,
     isError: totalsQuery.isError,
     error: totalsQuery.error,
-    isFetching: totalsQuery.isFetching,
+    isFetching: totalsQuery.isFetching || producedQuery.isFetching,
     refetchTotals: totalsQuery.refetch,
     syncStage20: syncMutation,
+    toggleProduced: toggleProducedMutation
   };
 }

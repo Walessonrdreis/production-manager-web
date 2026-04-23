@@ -7,20 +7,80 @@ import { fileURLToPath } from 'url';
 import fs from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 
-// Caminho para o banco local de desenvolvimento
+// Caminhos para o banco local de desenvolvimento
 const DB_PATH = path.join(process.cwd(), 'db.json');
+const BACKUP_DIR = path.join(process.cwd(), 'backups');
+
+// Estado global para o banco em memória (Melhora a velocidade drasticamente)
+let memoryDb: any = null;
+let isWriting = false;
+let writePending = false;
+
+// Função para garantir que o diretório de backups exista
+async function ensureBackupDir() {
+  try {
+    await fs.access(BACKUP_DIR);
+  } catch {
+    await fs.mkdir(BACKUP_DIR, { recursive: true });
+  }
+}
+
+async function createBackup() {
+  if (!memoryDb) return;
+  await ensureBackupDir();
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
+  const backupPath = path.join(BACKUP_DIR, `db_backup_${timestamp}.json`);
+  await fs.writeFile(backupPath, JSON.stringify(memoryDb, null, 2));
+  
+  // Opcional: Manter apenas os últimos 10 backups para não encher o disco
+  const files = await fs.readdir(BACKUP_DIR);
+  if (files.length > 10) {
+    const sorted = files.sort();
+    for (let i = 0; i < sorted.length - 10; i++) {
+      await fs.unlink(path.join(BACKUP_DIR, sorted[i]));
+    }
+  }
+}
 
 async function readDb() {
+  if (memoryDb) return memoryDb;
   try {
     const data = await fs.readFile(DB_PATH, 'utf-8');
-    return JSON.parse(data);
+    memoryDb = JSON.parse(data);
+    return memoryDb;
   } catch (error) {
-    return { sectors: [], planning: [] };
+    memoryDb = { sectors: [], planning: [], dashboard_produced: [] };
+    return memoryDb;
+  }
+}
+
+async function persistDb() {
+  if (isWriting) {
+    writePending = true;
+    return;
+  }
+  isWriting = true;
+  try {
+    // Escrita atômica: salva num temporário e renomeia
+    const tempPath = `${DB_PATH}.tmp`;
+    await fs.writeFile(tempPath, JSON.stringify(memoryDb, null, 2));
+    await fs.rename(tempPath, DB_PATH);
+    await createBackup();
+  } catch (err) {
+    console.error('Erro ao persistir banco de dados:', err);
+  } finally {
+    isWriting = false;
+    if (writePending) {
+      writePending = false;
+      persistDb();
+    }
   }
 }
 
 async function writeDb(data: any) {
-  await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
+  memoryDb = data;
+  // Não "aguardamos" o disco para responder ao cliente (Performance!)
+  persistDb();
 }
 
 // Criamos um agente HTTPS persistente para reutilizar conexões e evitar o aviso de MaxListeners
@@ -52,14 +112,18 @@ process.setMaxListeners(20);
     try {
       const targetPath = req.path.startsWith('/') ? req.path.slice(1) : req.path;
       
-      // INTERCEPTAÇÃO PARA BANCO LOCAL EM DESENVOLVIMENTO (Sectors e Planning)
+      // INTERCEPTAÇÃO PARA BANCO LOCAL EM DESENVOLVIMENTO (Sectors, Planning e Dashboard Produced)
       if (targetPath === 'sectors' || targetPath.startsWith('sectors/') || 
-          targetPath === 'planning' || targetPath.startsWith('planning/')) {
+          targetPath === 'planning' || targetPath.startsWith('planning/') ||
+          targetPath === 'dashboard/produced' || targetPath.startsWith('dashboard/produced/')) {
         
         const db = await readDb();
-        const collection = targetPath.startsWith('sectors') ? 'sectors' : 'planning';
+        let collection = 'sectors';
+        if (targetPath.startsWith('planning')) collection = 'planning';
+        if (targetPath.startsWith('dashboard/produced')) collection = 'dashboard_produced';
+
         const parts = targetPath.split('/');
-        const id = parts.length > 1 ? parts[1] : null;
+        const id = parts.length > 1 ? (parts[0] === 'dashboard' ? parts[2] : parts[1]) : null;
 
         if (req.method === 'GET') {
           if (id) {

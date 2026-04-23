@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "update-structure": "node scripts/update-structure.js"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

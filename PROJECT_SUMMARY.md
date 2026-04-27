@@ -92,8 +92,8 @@ O sistema realiza uma "mesclagem virtual" de dados:
 
 ### 📅 Planejamento de Produção
 - O planejamento utiliza exclusivamente a lista de **'Meus Produtos'** (itens selecionados no catálogo pelo usuário).
-- Permite selecionar itens desta lista personalizada para gerar ordens de fabricação.
-- **Persistência Robust:** Utiliza **IndexedDB** (via Dexie) para armazenar tanto a lista de produtos salvos quanto os itens selecionados no planejamento, garantindo performance e suporte a grandes volumes de dados.
+- **Seleção Múltipla:** Suporte para selecionar vários produtos simultaneamente através de checkboxes e adicioná-los em massa à fila de planejamento.
+- **Persistência Robusta:** Utiliza **IndexedDB** (via Dexie) para armazenar tanto a lista de produtos salvos quanto os itens selecionados no planejamento, garantindo performance e suporte a grandes volumes de dados.
 - Exportação direta para PDF para uso no chão de fábrica.
 
 ### 🏢 Gestão de Setores

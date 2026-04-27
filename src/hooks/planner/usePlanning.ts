@@ -24,6 +24,12 @@ export function usePlanning() {
     }
   };
 
+  const addBulkItems = async (products: Product[]) => {
+    for (const product of products) {
+      await addItem(product, 1);
+    }
+  };
+
   const updateQuantity = async (id: string | number, quantity: number) => {
     await db.planningItems.update(id, {
       plannedQuantity: Math.max(1, quantity)
@@ -42,6 +48,7 @@ export function usePlanning() {
     items,
     isLoading: items === undefined,
     addItem,
+    addBulkItems,
     updateQuantity,
     removeItem,
     clearPlanning,

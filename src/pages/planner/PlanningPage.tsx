@@ -1,4 +1,4 @@
-import { useProducts } from '../../hooks/api/useProducts';
+import { useMyProducts } from '../../hooks/products/useMyProducts';
 import { usePlanning } from '../../hooks/planner/usePlanning';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -10,13 +10,23 @@ import { PlanningPDF } from './PlanningPDF';
 
 export function PlanningPage() {
   const [search, setSearch] = useState('');
-  const { products, isLoading: loadingProducts } = useProducts();
+  
+  /**
+   * REGRAS DE NEGÓCIO PARA FILTRAGEM DE PRODUTOS:
+   * Atualmente, o planejamento utiliza a lista de 'Meus Produtos' (persisitidos localmente via useMyProducts).
+   * 
+   * QUANDO A API TIVER A LÓGICA DE PRODUTOS FILTRADOS POR USUÁRIO/CONTEXTO:
+   * 1. Substituir 'useMyProducts' por um hook que consuma o endpoint da API (ex: useUserProducts).
+   * 2. O endpoint deve retornar apenas os produtos vinculados ao usuário ou setor logado.
+   * 3. Garantir que o 'useProducts' (hook original) permaneça no catálogo geral, enquanto esta page consome o filtro.
+   */
+  const { savedProducts } = useMyProducts();
   const { items, addItem, removeItem, period, setPeriod, clearPlanning, updateQuantity } = usePlanning();
   
-  const filteredProducts = products.filter(p => 
+  const filteredProducts = savedProducts.filter(p => 
     p.description.toLowerCase().includes(search.toLowerCase()) || 
     p.id.toLowerCase().includes(search.toLowerCase())
-  ).slice(0, 10);
+  );
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -71,20 +81,28 @@ export function PlanningPage() {
           </div>
 
           <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-            {loadingProducts ? (
-              <div className="text-center py-4 text-slate-500">Carregando...</div>
-            ) : filteredProducts.map((p) => (
+            {filteredProducts.map((p) => (
               <div key={p.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50">
-                <div>
-                    <div className="font-bold text-slate-900 uppercase text-xs truncate max-w-[200px]">{p.description}</div>
-                    <div className="text-[10px] text-blue-600 font-mono font-bold">ID: {p.id}</div>
+                <div className="flex-1 min-w-0 pr-4">
+                    <div className="font-bold text-slate-900 uppercase text-xs truncate">{p.description}</div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <div className="text-[10px] text-blue-600 font-mono font-bold">ID: {p.id}</div>
+                      <div className="text-[10px] text-slate-500 font-bold uppercase">ESTOQUE: {p.stock} {p.unit}</div>
+                      <div className="text-[10px] text-slate-900 font-bold">
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.price)}
+                      </div>
+                    </div>
                 </div>
-                <Button size="sm" variant="ghost" onClick={() => addItem(p, 1)} className="hover:bg-blue-50 text-blue-600">
+                <Button size="sm" variant="ghost" onClick={() => addItem(p, 1)} className="hover:bg-blue-50 text-blue-600 shrink-0">
                     <Plus size={18} />
                 </Button>
               </div>
             ))}
-            {search.length === 0 && <div className="text-center py-10 text-slate-400 italic text-sm">Use a busca acima para encontrar produtos</div>}
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-10 text-slate-400 italic text-sm">
+                {search.length > 0 ? 'Nenhum produto encontrado na busca' : 'Nenhum produto salvo em "Meus Produtos"'}
+              </div>
+            )}
           </div>
         </Card>
 

@@ -3,6 +3,7 @@ import { apiClient } from '../../services/api/client';
 import { ENDPOINTS } from '../../services/api/endpoints';
 import { Product } from '../../types/api';
 
+
 export function useProducts() {
   const queryClient = useQueryClient();
 

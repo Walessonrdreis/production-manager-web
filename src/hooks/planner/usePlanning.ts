@@ -1,83 +1,50 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
-import { apiClient } from '../../services/api/client';
-import { ENDPOINTS } from '../../services/api/endpoints';
-import { Product, Planning } from '../../types/api';
+import { db } from '../../lib/db';
+import { Product } from '../../types/api';
 
 export function usePlanning() {
-  const queryClient = useQueryClient();
+  const items = useLiveQuery(() => db.planningItems.toArray()) || [];
 
-  const planningQuery = useQuery({
-    queryKey: ['planning'],
-    queryFn: async (): Promise<Planning[]> => {
-      const { data } = await apiClient.get(ENDPOINTS.PLANNING.BASE);
-      return Array.isArray(data) ? data : [];
-    }
-  });
+  const [period, setPeriodState] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
-  const addItemMutation = useMutation({
-    mutationFn: async ({ product, quantity }: { product: Product, quantity: number }) => {
-      const existing = planningQuery.data?.find(i => i.productId === product.id);
-      if (existing) {
-        return await apiClient.patch(`${ENDPOINTS.PLANNING.BASE}/${existing.id}`, {
-          plannedQuantity: (existing.plannedQuantity || 0) + quantity
-        });
-      }
-      return await apiClient.post(ENDPOINTS.PLANNING.BASE, {
+  const addItem = async (product: Product, quantity: number) => {
+    const existing = items.find(i => i.productId === product.id);
+    if (existing) {
+      await db.planningItems.update(existing.id, {
+        plannedQuantity: (existing.plannedQuantity || 0) + quantity
+      });
+    } else {
+      await db.planningItems.add({
         ...product,
         productId: product.id,
         plannedQuantity: quantity,
         status: 'planned'
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planning'] });
+      } as any);
     }
-  });
+  };
 
-  const updateQuantityMutation = useMutation({
-    mutationFn: async ({ id, quantity }: { id: string, quantity: number }) => {
-      return await apiClient.patch(`${ENDPOINTS.PLANNING.BASE}/${id}`, {
-        plannedQuantity: Math.max(1, quantity)
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planning'] });
-    }
-  });
+  const updateQuantity = async (id: string | number, quantity: number) => {
+    await db.planningItems.update(id, {
+      plannedQuantity: Math.max(1, quantity)
+    });
+  };
 
-  const removeItemMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return await apiClient.delete(`${ENDPOINTS.PLANNING.BASE}/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planning'] });
-    }
-  });
+  const removeItem = async (id: string | number) => {
+    await db.planningItems.delete(id);
+  };
 
-  const clearMutation = useMutation({
-    mutationFn: async () => {
-      // In a real API would be a batch delete, here we have to do it for each or provide an endpoint
-      // For the mock, we can just fetch all and delete
-      const items = planningQuery.data || [];
-      for (const item of items) {
-        await apiClient.delete(`${ENDPOINTS.PLANNING.BASE}/${item.id}`);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planning'] });
-    }
-  });
-
-  const [period, setPeriodState] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const clearPlanning = async () => {
+    await db.planningItems.clear();
+  };
 
   return {
-    items: planningQuery.data || [],
-    isLoading: planningQuery.isLoading,
-    addItem: (product: Product, quantity: number) => addItemMutation.mutate({ product, quantity }),
-    updateQuantity: (id: string, quantity: number) => updateQuantityMutation.mutate({ id, quantity }),
-    removeItem: (id: string) => removeItemMutation.mutate(id),
-    clearPlanning: () => clearMutation.mutate(),
+    items,
+    isLoading: items === undefined,
+    addItem,
+    updateQuantity,
+    removeItem,
+    clearPlanning,
     period,
     setPeriod: (p: 'daily' | 'weekly' | 'monthly') => setPeriodState(p),
   };

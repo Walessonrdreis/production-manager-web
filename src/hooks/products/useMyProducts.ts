@@ -1,48 +1,31 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../../lib/db';
 import { Product } from '../../types/api';
 
-interface MyProductsStore {
-  savedProducts: Product[];
-  saveProduct: (product: Product) => void;
-  removeProduct: (productId: string) => void;
-  clearAll: () => void;
-  isSaved: (productId: string) => boolean;
-}
-
-export const useMyProductsStore = create<MyProductsStore>()(
-  persist(
-    (set, get) => ({
-      savedProducts: [],
-      saveProduct: (product) => {
-        const { savedProducts } = get();
-        if (!savedProducts.find((p) => p.id === product.id)) {
-          set({ savedProducts: [...savedProducts, product] });
-        }
-      },
-      removeProduct: (productId) => {
-        set({
-          savedProducts: get().savedProducts.filter((p) => p.id !== productId),
-        });
-      },
-      clearAll: () => set({ savedProducts: [] }),
-      isSaved: (productId) => {
-        return get().savedProducts.some((p) => p.id === productId);
-      },
-    }),
-    {
-      name: 'prod-manager-my-products',
-    }
-  )
-);
-
 export function useMyProducts() {
-  const store = useMyProductsStore();
+  const savedProducts = useLiveQuery(() => db.myProducts.toArray()) || [];
+
+  const saveProduct = async (product: Product) => {
+    await db.myProducts.put(product);
+  };
+
+  const removeProduct = async (productId: string) => {
+    await db.myProducts.delete(productId);
+  };
+
+  const clearAll = async () => {
+    await db.myProducts.clear();
+  };
+
+  const isSaved = (productId: string) => {
+    return savedProducts.some((p) => p.id === productId);
+  };
+
   return {
-    savedProducts: store.savedProducts,
-    saveProduct: store.saveProduct,
-    removeProduct: store.removeProduct,
-    clearAll: store.clearAll,
-    isSaved: store.isSaved,
+    savedProducts,
+    saveProduct,
+    removeProduct,
+    clearAll,
+    isSaved,
   };
 }

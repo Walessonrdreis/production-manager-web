@@ -74,7 +74,7 @@ export function useProducts() {
               id: String(p.omieCode || p.id || p.codigo_produto),
               code: String(p.codigo || p.code || ''),
               description: String(p.descricao || p.description || ''),
-              family: String(p.familia || p.family || ''),
+              family: String(p.descricao_familia || p.familyDescription || p.familia || p.family || ''),
               stock: Number(p.stockQuantity || p.estoque || p.stock || 0),
               price: Number(p.valor_unitario || p.price || 0),
               unit: String(p.unidade || p.unit || 'UN'),

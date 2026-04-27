@@ -57,6 +57,11 @@ export function MyProductsPage() {
               <h3 className="font-bold text-slate-900 uppercase leading-tight line-clamp-2 min-h-[3rem]">
                 {p.description}
               </h3>
+              {p.family && (
+                <div className="text-[10px] text-slate-400 font-bold uppercase mt-1">
+                  Família: {p.family}
+                </div>
+              )}
               <div className="pt-4 flex items-center justify-between border-t border-slate-50">
                 <div className="flex flex-col">
                   <span className="text-[10px] text-slate-400 font-bold uppercase">Estoque</span>

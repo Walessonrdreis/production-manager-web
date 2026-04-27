@@ -14,7 +14,10 @@ export function PlanningPage() {
   
   /**
    * REGRAS DE NEGÓCIO PARA FILTRAGEM DE PRODUTOS:
-   * Atualmente, o planejamento utiliza a lista de 'Meus Produtos' (persisitidos localmente via useMyProducts).
+   * Atualmente, o planejamento utiliza a lista de 'Meus Produtos' (persistidos localmente via IndexedDB).
+   * 
+   * LÓGICA DE FILTRO:
+   * A busca agora contempla Descrição, ID e Família do produto.
    * 
    * QUANDO A API TIVER A LÓGICA DE PRODUTOS FILTRADOS POR USUÁRIO/CONTEXTO:
    * 1. Substituir 'useMyProducts' por um hook que consuma o endpoint da API (ex: useUserProducts).
@@ -24,10 +27,18 @@ export function PlanningPage() {
   const { savedProducts } = useMyProducts();
   const { items, addItem, addBulkItems, removeItem, period, setPeriod, clearPlanning, updateQuantity } = usePlanning();
   
-  const filteredProducts = savedProducts.filter(p => 
-    p.description.toLowerCase().includes(search.toLowerCase()) || 
-    p.id.toLowerCase().includes(search.toLowerCase())
-  );
+  const normalizeString = (str: string) => 
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  const searchNormalized = normalizeString(search);
+  
+  const filteredProducts = savedProducts.filter(p => {
+    const descriptionMatch = normalizeString(p.description).includes(searchNormalized);
+    const idMatch = normalizeString(p.id).includes(searchNormalized);
+    const familyMatch = p.family ? normalizeString(p.family).includes(searchNormalized) : false;
+    
+    return descriptionMatch || idMatch || familyMatch;
+  });
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -106,7 +117,7 @@ export function PlanningPage() {
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <Input 
-              placeholder="Digite a descrição ou Código..." 
+              placeholder="Digite a descrição, Código ou Família..." 
               className="pl-10 h-11"
               value={search}
               onChange={(e) => setSearch(e.target.value)}

@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v1.2.1 (Atualizado em 27/04/2026)
+**Versão:** v1.2.3 (Atualizado em 27/04/2026)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento e rastreamento de progresso.
@@ -93,6 +93,7 @@ O sistema realiza uma "mesclagem virtual" de dados:
 ### 📅 Planejamento de Produção
 - O planejamento utiliza exclusivamente a lista de **'Meus Produtos'** (itens selecionados no catálogo pelo usuário).
 - **Seleção Múltipla:** Suporte para selecionar vários produtos simultaneamente através de checkboxes e adicioná-los em massa à fila de planejamento.
+- **Filtro Inteligente:** Busca unificada por Descrição, ID ou **Nome da Família**, com normalização de acentos e insensibilidade a maiúsculas/minúsculas.
 - **Persistência Robusta:** Utiliza **IndexedDB** (via Dexie) para armazenar tanto a lista de produtos salvos quanto os itens selecionados no planejamento, garantindo performance e suporte a grandes volumes de dados.
 - Exportação direta para PDF para uso no chão de fábrica.
 

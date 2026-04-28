@@ -1,46 +1,37 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../../services/api/client';
-import { ENDPOINTS } from '../../services/api/endpoints';
 import { Sector } from '../../types/api';
+import { 
+  getSectors, 
+  createSector, 
+  updateSector, 
+  deleteSector 
+} from '../../features/sectors';
 
 export function useSectors() {
   const queryClient = useQueryClient();
 
   const sectorsQuery = useQuery({
     queryKey: ['sectors'],
-    queryFn: async (): Promise<Sector[]> => {
-      const response = await apiClient.get(ENDPOINTS.SECTORS.BASE);
-      const data = response.data;
-      if (Array.isArray(data)) return data;
-      if (data.sectors && Array.isArray(data.sectors)) return data.sectors;
-      return [];
-    },
+    queryFn: getSectors,
   });
 
   const createMutation = useMutation({
-    mutationFn: async (sector: Omit<Sector, 'id'>) => {
-      const { data } = await apiClient.post(ENDPOINTS.SECTORS.BASE, sector);
-      return data;
-    },
+    mutationFn: createSector,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sectors'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, sector }: { id: string, sector: Partial<Sector> }) => {
-      const { data } = await apiClient.patch(`${ENDPOINTS.SECTORS.BASE}/${id}`, sector);
-      return data;
-    },
+    mutationFn: ({ id, sector }: { id: string, sector: Partial<Sector> }) => 
+      updateSector(id, sector),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sectors'] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiClient.delete(`${ENDPOINTS.SECTORS.BASE}/${id}`);
-    },
+    mutationFn: deleteSector,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sectors'] });
     },

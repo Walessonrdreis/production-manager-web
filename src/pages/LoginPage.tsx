@@ -2,6 +2,7 @@ import { LoginForm } from '../components/auth/LoginForm';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../services/auth/authService';
 import { Layers } from 'lucide-react';
+import { login } from '../features/auth';
 
 export function LoginPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -23,7 +24,7 @@ export function LoginPage() {
           <h1 className="text-2xl font-bold tracking-tight">Production Management</h1>
         </div>
         
-        <LoginForm />
+        <LoginForm onLogin={login} />
         
         <p className="mt-8 text-slate-400 text-xs font-medium uppercase tracking-widest bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full border border-white/5">
           Versão 1.2.0 • 2026

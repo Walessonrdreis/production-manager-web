@@ -181,13 +181,13 @@ export function PlanningPage() {
               <div key={item.id} className="flex items-center gap-4 p-4 rounded-xl border border-blue-100 bg-blue-50/30">
                 <div className="flex-1 min-w-0">
                     <div className="font-bold text-slate-900 uppercase text-xs truncate">{item.description}</div>
-                    <div className="text-[10px] text-slate-500 font-mono italic">Cód: {item.id}</div>
+                    <div className="text-[10px] text-slate-500 font-mono italic">Cód: {item.code}</div>
                 </div>
                 <div className="w-20">
                     <Input 
                       type="number" 
                       className="text-center h-9 font-bold" 
-                      value={item.plannedQuantity} 
+                      value={item.quantity} 
                       onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
                     />
                 </div>

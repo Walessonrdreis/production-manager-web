@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { ProducedRepository } from '../repositories/produced.repo';
+import { markProducedAsSynced } from '../features/dashboard';
 import { apiClient } from '../services/api/client';
 import { ENDPOINTS } from '../services/api/endpoints';
 
@@ -13,7 +13,7 @@ export async function syncProducedToBackend() {
   for (const record of unsynced) {
     try {
       await apiClient.post(ENDPOINTS.DASHBOARD.PRODUCED, record);
-      await ProducedRepository.markAsSynced(record.id);
+      await markProducedAsSynced(record.id);
       console.log(`[Sync] Registro ${record.id} sincronizado com sucesso.`);
     } catch (error) {
       console.error(`[Sync] Erro ao sincronizar registro ${record.id}:`, error);

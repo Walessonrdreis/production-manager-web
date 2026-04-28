@@ -1,47 +1,38 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
-import { db } from '../../lib/db';
+import { 
+  addPlanningItem, 
+  addBulkPlanningItems,
+  updatePlanningItem, 
+  removePlanningItem, 
+  clearPlanning,
+  getPlanningItems
+} from '../../features/planner';
 import { Product } from '../../types/api';
 
 export function usePlanning() {
-  const items = useLiveQuery(() => db.planningItems.toArray()) || [];
+  const items = useLiveQuery(() => getPlanningItems()) || [];
 
   const [period, setPeriodState] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   const addItem = async (product: Product, quantity: number) => {
-    const existing = items.find(i => i.productId === product.id);
-    if (existing) {
-      await db.planningItems.update(existing.id, {
-        plannedQuantity: (existing.plannedQuantity || 0) + quantity
-      });
-    } else {
-      await db.planningItems.add({
-        ...product,
-        productId: product.id,
-        plannedQuantity: quantity,
-        status: 'planned'
-      } as any);
-    }
+    await addPlanningItem(product, quantity);
   };
 
   const addBulkItems = async (products: Product[]) => {
-    for (const product of products) {
-      await addItem(product, 1);
-    }
+    await addBulkPlanningItems(products);
   };
 
   const updateQuantity = async (id: string | number, quantity: number) => {
-    await db.planningItems.update(id, {
-      plannedQuantity: Math.max(1, quantity)
-    });
+    await updatePlanningItem(id, quantity);
   };
 
   const removeItem = async (id: string | number) => {
-    await db.planningItems.delete(id);
+    await removePlanningItem(id);
   };
 
-  const clearPlanning = async () => {
-    await db.planningItems.clear();
+  const clear = async () => {
+    await clearPlanning();
   };
 
   return {
@@ -51,7 +42,7 @@ export function usePlanning() {
     addBulkItems,
     updateQuantity,
     removeItem,
-    clearPlanning,
+    clearPlanning: clear,
     period,
     setPeriod: (p: 'daily' | 'weekly' | 'monthly') => setPeriodState(p),
   };

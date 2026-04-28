@@ -1,5 +1,5 @@
-import { db } from '../db';
-import { type PlanningItem } from '../db/models';
+import { db } from '../../../db';
+import { type PlanningItem } from '../../../db/models';
 
 export const PlanningRepository = {
   async getAll() {
@@ -42,5 +42,9 @@ export const PlanningRepository = {
 
   async markAsSynced(id: string) {
     await db.planning.update(id, { synced: true });
+  },
+
+  async clear() {
+    return await db.planning.clear();
   }
 };

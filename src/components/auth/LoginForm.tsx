@@ -3,7 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { useAuthStore, authService } from '../../services/auth/authService';
+import { useAuthStore } from '../../services/auth/authService';
+import { login } from '../../features/auth';
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +18,11 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export function LoginForm() {
+interface LoginFormProps {
+  onLogin?: (email: string, password: string) => Promise<any>;
+}
+
+export function LoginForm({ onLogin }: LoginFormProps) {
   const [error, setError] = useState<string | null>(null);
   const setAuth = useAuthStore((state) => state.setAuth);
   const navigate = useNavigate();
@@ -38,7 +43,9 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       setError(null);
-      const response = await authService.login(data.email, data.password);
+      // Usa a função injetada ou a padrão da feature
+      const loginFn = onLogin || login;
+      const response = await loginFn(data.email, data.password);
       
       setAuth(response.user, response.token);
       

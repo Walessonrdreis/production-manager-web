@@ -1,5 +1,5 @@
-import { db } from '../db';
-import { type ProducedRecord } from '../db/models';
+import { db } from '../../../db';
+import { type ProducedRecord } from '../../../db/models';
 
 export const ProducedRepository = {
   async getAll() {

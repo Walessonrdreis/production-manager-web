@@ -1,20 +1,25 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../lib/db';
+import { 
+  selectProduct as selectProductUseCase, 
+  unselectProduct as unselectProductUseCase,
+  getSelectedProducts,
+  clearMyProducts
+} from '../../features/products';
 import { Product } from '../../types/api';
 
 export function useMyProducts() {
-  const savedProducts = useLiveQuery(() => db.myProducts.toArray()) || [];
+  const savedProducts = useLiveQuery(() => getSelectedProducts()) || [];
 
   const saveProduct = async (product: Product) => {
-    await db.myProducts.put(product);
+    await selectProductUseCase(product);
   };
 
   const removeProduct = async (productId: string) => {
-    await db.myProducts.delete(productId);
+    await unselectProductUseCase(productId);
   };
 
   const clearAll = async () => {
-    await db.myProducts.clear();
+    await clearMyProducts();
   };
 
   const isSaved = (productId: string) => {

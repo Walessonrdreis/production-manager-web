@@ -56,10 +56,10 @@ export const PlanningPDF = ({ items, period }: PlanningPDFProps) => {
 
           {items.map((item, index) => (
             <View key={index} style={styles.tableRow}>
-              <Text style={styles.colCode}>{item.code || item.id}</Text>
+              <Text style={styles.colCode}>{item.code}</Text>
               <Text style={styles.colDesc}>{item.description}</Text>
-              <Text style={styles.colSector}>{item.sectorId || '-'}</Text>
-              <Text style={styles.colQty}>{item.plannedQuantity}</Text>
+              <Text style={styles.colSector}>{item.sectorName || '-'}</Text>
+              <Text style={styles.colQty}>{item.quantity}</Text>
               <Text style={styles.colNotes}>{item.notes || ''}</Text>
             </View>
           ))}

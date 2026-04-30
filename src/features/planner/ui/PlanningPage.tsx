@@ -1,10 +1,11 @@
 import { useMyProducts } from '../../../hooks/products/useMyProducts';
 import { usePlanning } from '../../../hooks/planner/usePlanning';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { PlanningHeader } from './components/PlanningHeader';
 import { PlanningProductList } from './components/PlanningProductList';
 import { PlanningSelectedItems } from './components/PlanningSelectedItems';
+import { PlanningLogic } from '../domain/PlanningLogic';
 
 export function PlanningPage() {
   const [search, setSearch] = useState('');
@@ -13,18 +14,9 @@ export function PlanningPage() {
   const { savedProducts } = useMyProducts();
   const { items, addItem, addBulkItems, removeItem, period, setPeriod, clearPlanning, updateQuantity } = usePlanning();
   
-  const normalizeString = (str: string) => 
-    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-  const searchNormalized = normalizeString(search);
-  
-  const filteredProducts = savedProducts.filter(p => {
-    const descriptionMatch = normalizeString(p.description).includes(searchNormalized);
-    const idMatch = normalizeString(p.id).includes(searchNormalized);
-    const familyMatch = p.family ? normalizeString(p.family).includes(searchNormalized) : false;
-    
-    return descriptionMatch || idMatch || familyMatch;
-  });
+  const filteredProducts = useMemo(() => {
+    return PlanningLogic.filterProducts(savedProducts, search);
+  }, [savedProducts, search]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => 

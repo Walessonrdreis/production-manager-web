@@ -30,5 +30,27 @@ export const ProductionLogic = {
         quantity: totalNeeded
       }
     };
+  },
+
+  /**
+   * Decide se um registro deve ser criado ou removido ao alternar um único item.
+   */
+  calculateToggleAction(
+    exists: boolean,
+    params: { id: string; description: string; quantity: number; orderId?: string; orderNumber?: string }
+  ): { action: 'create' | 'delete'; record?: Omit<ProducedRecord, 'updatedAt' | 'synced'> } {
+    if (exists) {
+      return { action: 'delete' };
+    }
+    return {
+      action: 'create',
+      record: {
+        id: params.id,
+        description: params.description,
+        quantity: params.quantity,
+        orderId: params.orderId,
+        orderNumber: params.orderNumber
+      }
+    };
   }
 };

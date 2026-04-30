@@ -45,4 +45,19 @@ describe('ProductionLogic', () => {
       });
     });
   });
+
+  describe('calculateToggleAction', () => {
+    const params = { id: '1', description: 'P1', quantity: 5 };
+
+    it('should return delete action if record exists', () => {
+      const result = ProductionLogic.calculateToggleAction(true, params);
+      expect(result.action).toBe('delete');
+    });
+
+    it('should return create action with record if record does not exist', () => {
+      const result = ProductionLogic.calculateToggleAction(false, params);
+      expect(result.action).toBe('create');
+      expect(result.record).toEqual(params);
+    });
+  });
 });

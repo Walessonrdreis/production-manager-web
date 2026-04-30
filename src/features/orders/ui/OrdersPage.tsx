@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useOrders, Order } from '../../../hooks/orders/useOrders';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Search } from 'lucide-react';
+import { OrderLogic } from '../domain/OrderLogic';
 
 import { OrdersHeader } from './components/OrdersHeader';
 import { OrdersTable } from './components/OrdersTable';
@@ -12,6 +13,11 @@ export function OrdersPage() {
   const { orders, isLoading, isError, error, refetchOrders } = useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const filteredOrders = useMemo(() => {
+    return OrderLogic.filterOrders(orders || [], search);
+  }, [orders, search]);
 
   const handleOpenDetails = (order: Order) => {
     setSelectedOrder(order);
@@ -43,9 +49,22 @@ export function OrdersPage() {
         onRefresh={refetchOrders}
       />
 
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="h-4 w-4 text-slate-400" />
+        </div>
+        <input
+          type="text"
+          placeholder="Buscar pedidos ou clientes..."
+          className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
       <Card>
         <OrdersTable 
-          orders={orders || []}
+          orders={filteredOrders}
           isLoading={isLoading}
           onOpenDetails={handleOpenDetails}
         />

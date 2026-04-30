@@ -2,12 +2,19 @@ import { useMyProducts } from '../../../hooks/products/useMyProducts';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { EmptyState } from '../../../components/ui/EmptyState';
-import { BookmarkCheck, Trash2, Package } from 'lucide-react';
+import { BookmarkCheck, Trash2, Package, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { MyProductsLogic } from '../domain/MyProductsLogic';
 
 export function MyProductsPage() {
   const { savedProducts, removeProduct, clearAll } = useMyProducts();
+  const [search, setSearch] = useState('');
   const navigate = useNavigate();
+
+  const filteredProducts = useMemo(() => {
+    return MyProductsLogic.filterProducts(savedProducts, search);
+  }, [savedProducts, search]);
 
   if (savedProducts.length === 0) {
     return (
@@ -34,8 +41,21 @@ export function MyProductsPage() {
         </Button>
       </header>
 
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="h-4 w-4 text-slate-400" />
+        </div>
+        <input
+          type="text"
+          placeholder="Buscar nos meus produtos..."
+          className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {savedProducts.map((p) => (
+        {filteredProducts.map((p) => (
           <Card key={p.id} className="relative group">
             <div className="flex items-start justify-between mb-4">
               <div className="p-2 bg-blue-50 rounded-lg text-blue-600">

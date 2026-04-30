@@ -78,4 +78,39 @@ describe('PlanningLogic', () => {
       expect(PlanningLogic.validateQuantity(100)).toBe(100);
     });
   });
+
+  describe('filterProducts', () => {
+    const products: any[] = [
+      { id: '1', description: 'Papel A4', family: 'Escritório', code: 'PROD001' },
+      { id: '2', description: 'Caneta Azul', family: 'Escritório', code: 'PROD002' },
+      { id: '3', description: 'Martelo', family: 'Obras', code: 'FERR001' }
+    ];
+
+    it('should return all products if search is empty', () => {
+      expect(PlanningLogic.filterProducts(products as Product[], '')).toHaveLength(3);
+    });
+
+    it('should filter by description', () => {
+      const result = PlanningLogic.filterProducts(products as Product[], 'papel');
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('1');
+    });
+
+    it('should filter by family', () => {
+      const result = PlanningLogic.filterProducts(products as Product[], 'obras');
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('3');
+    });
+
+    it('should filter by code', () => {
+      const result = PlanningLogic.filterProducts(products as Product[], 'FERR');
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('3');
+    });
+
+    it('should be case insensitive and ignore accents', () => {
+      const result = PlanningLogic.filterProducts(products as Product[], 'ESCRITORIO');
+      expect(result).toHaveLength(2);
+    });
+  });
 });

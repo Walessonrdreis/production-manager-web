@@ -1,5 +1,6 @@
 import { db } from '../../../db';
 import { type ProducedRecord } from '../../../db/models';
+import { ProductionLogic } from '../domain/ProductionLogic';
 
 export const ProducedRepository = {
   async getAll() {
@@ -52,26 +53,27 @@ export const ProducedRepository = {
 
   async toggleAll(description: string, totalNeeded: number) {
     const existing = await this.getByDescription(description);
-    const currentTotal = existing.reduce((acc, r) => acc + r.quantity, 0);
+    const { idsToDelete, recordToAdd } = ProductionLogic.calculateToggleAllAction(
+      description,
+      totalNeeded,
+      existing
+    );
 
-    if (currentTotal >= totalNeeded) {
-      const ids = existing.map(r => r.id);
-      await db.produced.bulkDelete(ids);
-      return [];
-    } else {
-      const ids = existing.map(r => r.id);
-      await db.produced.bulkDelete(ids);
-      
+    if (idsToDelete.length > 0) {
+      await db.produced.bulkDelete(idsToDelete);
+    }
+
+    if (recordToAdd) {
       const newRecord: ProducedRecord = {
-        id: `all-${description}`,
-        description,
-        quantity: totalNeeded,
+        ...recordToAdd,
         synced: false,
         updatedAt: new Date().toISOString(),
       };
       await db.produced.add(newRecord);
       return [newRecord];
     }
+
+    return [];
   },
 
   async markAsSynced(id: string) {

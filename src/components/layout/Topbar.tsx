@@ -1,5 +1,6 @@
 import React from 'react';
-import { Menu } from 'lucide-react';
+import { Menu, Cloud, RefreshCw } from 'lucide-react';
+import { useSyncStatus } from '../../hooks/ui/useSyncStatus';
 
 interface TopbarProps {
   onToggleSidebar: () => void;
@@ -7,6 +8,8 @@ interface TopbarProps {
 }
 
 export function Topbar({ onToggleSidebar, title }: TopbarProps) {
+  const { pendingCount, isSynced } = useSyncStatus();
+
   return (
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-40 transition-all">
       <div className="flex items-center gap-3">
@@ -25,9 +28,26 @@ export function Topbar({ onToggleSidebar, title }: TopbarProps) {
       </div>
       
       <div className="flex items-center gap-4">
+        {/* Sync Status */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100">
+          {isSynced ? (
+            <>
+              <Cloud size={14} className="text-emerald-500" />
+              <span className="text-[10px] font-bold text-slate-500 uppercase">Sincronizado</span>
+            </>
+          ) : (
+            <>
+              <RefreshCw size={14} className="text-amber-500 animate-spin-slow" />
+              <span className="text-[10px] font-bold text-amber-600 uppercase">
+                {pendingCount} Pendente{pendingCount > 1 ? 's' : ''}
+              </span>
+            </>
+          )}
+        </div>
+
         <div className="flex flex-col items-end">
           <span className="text-[10px] sm:text-xs font-medium text-slate-500">Matriz</span>
-          <span className="text-[8px] sm:text-[10px] text-emerald-600 font-bold uppercase">Online</span>
+          <span className="text-[8px] sm:text-[10px] text-emerald-600 font-bold uppercase">Conectado</span>
         </div>
       </div>
     </header>

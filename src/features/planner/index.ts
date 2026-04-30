@@ -10,3 +10,4 @@ export * from './usecases/RemovePlanningItem';
 export * from './usecases/ClearPlanning';
 export * from './usecases/GetPlanningItems';
 export * from './infra/PlanningRepository';
+export * from './domain/PlanningLogic';

@@ -1,5 +1,6 @@
-import { DashboardRepository } from '../infra/DashboardRepository';
+import { type ProducedRecord } from '../../../db/models';
+import { ProducedRepository } from '../infra/ProducedRepository';
 
-export async function getProducedRecords(): Promise<any[]> {
-  return DashboardRepository.getProduced();
+export async function getProducedRecords(): Promise<ProducedRecord[]> {
+  return ProducedRepository.getAll();
 }

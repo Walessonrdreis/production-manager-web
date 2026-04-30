@@ -40,6 +40,18 @@ export const PlanningRepository = {
     return newItems;
   },
 
+  async bulkUpdate(updates: { id: string, quantity: number }[]) {
+    const timestamp = new Date().toISOString();
+    const promises = updates.map(u => 
+      db.planning.update(u.id, { 
+        quantity: u.quantity, 
+        synced: false, 
+        updatedAt: timestamp 
+      })
+    );
+    await Promise.all(promises);
+  },
+
   async markAsSynced(id: string) {
     await db.planning.update(id, { synced: true });
   },

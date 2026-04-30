@@ -1,5 +1,5 @@
-import { DashboardRepository } from '../infra/DashboardRepository';
+import { ProducedRepository } from '../infra/ProducedRepository';
 
-export async function removeProducedRecord(id: string): Promise<any> {
-  return DashboardRepository.removeProduced(id);
+export async function removeProducedRecord(id: string): Promise<void> {
+  return ProducedRepository.delete(id);
 }

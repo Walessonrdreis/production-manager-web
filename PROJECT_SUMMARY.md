@@ -1,15 +1,29 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v1.5.0 (Atualizado em 28/04/2026 - Conclusão da Migração ADR 003)
+**Versão:** v1.12.0 (Atualizado em 29/04/2026 - Governança Extensiva e Testes)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento e rastreamento de progresso.
 
-## 🏗️ Arquitetura Técnica
+## 🏗️ Arquitetura Técnica (ADR-003 & Guia Operacional)
 
-### 1. Filosofia de Design
-- **Arquitetura:** Clean Architecture / Feature-based + Use Cases (ADR 003).
-- **Consolidação:** Todas as funcionalidades principais (Auth, Catalog, Dashboard, Orders, Planner, Products, Sectors) foram migradas para a estrutura modular de features.
-- **Princípios:** Responsabilidade única, desacoplamento de infraestrutura (Repositórios) e lógica de negócio (UseCases).
+### 1. Governança e Estrutura Modular
+- **Guia Operacional:** Implementado o `docs/GUIA_OPERACIONAL.md` como base para governança do código pós-migração.
+- **Isolamento de Domínio:** Implementada a camada de `domain` em todas as features principais (`dashboard`, `planner`, `orders`, `catalog`, `sectors`). Regras de negócio puras são centralizadas em arquivos `*Logic.ts` ou `*Normalizer.ts`.
+- **Testes Unitários:** Cobertura de testes unitários com **Vitest** para todas as lógicas de domínio, garantindo que transformações de dados e regras de negócio sejam validadas independentemente de APIs ou Banco de Dados.
+- **Refatoração do Planejador:** Implementada lógica de "Upsert" no domínio. Ao adicionar produtos, o sistema incrementa quantidades de itens existentes automaticamente.
+- **Normalização de Dados:** Implementados heurísticas de busca de arrays e normalização de objetos para lidar com a variabilidade das respostas da API Omie, centralizados na camada de domínio.
+- **Encapsulamento de UI:** Seguindo rigorosamente a ADR 003, as páginas residem em `src/features/<feature>/ui`, com `src/pages` atuando apenas como re-exportadores.
+- **Hooks Atômicos:** Organização por feature em `src/hooks`, separando claramente lógica de Query de lógica de Mutation.
+### 2. Persistência e Local-First (IndexedDB)
+- **Consolidação de Dados:** O sistema utiliza uma única instância do **Dexie.js** localizada em `src/db/index.ts` (versão 3), centralizando as tabelas:
+    - `produced`: Rastreamento de progresso de produção.
+    - `planning`: Itens selecionados para o planejamento atual.
+    - `myProducts`: Catálogo pessoal de produtos selecionados do Omie.
+    - `cache`: Cache de respostas da API para performance offline.
+- **Visibilidade de Sincronização:** Implementado o hook `useSyncStatus` e um indicador global no `Topbar` que monitora em tempo real quantos itens locais ainda não foram sincronizados com o servidor original.
+
+### 3. Integração Omie
+- **Fluxo de Dados:** Dashboard consome totais da Etapa 20 via API e os cruza com a produção local (`produced`) para calcular o saldo real.
 
 ### 2. Stack Tecnológica
 - **Frontend:** React 19 + Vite + TanStack Query.
@@ -24,11 +38,11 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
   │   ├── layout/         # Layouts compartilhados
   │   ├── ui/             # Design System (componentes atômicos)
   │   └── auth/           # Componentes visuais de autenticação
-  ├── pages/              # Páginas (Composição de features e UI)
-  ├── hooks/
-  │   ├── api/            # Bridges para TanStack Query (delegam para features)
-  │   └── ...             # Bridges utilitários
-  ├── services/           # Infra de baixo nível (Client API, Endpoints)
+  ├── pages/              # Pontos de entrada das rotas (Re-exports das Features)
+  ├── hooks/              # Camada de Hooks Atômicos (Feature-based)
+  │   ├── <feature>/      # Hooks específicos (Ex: useDashboardTotals.ts)
+  │   └── ...
+  ├── services/           # Infra de baixo nível (Client API, Endpoints, Auth Store)
   ├── types/              # Tipos globais
   └── features/           # Núcleo de negócio (Evolução Modular)
       └── <feature>/
@@ -36,6 +50,7 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
           ├── domain/     # Regras puras e tipos de domínio
           ├── infra/      # Adapters (API, DB, etc.)
           ├── state/      # Estado local (se necessário)
+          ├── ui/         # Views e componentes específicos da feature (Pages)
           └── index.ts    # Interface pública da feature
 ```
 

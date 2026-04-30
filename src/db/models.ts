@@ -1,3 +1,5 @@
+import { type Product } from '../types/api';
+
 export interface ProducedRecord {
   id: string; // SKU or combined unique ID
   description: string;
@@ -25,3 +27,7 @@ export interface APICache {
   data: any;
   expiresAt: number;
 }
+
+export type SavedProduct = Product & {
+  savedAt: string;
+};

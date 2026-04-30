@@ -28,6 +28,16 @@ export interface APICache {
   expiresAt: number;
 }
 
+export interface Customer {
+  id: string;
+  name: string;
+  document?: string;
+  email?: string;
+  phone?: string;
+  omieCode?: string;
+  updatedAt: string;
+}
+
 export type SavedProduct = Product & {
   savedAt: string;
 };

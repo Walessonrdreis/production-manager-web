@@ -9,6 +9,7 @@ export interface Order {
   id: string;
   orderNumber: string;
   customerName: string;
+  customerId?: string; // ID local do cliente se identificado
   items: OrderItem[];
   status: string;
   etapa: string;
@@ -57,6 +58,7 @@ export function normalizeOrder(raw: any): Order {
     id: String(raw.omieCode || raw.id || raw.codigo_pedido || Math.random().toString()),
     orderNumber: raw.numeroPedido || raw.orderNumber || raw.numero_pedido || 'N/A',
     customerName: raw.customerName || raw.cliente || raw.nome_cliente || 'Cliente Omie',
+    customerId: raw.cabecalho?.codigo_cliente ? String(raw.cabecalho.codigo_cliente) : undefined,
     items,
     status: raw.status || (raw.cancelado === 'Y' ? 'Cancelado' : raw.encerrado === 'Y' ? 'Encerrado' : 'Ativo'),
     etapa: raw.etapa || raw.cabecalho?.etapa || '20',

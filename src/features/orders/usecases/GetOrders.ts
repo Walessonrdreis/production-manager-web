@@ -2,6 +2,7 @@ import { Order, OrdersRepository } from '../index';
 import { findOrdersArray, normalizeOrder } from '../domain/OrderNormalizer';
 import { Result } from '../../../lib/Result';
 import { validateOmieOrders } from '../infra/OrderSchemas';
+import { enrichOrdersWithLocalCustomers } from '../../customers/domain/CustomerEnricher';
 
 /**
  * UseCase: Busca e normaliza a lista de ordens de venda (pedidos).
@@ -26,8 +27,12 @@ export async function getOrders(): Promise<Result<Order[]>> {
       console.warn('Dados da API Omie (Pedidos) fora do padrão esperado:', validation.error);
     }
 
-    const orders = dataToNormalize.map(normalizeOrder);
-    return Result.ok(orders);
+    const baseOrders = dataToNormalize.map(normalizeOrder);
+
+    // Enriquecimento com dados locais de clientes
+    const enrichedOrders = await enrichOrdersWithLocalCustomers(baseOrders);
+
+    return Result.ok(enrichedOrders);
   } catch (err) {
     return Result.fail(err instanceof Error ? err.message : 'Erro ao carregar pedidos da Omie.');
   }

@@ -8,7 +8,8 @@ import {
   CalendarRange, 
   LogOut,
   X,
-  User
+  User,
+  Users
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuthStore } from '../../services/auth/authService';
@@ -17,6 +18,7 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { id: 'products', label: 'Produtos Omie', path: '/products', icon: Package },
   { id: 'my-products', label: 'Meus Produtos', path: '/my-products', icon: User },
+  { id: 'customers', label: 'Clientes', path: '/customers', icon: Users },
   { id: 'sectors', label: 'Setores', path: '/sectors', icon: Layers },
   { id: 'orders', label: 'Ordens Pendentes', path: '/orders', icon: ShoppingCart },
   { id: 'planning', label: 'Gerador de Plano', path: '/planning', icon: CalendarRange },

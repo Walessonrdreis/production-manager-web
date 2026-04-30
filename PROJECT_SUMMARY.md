@@ -1,12 +1,17 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v1.16.1 (Atualizado em 30/04/2026 - Estabilidade e Reatividade)
+**Versão:** v1.17.0 (Atualizado em 30/04/2026 - Feature de Clientes)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento e rastreamento de progresso.
 
 ## 🏗️ Arquitetura Técnica (ADR-003 & Guia Operacional)
 
-### 1. Governança e Estrutura Modular
+### 1. Feature de Clientes (Novo)
+- **Persistência Local-First:** Cadastro completo de clientes no IndexedDB (Dexie).
+- **Enriquecimento Dinâmico:** Implementado o `CustomerEnricher` que resolve o nome do cliente em pedidos da Omie usando a base local (match via `omieCode`).
+- **Navegação:** Adicionado link dedicado na Sidebar e rota protegida `/customers`.
+
+### 2. Governança e Estrutura Modular
 - **Guia Operacional:** Implementado o `docs/GUIA_OPERACIONAL.md` com 8 Pilares Arquiteturais definidos.
 - **Result Pattern:** 100% dos UseCases e Hooks mutáveis/assíncronos refatorados para o padrão `{ success, data, error }`.
 - **Zod-First (Permissivo):** Schemas de validação configurados com `.passthrough()` para garantir que dados de domínio (como `sectorId`) não sejam removidos acidentalmente durante a validação de infraestrutura.
@@ -20,11 +25,12 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 3. **Expandir Schemas Zod** para cobrir fluxos de Estoque específicos se necessário.
 - **Encapsulamento de UI:** Seguindo rigorosamente a ADR 003, as páginas residem em `src/features/<feature>/ui`, com `src/pages` atuando apenas como re-exportadores.
 - **Hooks Atômicos:** Organização por feature em `src/hooks`, separando claramente lógica de Query de lógica de Mutation.
-### 2. Persistência e Local-First (IndexedDB)
-- **Consolidação de Dados:** O sistema utiliza uma única instância do **Dexie.js** localizada em `src/db/index.ts` (versão 3), centralizando as tabelas:
+### 3. Persistência e Local-First (IndexedDB)
+- **Consolidação de Dados:** O sistema utiliza uma única instância do **Dexie.js** localizada em `src/db/index.ts` (versão 5), centralizando as tabelas:
     - `produced`: Rastreamento de progresso de produção.
     - `planning`: Itens selecionados para o planejamento atual.
     - `myProducts`: Catálogo pessoal de produtos selecionados do Omie.
+    - `customers`: Base local de clientes.
     - `cache`: Cache de respostas da API para performance offline.
 - **Visibilidade de Sincronização:** Implementado o hook `useSyncStatus` e um indicador global no `Topbar` que monitora em tempo real quantos itens locais ainda não foram sincronizados com o servidor original.
 

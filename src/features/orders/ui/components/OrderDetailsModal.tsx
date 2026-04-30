@@ -18,6 +18,24 @@ export function OrderDetailsModal({ isOpen, onClose, selectedOrder }: OrderDetai
     >
       {selectedOrder && (
         <div className="space-y-6">
+          <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 mb-2">
+            <h4 className="text-[10px] text-blue-500 uppercase font-bold tracking-widest mb-1.5 flex items-center gap-1.5">
+              <ClipboardList size={12} />
+              Informações do Cliente
+            </h4>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-base font-bold text-slate-900 leading-tight">{selectedOrder.customerName}</div>
+                <div className="text-xs text-slate-500 mt-1">Código Omie: {selectedOrder.customerId || 'N/A'}</div>
+              </div>
+              {selectedOrder.isLocalCustomer && (
+                <div className="bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                  Identificado Localmente
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
               <div className="flex items-center gap-2 text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-1">

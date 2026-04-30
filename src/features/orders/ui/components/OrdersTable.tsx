@@ -33,6 +33,7 @@ export function OrdersTable({ orders, isLoading, onOpenDetails }: OrdersTablePro
         <thead>
           <tr className="bg-slate-50/80 border-b border-slate-200">
             <th className="py-4 px-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Número Pedido</th>
+            <th className="py-4 px-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Cliente</th>
             <th className="py-4 px-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Status/Etapa</th>
             <th className="py-4 px-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Resumo Itens</th>
             <th className="py-4 px-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider text-right">Previsão</th>
@@ -45,6 +46,15 @@ export function OrdersTable({ orders, isLoading, onOpenDetails }: OrdersTablePro
               <td className="py-4 px-4">
                   <div className="font-mono font-bold text-blue-600 text-sm">#{o.orderNumber}</div>
                   <div className="text-[10px] text-slate-400 font-mono mt-0.5">ID Omie: {o.id}</div>
+              </td>
+              <td className="py-4 px-4">
+                  <div className="flex items-center gap-1.5">
+                    <div className="font-bold text-slate-700 truncate max-w-[150px]">{o.customerName}</div>
+                    {o.isLocalCustomer && (
+                      <span className="bg-blue-100 text-blue-600 text-[8px] font-bold px-1 rounded-sm uppercase tracking-tighter">LOCAL</span>
+                    )}
+                  </div>
+                  <div className="text-[10px] text-slate-400">Cod: {o.customerId || 'N/A'}</div>
               </td>
               <td className="py-4 px-4">
                   <div className="flex items-center gap-2">

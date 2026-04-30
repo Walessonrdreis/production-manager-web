@@ -10,6 +10,7 @@ export interface Order {
   orderNumber: string;
   customerName: string;
   customerId?: string; // ID local do cliente se identificado
+  isLocalCustomer?: boolean;
   items: OrderItem[];
   status: string;
   etapa: string;

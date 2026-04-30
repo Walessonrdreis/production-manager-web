@@ -22,10 +22,14 @@ export async function enrichOrdersWithLocalCustomers(orders: Order[]): Promise<O
       if (localCustomer) {
         return {
           ...order,
-          customerName: localCustomer.name // Prioridade para o nome cadastrado localmente
+          customerName: localCustomer.name, // Prioridade para o nome cadastrado localmente
+          isLocalCustomer: true
         };
       }
-      return order;
+      return {
+        ...order,
+        isLocalCustomer: false
+      };
     });
   } catch (error) {
     console.warn('Falha ao enriquecer ordens com clientes locais:', error);

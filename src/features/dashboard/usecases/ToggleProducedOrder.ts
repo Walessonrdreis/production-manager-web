@@ -1,5 +1,6 @@
 import { ProductionLogic } from '../domain/ProductionLogic';
 import { ProducedRepository } from '../infra/ProducedRepository';
+import { Result } from '../../../lib/Result';
 
 /**
  * UseCase: Alterna a seleção de um registro de produção por pedido.
@@ -11,23 +12,28 @@ export async function toggleProducedOrder(
   quantity: number, 
   orderId?: string, 
   orderNumber?: string
-) {
-  const existing = await ProducedRepository.getById(id);
-  
-  const { action, record } = ProductionLogic.calculateToggleAction(!!existing, {
-    id,
-    description,
-    quantity,
-    orderId,
-    orderNumber
-  });
+): Promise<Result<any>> {
+  try {
+    const existing = await ProducedRepository.getById(id);
+    
+    const { action, record } = ProductionLogic.calculateToggleAction(!!existing, {
+      id,
+      description,
+      quantity,
+      orderId,
+      orderNumber
+    });
 
-  if (action === 'delete') {
-    await ProducedRepository.delete(id);
-    return null;
-  } else if (record) {
-    return await ProducedRepository.save(record);
+    if (action === 'delete') {
+      await ProducedRepository.delete(id);
+      return Result.ok(null);
+    } else if (record) {
+      const saved = await ProducedRepository.save(record);
+      return Result.ok(saved);
+    }
+    
+    return Result.ok(null);
+  } catch (err) {
+    return Result.fail('Erro ao alternar registro de produção.');
   }
-  
-  return null;
 }

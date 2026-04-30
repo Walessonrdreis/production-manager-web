@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useToastStore } from '../../components/ui/Toast';
+import { toast } from 'sonner';
 
 const BASE_URL = '/api/proxy/';
 
@@ -31,13 +31,9 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    const { addToast } = useToastStore.getState();
-    
-    if (!error.response) {
-      addToast({
-        title: 'Erro de Conexão',
-        message: 'Não foi possível conectar ao servidor. Verifique sua internet.',
-        type: 'error'
+    if (!error?.response) {
+      toast.error('Erro de Conexão', {
+        description: 'Não foi possível conectar ao servidor. Verifique sua internet.'
       });
       return Promise.reject(error);
     }
@@ -80,10 +76,8 @@ apiClient.interceptors.response.use(
       message: 'Ocorreu um erro inesperado na comunicação com a API.' 
     };
 
-    addToast({
-      title: errorInfo.title,
-      message: errorInfo.message,
-      type: 'error'
+    toast.error(errorInfo.title, {
+      description: errorInfo.message
     });
 
     if (status === 401) {

@@ -1,18 +1,22 @@
 import { Product } from '../../../types/api';
 import { CatalogRepository } from '../infra/CatalogRepository';
 import { findMetaTotal, findArray, normalizeProduct } from '../domain/CatalogNormalizer';
+import { Result } from '../../../lib/Result';
+import { validateOmieProducts } from '../../products/infra/ProductSchemas';
 
 /**
- * UseCase: Busca produtos no catálogo do Omie
+ * UseCase: Busca produtos no catálogo do Omie.
+ * Pilar 1: Result Pattern.
+ * Pilar 3: Zod-First na Infra.
  */
-export async function getOmieProducts(): Promise<Product[]> {
+export async function getOmieProducts(): Promise<Result<Product[]>> {
   let allProducts: Product[] = [];
   let page = 1;
   let hasMore = true;
   let expectedTotal: number | null = null;
 
-  while (hasMore) {
-    try {
+  try {
+    while (hasMore) {
       const response = await CatalogRepository.getProductsPage(page);
       const res = response.data;
       
@@ -25,8 +29,16 @@ export async function getOmieProducts(): Promise<Product[]> {
       if (!Array.isArray(pageData) || pageData.length === 0) {
         hasMore = false;
       } else {
-        const newProducts = pageData
-          .filter(p => {
+        // Validação Zod
+        const validation = validateOmieProducts(pageData);
+        const dataToNormalize = validation.success ? validation.data : pageData;
+
+        if (!validation.success) {
+          console.warn(`Página ${page} do catálogo com dados fora do padrão:`, validation.error);
+        }
+
+        const newProducts = dataToNormalize
+          .filter((p: any) => {
             const id = p.omieCode || p.id || p.codigo_produto;
             return !allProducts.find(ex => ex.id === id);
           })
@@ -44,13 +56,12 @@ export async function getOmieProducts(): Promise<Product[]> {
           }
         }
       }
-    } catch (error) {
-      console.error('Erro ao buscar página do catálogo:', error);
-      hasMore = false;
-    }
 
-    if (page > 300) hasMore = false; 
+      if (page > 300) hasMore = false; 
+    }
+    
+    return Result.ok(allProducts);
+  } catch (err) {
+    return Result.fail(err instanceof Error ? err.message : 'Erro ao carregar catálogo da Omie.');
   }
-  
-  return allProducts;
 }

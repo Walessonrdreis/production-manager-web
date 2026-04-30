@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../../db';
 import { 
   selectProduct as selectProductUseCase, 
   unselectProduct as unselectProductUseCase,
@@ -6,20 +7,41 @@ import {
   clearMyProducts
 } from '../../features/products';
 import { Product } from '../../types/api';
+import { useToast } from '../../components/ui/Toast';
 
 export function useMyProducts() {
-  const savedProducts = useLiveQuery(() => getSelectedProducts()) || [];
+  const { success, error: toastError } = useToast();
+  const products = useLiveQuery(() => db.myProducts.toArray());
+  const savedProducts = products || [];
 
   const saveProduct = async (product: Product) => {
-    await selectProductUseCase(product);
+    const res = await selectProductUseCase(product);
+    if (!res.success) {
+      toastError(res.error);
+    } else {
+      success('Produto salvo nos favoritos.');
+    }
+    return res;
   };
 
   const removeProduct = async (productId: string) => {
-    await unselectProductUseCase(productId);
+    const res = await unselectProductUseCase(productId);
+    if (!res.success) {
+      toastError(res.error);
+    } else {
+      success('Produto removido dos favoritos.');
+    }
+    return res;
   };
 
   const clearAll = async () => {
-    await clearMyProducts();
+    const res = await clearMyProducts();
+    if (!res.success) {
+      toastError(res.error);
+    } else {
+      success('Lista de favoritos limpa.');
+    }
+    return res;
   };
 
   const isSaved = (productId: string) => {
@@ -32,5 +54,7 @@ export function useMyProducts() {
     removeProduct,
     clearAll,
     isSaved,
+    isLoading: products === undefined,
+    error: null,
   };
 }

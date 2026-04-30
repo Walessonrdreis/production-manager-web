@@ -41,17 +41,29 @@ export function findOrdersArray(obj: any, depth = 0): any[] | null {
 }
 
 export function normalizeOrder(raw: any): Order {
+  const rawItems = Array.isArray(raw.items) 
+    ? raw.items 
+    : (Array.isArray(raw.detalhe?.itens) ? raw.detalhe.itens : []);
+
+  // Normalizar itens para garantir nomes de campos consistentes
+  const items = rawItems.map((item: any) => ({
+    omieItemCode: String(item.omieItemCode || item.codigo_produto || ''),
+    description: item.description || item.descricao || 'Item sem descrição',
+    quantity: Number(item.quantity || item.quantidade || 0),
+    unit: item.unit || item.unidade || 'UN'
+  }));
+
   return {
-    id: raw.omieCode || raw.id || raw._id || Math.random().toString(),
+    id: String(raw.omieCode || raw.id || raw.codigo_pedido || Math.random().toString()),
     orderNumber: raw.numeroPedido || raw.orderNumber || raw.numero_pedido || 'N/A',
     customerName: raw.customerName || raw.cliente || raw.nome_cliente || 'Cliente Omie',
-    items: Array.isArray(raw.items) ? raw.items : [],
+    items,
     status: raw.status || (raw.cancelado === 'Y' ? 'Cancelado' : raw.encerrado === 'Y' ? 'Encerrado' : 'Ativo'),
-    etapa: raw.etapa || '20',
+    etapa: raw.etapa || raw.cabecalho?.etapa || '20',
     cancelado: raw.cancelado || 'N',
     encerrado: raw.encerrado || 'N',
     createdAt: raw.lastSyncAt || raw.createdAt || new Date().toISOString(),
-    dataPrevisao: raw.dataPrevisao || '',
+    dataPrevisao: raw.dataPrevisao || raw.cabecalho?.data_previsao || '',
     lastSyncAt: raw.lastSyncAt || ''
   };
 }

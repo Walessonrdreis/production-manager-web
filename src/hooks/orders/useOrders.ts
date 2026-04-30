@@ -12,11 +12,13 @@ export function useOrders() {
     staleTime: 1000 * 60 * 30,
   });
 
+  const result = ordersQuery.data;
+
   return {
-    orders: ordersQuery.data || [],
+    orders: result?.success ? result.data : [],
     isLoading: ordersQuery.isLoading,
-    isError: ordersQuery.isError,
-    error: ordersQuery.error,
+    isError: ordersQuery.isError || (result !== undefined && !result.success),
+    error: ordersQuery.error || (result?.success === false ? result.error : null),
     refetchOrders: ordersQuery.refetch,
   };
 }

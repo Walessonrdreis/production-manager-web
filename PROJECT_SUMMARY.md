@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v1.12.0 (Atualizado em 29/04/2026 - Governança Extensiva e Testes)
+**Versão:** v1.16.1 (Atualizado em 30/04/2026 - Estabilidade e Reatividade)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento e rastreamento de progresso.
@@ -7,11 +7,17 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ## 🏗️ Arquitetura Técnica (ADR-003 & Guia Operacional)
 
 ### 1. Governança e Estrutura Modular
-- **Guia Operacional:** Implementado o `docs/GUIA_OPERACIONAL.md` como base para governança do código pós-migração.
-- **Isolamento de Domínio:** Implementada a camada de `domain` em todas as features principais (`dashboard`, `planner`, `orders`, `catalog`, `sectors`). Regras de negócio puras são centralizadas em arquivos `*Logic.ts` ou `*Normalizer.ts`.
-- **Testes Unitários:** Cobertura de testes unitários com **Vitest** para todas as lógicas de domínio, garantindo que transformações de dados e regras de negócio sejam validadas independentemente de APIs ou Banco de Dados.
-- **Refatoração do Planejador:** Implementada lógica de "Upsert" no domínio. Ao adicionar produtos, o sistema incrementa quantidades de itens existentes automaticamente.
-- **Normalização de Dados:** Implementados heurísticas de busca de arrays e normalização de objetos para lidar com a variabilidade das respostas da API Omie, centralizados na camada de domínio.
+- **Guia Operacional:** Implementado o `docs/GUIA_OPERACIONAL.md` com 8 Pilares Arquiteturais definidos.
+- **Result Pattern:** 100% dos UseCases e Hooks mutáveis/assíncronos refatorados para o padrão `{ success, data, error }`.
+- **Zod-First (Permissivo):** Schemas de validação configurados com `.passthrough()` para garantir que dados de domínio (como `sectorId`) não sejam removidos acidentalmente durante a validação de infraestrutura.
+- **Reatividade DEXIE:** Restaurada a reatividade em tempo real nos hooks `usePlanning`, `useMyProducts` e `useLocalProduced` após a refatoração Result, garantindo sincronia instantânea entre IndexedDB e UI.
+- **Feedback Visual:** Substituído Toast antigo por `sonner` com suporte a `richColors` e `closeButton`.
+- **Integridade de Dados:** O `OrderNormalizer` foi robustecido para suportar tanto a estrutura aninhada do Omie (`detalhe.itens`) quanto a estrutura plana pós-validação.
+
+### 🚀 Próximos Passos (Backlog de Preparação)
+1. **Implementar "Optimistic Updates"** nos fluxos do Dashboard (Produção Local).
+2. **Refinar a UI do Dashboard** para exibir indicadores de sincronização em tempo real mais granulares.
+3. **Expandir Schemas Zod** para cobrir fluxos de Estoque específicos se necessário.
 - **Encapsulamento de UI:** Seguindo rigorosamente a ADR 003, as páginas residem em `src/features/<feature>/ui`, com `src/pages` atuando apenas como re-exportadores.
 - **Hooks Atômicos:** Organização por feature em `src/hooks`, separando claramente lógica de Query de lógica de Mutation.
 ### 2. Persistência e Local-First (IndexedDB)

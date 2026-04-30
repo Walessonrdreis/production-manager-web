@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../../db';
 import { useState } from 'react';
 import { 
   addPlanningItem, 
@@ -9,35 +10,67 @@ import {
   getPlanningItems
 } from '../../features/planner';
 import { Product } from '../../types/api';
+import { useToast } from '../../components/ui/Toast';
 
 export function usePlanning() {
-  const items = useLiveQuery(() => getPlanningItems()) || [];
+  const { success, error: toastError } = useToast();
+  const rawItems = useLiveQuery(() => db.planning.toArray());
+  const items = rawItems || [];
 
   const [period, setPeriodState] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   const addItem = async (product: Product, quantity: number) => {
-    await addPlanningItem(product, quantity);
+    const result = await addPlanningItem(product, quantity);
+    if (!result.success) {
+      toastError(result.error);
+    } else {
+      success('Item adicionado ao planejamento.');
+    }
+    return result;
   };
 
   const addBulkItems = async (products: Product[]) => {
-    await addBulkPlanningItems(products);
+    const result = await addBulkPlanningItems(products);
+    if (!result.success) {
+      toastError(result.error);
+    } else {
+      success(`${products.length} itens adicionados.`);
+    }
+    return result;
   };
 
   const updateQuantity = async (id: string | number, quantity: number) => {
-    await updatePlanningItem(id, quantity);
+    const result = await updatePlanningItem(id, quantity);
+    if (!result.success) {
+      toastError(result.error);
+    }
+    return result;
   };
 
   const removeItem = async (id: string | number) => {
-    await removePlanningItem(id);
+    const result = await removePlanningItem(id);
+    if (!result.success) {
+      toastError(result.error);
+    } else {
+      success('Item removido do planejamento.');
+    }
+    return result;
   };
 
   const clear = async () => {
-    await clearPlanning();
+    const result = await clearPlanning();
+    if (!result.success) {
+      toastError(result.error);
+    } else {
+      success('Planejamento limpo.');
+    }
+    return result;
   };
 
   return {
     items,
-    isLoading: items === undefined,
+    isLoading: rawItems === undefined,
+    error: null,
     addItem,
     addBulkItems,
     updateQuantity,

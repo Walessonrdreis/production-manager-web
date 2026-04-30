@@ -40,3 +40,15 @@ Para toda e qualquer tarefa, o agente deve iniciar a resposta com:
     -   (c) refatoração estrutural ampla (proibida sem autorização)
 3.  **Lista de Arquivos:** Listar todos os arquivos que serão modificados.
 4.  **Bloqueio de Escopo:** Se surgir a necessidade de alterar um arquivo fora da lista inicial, o agente deve **parar e pedir nova autorização**.
+
+## 6. Pilares Arquiteturais (Escalabilidade e Segurança)
+Para garantir a saúde do projeto a longo prazo, seguimos estes 7 pilares:
+
+1.  **Padronização de Retorno (Result Pattern)**: UseCases devem retornar `{ success: boolean, data?: T, error?: string }`. Isso evita try/catch espalhado na UI e documenta falhas de negócio.
+2.  **Imutabilidade no Domínio**: Funções em `domain/` devem ser puras. Proibido mutar objetos de entrada; sempre retorne novas instâncias.
+3.  **Validação de Fronteira (Zod-First)**: Dados de APIs externas (Omie/Proxy) devem ser validados (via Zod ou similar) na camada de `infra/` antes da normalização.
+4.  **Memoização Mandatória**: Filtros, buscas e cálculos pesados do domínio chamados em componentes de UI devem ser protegidos com `useMemo`.
+5.  **Isolamento de Lógica**: Nenhuma lógica de cálculo ("como fazer") deve estar na UI ou em UseCases. Tudo deve estar centralizado e testado no `domain/`.
+6.  **Estratégia de Normalização**: O mapeamento de API para o modelo interno deve ser isolado em arquivos `*Normalizer.ts` ou funções específicas no `domain/`.
+7.  **Test-Driven Logic**: 100% dos arquivos na pasta `domain/` devem ter um arquivo `.test.ts` acompanhando, cobrindo casos de sucesso e erro.
+8.  **Documentação Viva e Rastreabilidade (Living Documentation)**: O `PROJECT_SUMMARY.md` e o `GUIA_OPERACIONAL.md` são partes integrantes do sistema. Toda mudança de arquitetura, contrato ou lógica de negócio deve ser refletida na documentação proativamente pelo agente. Nenhuma funcionalidade é considerada "terminada" sem sua devida rastreabilidade documental.

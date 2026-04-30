@@ -3,7 +3,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { BrowserRouter } from 'react-router-dom';
-import { ToastContainer } from '../components/ui/Toast';
+import { Toaster } from 'sonner';
 import { ErrorBoundary } from './ErrorBoundary';
 
 // Query Client Configuration
@@ -40,7 +40,7 @@ export function AppProviders({ children }: AppProvidersProps) {
         <BrowserRouter>
           {children}
         </BrowserRouter>
-        <ToastContainer />
+        <Toaster position="top-right" richColors closeButton />
       </PersistQueryClientProvider>
     </ErrorBoundary>
   );

@@ -55,17 +55,13 @@ export function DashboardPage() {
   const adjustedTotal = Math.max(0, (totals?.totalItems || 0) - totalProducedItemsCount);
 
   if (isError) {
-    const axiosError = error as any;
-    const status = axiosError.response?.status || 'Erro';
-    const statusText = axiosError.response?.statusText || 'Falha na comunicação';
-    
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center">
         <div className="bg-red-50 p-6 rounded-2xl border border-red-100 max-w-sm">
           <AlertCircle size={32} className="text-red-500 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-red-900 mb-1">Resposta do Servidor</h2>
-          <p className="text-red-700 font-mono text-sm mb-6 bg-white py-2 rounded border border-red-100">
-            HTTP {status}: {statusText}
+          <h2 className="text-lg font-bold text-red-900 mb-1">Atenção</h2>
+          <p className="text-red-700 text-sm mb-6 bg-white py-2 px-4 rounded border border-red-100 italic">
+            {typeof error === 'string' ? error : 'Ocorreu um erro ao carregar os dados.'}
           </p>
           <Button onClick={() => refetchTotals()} variant="outline" size="sm" className="w-full">
             Tentar Novamente

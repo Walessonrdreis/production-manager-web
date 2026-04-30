@@ -1,6 +1,8 @@
 import { type PlanningItem } from '../../../db/models';
 import { type Product } from '../../../types/api';
 
+export type { PlanningItem };
+
 export const PlanningLogic = {
   /**
    * Calcula as operações necessárias para adicionar produtos ao planejamento.

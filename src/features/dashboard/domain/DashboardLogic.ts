@@ -6,8 +6,15 @@ export const DashboardLogic = {
    * Agrega os dados crus da API Omie para o formato de exibição do dashboard.
    */
   aggregateStage20Totals(rawData: any): DashboardTotalsResponse {
-    const products = Array.isArray(rawData) ? rawData : (rawData.data || []);
-    const totalUnits = products.reduce((acc: number, curr: any) => acc + (Number(curr.totalQuantity) || 0), 0);
+    const rawProducts = Array.isArray(rawData) ? rawData : (rawData.data || []);
+    
+    // Normalizar campos para garantir compatibilidade com a UI
+    const products = rawProducts.map((p: any) => ({
+      description: p.description || p.descricao || 'Sem descrição',
+      totalQuantity: Number(p.totalQuantity || p.total_quantidade || p.quantidade || 0)
+    }));
+
+    const totalUnits = products.reduce((acc: number, curr: any) => acc + curr.totalQuantity, 0);
 
     return {
       data: products,

@@ -19,8 +19,8 @@ export function usePlanning() {
 
   const [period, setPeriodState] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
-  const addItem = async (product: Product, quantity: number) => {
-    const result = await addPlanningItem(product, quantity);
+  const addItem = async (product: Product, quantity: number, sectorId: string, sectorName: string) => {
+    const result = await addPlanningItem(product, quantity, sectorId, sectorName);
     if (!result.success) {
       toastError(result.error);
     } else {
@@ -29,8 +29,8 @@ export function usePlanning() {
     return result;
   };
 
-  const addBulkItems = async (products: Product[]) => {
-    const result = await addBulkPlanningItems(products);
+  const addBulkItems = async (products: Product[], sectorId: string, sectorName: string) => {
+    const result = await addBulkPlanningItems(products, sectorId, sectorName);
     if (!result.success) {
       toastError(result.error);
     } else {

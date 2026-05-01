@@ -40,9 +40,9 @@ export function findArray(obj: any, depth = 0): any[] | null {
  */
 export function normalizeProduct(p: any): Product {
   return {
-    id: String(p.omieCode || p.id || p.codigo_produto),
+    id: String(p.omieCode || p.id || p.codigo_produto || ''),
     code: String(p.codigo || p.code || ''),
-    description: String(p.descricao || p.description || ''),
+    description: String(p.descricao || p.description || p.descr_detalhada || 'Sem descrição'),
     family: String(p.descricao_familia || p.familyDescription || p.familia || p.family || ''),
     stock: Number(p.stockQuantity || p.estoque || p.stock || 0),
     price: Number(p.valor_unitario || p.price || 0),

@@ -12,6 +12,7 @@ interface PlanningProductListProps {
   onToggleSelectAll: () => void;
   onBulkAdd: () => void;
   onAddItem: (p: any, qty: number) => void;
+  activeSectorName?: string;
 }
 
 export function PlanningProductList({
@@ -21,14 +22,17 @@ export function PlanningProductList({
   onToggleSelect,
   onToggleSelectAll,
   onBulkAdd,
-  onAddItem
+  onAddItem,
+  activeSectorName
 }: PlanningProductListProps) {
   return (
     <Card>
       <div className="flex justify-between items-start mb-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900">Adicionar Produtos</h2>
-          <p className="text-sm text-slate-500">Busque pelo catálogo para planejar a produção.</p>
+          <p className="text-sm text-slate-500">
+            Destino: <span className="font-bold text-blue-600">{activeSectorName || 'Nenhum setor selecionado'}</span>
+          </p>
         </div>
         {selectedIds.length > 0 && (
           <Button 

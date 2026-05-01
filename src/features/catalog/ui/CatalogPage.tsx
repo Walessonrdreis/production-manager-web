@@ -79,10 +79,18 @@ export function CatalogPage() {
 
   if (isError) {
     return (
-      <div className="p-8 text-center">
-        <div className="bg-red-50 p-6 rounded-xl border border-red-100 max-w-sm mx-auto">
-          <p className="text-red-700 font-mono text-sm mb-6">Erro: {(error as any)?.message}</p>
-          <Button onClick={() => refetchProducts()} variant="outline" size="sm" className="w-full">Tentar novamente</Button>
+      <div className="p-8 text-center flex flex-col items-center justify-center min-h-[400px]">
+        <div className="bg-red-50 p-8 rounded-2xl border border-red-100 max-w-sm">
+          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <RefreshCw size={24} />
+          </div>
+          <h3 className="text-lg font-bold text-red-900 mb-2">Ops! Algo deu errado</h3>
+          <p className="text-red-700 text-sm mb-6">
+            Não conseguimos carregar o catálogo de produtos no momento. Pode ser uma instabilidade na API Omie ou na sua conexão.
+          </p>
+          <Button onClick={() => refetchProducts()} className="w-full bg-red-600 hover:bg-red-700 text-white border-none">
+            Tentar Novamente
+          </Button>
         </div>
       </div>
     );

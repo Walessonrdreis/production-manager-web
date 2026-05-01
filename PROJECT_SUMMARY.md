@@ -1,17 +1,32 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v1.17.0 (Atualizado em 30/04/2026 - Feature de Clientes)
+**Versão:** v2.0.1 (Atualizado em 01/05/2026 - Correção de Consistência de Dados)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento e rastreamento de progresso.
 
 ## 🏗️ Arquitetura Técnica (ADR-003 & Guia Operacional)
 
-### 1. Feature de Clientes (Novo)
+### 1. Robustez na Integração Omie (Novo)
+- **Normalização de Produtos:** Refatorado o `normalizeProduct` para suportar variações de campos da API Omie (`descricao`, `descr_detalhada`, `description`), garantindo que o nome do produto nunca seja omitido se disponível.
+- **Correção Zod Schema:** Removidos valores padrão no nível de infraestrutura que causavam conflitos com a lógica de mapeamento do domínio (Identity vs Infrastructure values).
+
+### 2. Planejamento Multi-Setor
+- **Identidade Composta:** Itens de planejamento agora são únicos por `[Código do Produto + ID do Setor]`. Isso permite que o mesmo SKU seja planejado em diferentes etapas produtivas de forma independente.
+- **Setor Ativo (UI):** Implementado seletor de setor no cabeçalho do planejamento. Novos itens são automaticamente vinculados ao setor selecionado.
+- **Páginas de Trabalho (PDF):** O gerador de PDF agora cria uma página separada para cada setor, incluindo campos para checklists e assinaturas dos responsáveis por etapa.
+- **Agrupamento Visual:** Lista de itens selecionados agrupada por setor para melhor conferência da carga de trabalho.
+
+### 2. Feature de Setores (API Real)
+- **Migração de Proxy:** Removida a interceptação local do `server.ts` para a rota de setores.
+- **Endpoints Admin:** Configurado o uso de `/v1/admin/sectors` para CRUD completo (Create, Read, Update, Delete).
+- **Consistência de Dados:** Mantido o padrão de normalização e `Result Pattern` nos usecases de setores.
+
+### 3. Feature de Clientes
 - **Persistência Local-First:** Cadastro completo de clientes no IndexedDB (Dexie).
 - **Enriquecimento Dinâmico:** Implementado o `CustomerEnricher` que resolve o nome do cliente em pedidos da Omie usando a base local (match via `omieCode`).
 - **Navegação:** Adicionado link dedicado na Sidebar e rota protegida `/customers`.
 
-### 2. Governança e Estrutura Modular
+### 4. Governança e Estrutura Modular
 - **Guia Operacional:** Implementado o `docs/GUIA_OPERACIONAL.md` com 8 Pilares Arquiteturais definidos.
 - **Result Pattern:** 100% dos UseCases e Hooks mutáveis/assíncronos refatorados para o padrão `{ success, data, error }`.
 - **Zod-First (Permissivo):** Schemas de validação configurados com `.passthrough()` para garantir que dados de domínio (como `sectorId`) não sejam removidos acidentalmente durante a validação de infraestrutura.

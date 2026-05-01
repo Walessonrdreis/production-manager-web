@@ -7,10 +7,19 @@ import { Result } from '../../../lib/Result';
  * UseCase: Adiciona múltiplos produtos ao planejamento com quantidade padrão 1.
  * Pilar 1: Result Pattern.
  */
-export async function addBulkPlanningItems(products: Product[]): Promise<Result<void>> {
+export async function addBulkPlanningItems(
+  products: Product[], 
+  sectorId: string, 
+  sectorName: string
+): Promise<Result<void>> {
   try {
     const currentItems = await PlanningRepository.getAll();
-    const productsWithQuantity = products.map(p => ({ product: p, quantity: 1 }));
+    const productsWithQuantity = products.map(p => ({ 
+      product: p, 
+      quantity: 1,
+      sectorId,
+      sectorName
+    }));
 
     const { toAdd, toUpdate } = PlanningLogic.calculateAdditions(currentItems, productsWithQuantity);
 

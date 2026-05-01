@@ -17,7 +17,12 @@ describe('PlanningLogic', () => {
 
     it('should suggest adding a new item when it does not exist', () => {
       const currentItems: PlanningItem[] = [];
-      const productsToAdd = [{ product: mockProduct, quantity: 5 }];
+      const productsToAdd = [{ 
+        product: mockProduct, 
+        quantity: 5, 
+        sectorId: 'S1', 
+        sectorName: 'SOLDA' 
+      }];
 
       const result = PlanningLogic.calculateAdditions(currentItems, productsToAdd);
 
@@ -25,16 +30,22 @@ describe('PlanningLogic', () => {
       expect(result.toAdd[0]).toMatchObject({
         code: 'P1',
         description: 'Produto 1',
-        quantity: 5
+        quantity: 5,
+        sectorId: 'S1'
       });
       expect(result.toUpdate).toHaveLength(0);
     });
 
-    it('should suggest updating an existing item when codes match', () => {
+    it('should suggest updating an existing item when codes and sectors match', () => {
       const currentItems: PlanningItem[] = [
-        { id: 'uuid-1', code: 'P1', description: 'P1', quantity: 2, unit: 'UN', synced: false, updatedAt: '' }
+        { id: 'uuid-1', code: 'P1', description: 'P1', quantity: 2, unit: 'UN', synced: false, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA' }
       ];
-      const productsToAdd = [{ product: mockProduct, quantity: 3 }];
+      const productsToAdd = [{ 
+        product: mockProduct, 
+        quantity: 3, 
+        sectorId: 'S1', 
+        sectorName: 'SOLDA' 
+      }];
 
       const result = PlanningLogic.calculateAdditions(currentItems, productsToAdd);
 
@@ -46,19 +57,37 @@ describe('PlanningLogic', () => {
       });
     });
 
+    it('should suggest adding a new item even if code exists but sector is different', () => {
+      const currentItems: PlanningItem[] = [
+        { id: 'uuid-1', code: 'P1', description: 'P1', quantity: 2, unit: 'UN', synced: false, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA' }
+      ];
+      const productsToAdd = [{ 
+        product: mockProduct, 
+        quantity: 3, 
+        sectorId: 'S2', 
+        sectorName: 'CORTE' 
+      }];
+
+      const result = PlanningLogic.calculateAdditions(currentItems, productsToAdd);
+
+      expect(result.toAdd).toHaveLength(1);
+      expect(result.toUpdate).toHaveLength(0);
+      expect(result.toAdd[0].sectorId).toBe('S2');
+    });
+
     it('should handle multiple products and cumulative additions in the same batch', () => {
       const currentItems: PlanningItem[] = [
-        { id: 'uuid-1', code: 'P1', description: 'P1', quantity: 2, unit: 'UN', synced: false, updatedAt: '' }
+        { id: 'uuid-1', code: 'P1', description: 'P1', quantity: 2, unit: 'UN', synced: false, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA' }
       ];
       const productsToAdd = [
-        { product: mockProduct, quantity: 3 },
-        { product: mockProduct, quantity: 10 },
-        { product: { ...mockProduct, id: 'P2', description: 'P2' }, quantity: 1 }
+        { product: mockProduct, quantity: 3, sectorId: 'S1', sectorName: 'SOLDA' },
+        { product: mockProduct, quantity: 10, sectorId: 'S1', sectorName: 'SOLDA' },
+        { product: { ...mockProduct, id: 'P2', description: 'P2' }, quantity: 1, sectorId: 'S1', sectorName: 'SOLDA' }
       ];
 
       const result = PlanningLogic.calculateAdditions(currentItems, productsToAdd);
 
-      expect(result.toUpdate).toHaveLength(2); // Duas atualizações para P1 (acumuladas)
+      expect(result.toUpdate).toHaveLength(2); // Duas atualizações para P1 (acumuladas) no mesmo setor
       expect(result.toUpdate[0].quantity).toBe(5);
       expect(result.toUpdate[1].quantity).toBe(15);
       

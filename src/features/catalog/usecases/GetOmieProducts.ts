@@ -34,7 +34,8 @@ export async function getOmieProducts(): Promise<Result<Product[]>> {
         const dataToNormalize = validation.success ? validation.data : pageData;
 
         if (!validation.success) {
-          console.warn(`Página ${page} do catálogo com dados fora do padrão:`, validation.error);
+          // Log simplificado para evitar ruído no console e facilitar debug humano se necessário
+          console.warn(`[Catalog] Página ${page}: Alguns campos vieram em formato diferente do esperado, mas o sistema irá tentar processar mesmo assim.`);
         }
 
         const newProducts = dataToNormalize

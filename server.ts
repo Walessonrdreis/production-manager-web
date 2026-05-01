@@ -112,14 +112,12 @@ process.setMaxListeners(20);
     try {
       const targetPath = req.path.startsWith('/') ? req.path.slice(1) : req.path;
       
-      // INTERCEPTAÇÃO PARA BANCO LOCAL EM DESENVOLVIMENTO (Sectors, Planning e Dashboard Produced)
-      if (targetPath === 'sectors' || targetPath.startsWith('sectors/') || 
-          targetPath === 'planning' || targetPath.startsWith('planning/') ||
+      // INTERCEPTAÇÃO PARA BANCO LOCAL EM DESENVOLVIMENTO (Planning e Dashboard Produced)
+      if (targetPath === 'planning' || targetPath.startsWith('planning/') ||
           targetPath === 'dashboard/produced' || targetPath.startsWith('dashboard/produced/')) {
         
         const db = await readDb();
-        let collection = 'sectors';
-        if (targetPath.startsWith('planning')) collection = 'planning';
+        let collection = 'planning';
         if (targetPath.startsWith('dashboard/produced')) collection = 'dashboard_produced';
 
         const parts = targetPath.split('/');
@@ -159,6 +157,7 @@ process.setMaxListeners(20);
       }
 
       const targetUrl = `https://production-manager-api.onrender.com/v1/${targetPath}`;
+      console.log(`[PROXY] ${req.method} ${req.url} -> ${targetUrl}`);
       
       // Encaminhamos o cabeçalho de autorização se presente
       const headers: any = {

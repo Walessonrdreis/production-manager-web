@@ -7,9 +7,10 @@ import { Result } from '../../../lib/Result';
  */
 export async function getSectors(): Promise<Result<Sector[]>> {
   try {
-    const sectors = await SectorsRepository.getAll();
+    const sectors = await SectorsRepository.getAll({ includeInactive: true });
     return Result.ok(sectors);
-  } catch (err) {
-    return Result.fail('Erro ao buscar setores.');
+  } catch (err: any) {
+    console.error('[UseCase] Erro ao buscar setores:', err);
+    return Result.fail(err.message || 'Erro ao buscar setores.');
   }
 }

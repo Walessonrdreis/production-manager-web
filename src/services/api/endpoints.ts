@@ -12,7 +12,7 @@ export const ENDPOINTS = {
     SYNC: 'admin/omie/sync/products',
   },
   SECTORS: {
-    BASE: 'sectors',
+    BASE: 'admin/sectors',
   },
   PLANNING: {
     BASE: 'planning',

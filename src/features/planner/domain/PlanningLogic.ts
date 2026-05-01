@@ -11,7 +11,7 @@ export const PlanningLogic = {
    */
   calculateAdditions(
     currentItems: PlanningItem[],
-    productsToAdd: { product: Product, quantity: number }[]
+    productsToAdd: { product: Product, quantity: number, sectorId: string, sectorName: string }[]
   ): { 
     toAdd: Omit<PlanningItem, 'id' | 'synced' | 'updatedAt'>[], 
     toUpdate: { id: string, quantity: number }[] 
@@ -19,13 +19,17 @@ export const PlanningLogic = {
     const toAdd: Omit<PlanningItem, 'id' | 'synced' | 'updatedAt'>[] = [];
     const toUpdate: { id: string, quantity: number }[] = [];
 
-    // Map para facilitar busca por código no estado atual
-    const itemsByCode = new Map<string, PlanningItem>();
-    currentItems.forEach(item => itemsByCode.set(item.code, item));
+    // Map para facilitar busca por composto [code-sectorId] no estado atual
+    const itemsByKey = new Map<string, PlanningItem>();
+    currentItems.forEach(item => {
+      const key = `${item.code}-${item.sectorId || 'default'}`;
+      itemsByKey.set(key, item);
+    });
 
-    productsToAdd.forEach(({ product, quantity }) => {
+    productsToAdd.forEach(({ product, quantity, sectorId, sectorName }) => {
       const productCode = String(product.id);
-      const existing = itemsByCode.get(productCode);
+      const key = `${productCode}-${sectorId}`;
+      const existing = itemsByKey.get(key);
 
       if (existing) {
         toUpdate.push({
@@ -33,21 +37,25 @@ export const PlanningLogic = {
           quantity: existing.quantity + quantity
         });
         // Atualiza o map para somas subsequentes no mesmo lote
-        itemsByCode.set(productCode, { ...existing, quantity: existing.quantity + quantity });
+        itemsByKey.set(key, { ...existing, quantity: existing.quantity + quantity });
       } else {
         toAdd.push({
           code: productCode,
           description: product.description,
           unit: product.unit || 'UN',
-          quantity: quantity
+          quantity: quantity,
+          sectorId,
+          sectorName
         });
         // Mock de item para o map caso o mesmo produto venha duplicado no lote de entrada
-        itemsByCode.set(productCode, {
+        itemsByKey.set(key, {
           id: 'temp',
           code: productCode,
           description: product.description,
           unit: product.unit || 'UN',
           quantity: quantity,
+          sectorId,
+          sectorName,
           synced: false,
           updatedAt: ''
         });

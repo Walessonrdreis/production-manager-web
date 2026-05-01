@@ -7,7 +7,12 @@ import { Result } from '../../../lib/Result';
  * UseCase: Adiciona um item ao planejamento.
  * Pilar 1: Result Pattern.
  */
-export async function addPlanningItem(product: Product, quantity: number): Promise<Result<void>> {
+export async function addPlanningItem(
+  product: Product, 
+  quantity: number, 
+  sectorId: string, 
+  sectorName: string
+): Promise<Result<void>> {
   try {
     if (quantity <= 0) {
       return Result.fail('A quantidade deve ser maior que zero.');
@@ -15,10 +20,8 @@ export async function addPlanningItem(product: Product, quantity: number): Promi
 
     const currentItems = await PlanningRepository.getAll();
     
-    // Pilar 2: Imutabilidade (PlanningLogic deve retornar novos dados)
-    // Pilar 5: Isolamento de Lógica (Cálculo está no Domain)
     const { toAdd, toUpdate } = PlanningLogic.calculateAdditions(currentItems, [
-      { product, quantity }
+      { product, quantity, sectorId, sectorName }
     ]);
 
     if (toAdd.length > 0) {

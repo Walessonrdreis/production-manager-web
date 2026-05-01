@@ -8,9 +8,15 @@ interface PlanningHeaderProps {
   onPeriodChange: (val: 'daily' | 'weekly' | 'monthly') => void;
   onClear: () => void;
   items: any[];
+  sectors: any[];
+  activeSectorId: string;
+  onActiveSectorChange: (id: string) => void;
 }
 
-export function PlanningHeader({ period, onPeriodChange, onClear, items }: PlanningHeaderProps) {
+export function PlanningHeader({ 
+  period, onPeriodChange, onClear, items, 
+  sectors, activeSectorId, onActiveSectorChange 
+}: PlanningHeaderProps) {
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
@@ -18,6 +24,17 @@ export function PlanningHeader({ period, onPeriodChange, onClear, items }: Plann
         <p className="text-xs sm:text-sm text-zinc-500">Selecione produtos para gerar ordens de fabricação</p>
       </div>
       <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+         <select 
+           className="h-10 rounded-xl border border-slate-200 px-3 text-sm font-bold bg-white focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none shadow-sm"
+           value={activeSectorId}
+           onChange={(e) => onActiveSectorChange(e.target.value)}
+         >
+            <option value="" disabled>Setor Destino...</option>
+            {sectors.map(s => (
+              <option key={s.id} value={s.id}>{s.name.toUpperCase()}</option>
+            ))}
+         </select>
+
          <select 
            className="h-10 rounded-xl border border-slate-200 px-3 text-sm font-bold bg-white focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none shadow-sm"
            value={period}

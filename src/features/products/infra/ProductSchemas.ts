@@ -8,13 +8,13 @@ export const OmieProductSchema = z.object({
   id: z.union([z.string(), z.number()]).optional().transform(val => val ? String(val) : undefined),
   codigo_produto: z.union([z.string(), z.number()]).optional().transform(val => val ? String(val) : undefined),
   codigo: z.string().optional(),
-  descricao: z.string().optional().default('Sem descrição'),
+  descricao: z.string().optional(),
   familia: z.string().optional(),
   descricao_familia: z.string().optional(),
   unidade: z.string().optional().default('UN'),
-  valor_unitario: z.number().optional().default(0),
-  estoque: z.number().optional().default(0),
-  stockQuantity: z.number().optional().default(0),
+  valor_unitario: z.coerce.number().optional().default(0),
+  estoque: z.coerce.number().optional().default(0),
+  stockQuantity: z.coerce.number().optional().default(0),
   omieCode: z.union([z.string(), z.number()]).optional().transform(val => val ? String(val) : undefined),
 }).passthrough();
 

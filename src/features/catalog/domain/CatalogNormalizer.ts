@@ -40,13 +40,14 @@ export function findArray(obj: any, depth = 0): any[] | null {
  */
 export function normalizeProduct(p: any): Product {
   return {
-    id: String(p.omieCode || p.id || p.codigo_produto || ''),
-    code: String(p.codigo || p.code || ''),
+    id: String(p.omieCode || p.id || p.codigo_produto || p.codigo_produto_integracao || ''),
+    code: String(p.codigo || p.code || p.codigo_produto_integracao || p.codigo_produto || ''),
     description: String(p.descricao || p.description || p.descr_detalhada || 'Sem descrição'),
     family: String(p.descricao_familia || p.familyDescription || p.familia || p.family || ''),
     stock: Number(p.stockQuantity || p.estoque || p.stock || 0),
+    minStock: Number(p.estoque_minimo || p.minStock || 0),
     price: Number(p.valor_unitario || p.price || 0),
     unit: String(p.unidade || p.unit || 'UN'),
-    sectorId: p.sectorId
+    sectorIds: p.sectorIds || (p.sectorId ? [p.sectorId] : [])
   };
 }

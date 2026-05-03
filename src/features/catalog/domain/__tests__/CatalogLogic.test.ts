@@ -4,9 +4,9 @@ import { Product } from '../../../../types/api';
 
 describe('CatalogLogic', () => {
   const mockProducts: Partial<Product>[] = [
-    { id: '1', code: 'A1', description: 'Papel', family: 'Escritório', stock: 5, sectorId: 'S1' },
-    { id: '2', code: 'B2', description: 'Caneta', family: 'Escritório', stock: 20, sectorId: 'S1' },
-    { id: '3', code: 'C3', description: 'Martelo', family: 'Ferramentas', stock: 2, sectorId: 'S2' }
+    { id: '1', code: 'A1', description: 'Papel', family: 'Escritório', stock: 5, sectorIds: ['S1'] },
+    { id: '2', code: 'B2', description: 'Caneta', family: 'Escritório', stock: 20, sectorIds: ['S1'] },
+    { id: '3', code: 'C3', description: 'Martelo', family: 'Ferramentas', stock: 2, sectorIds: ['S2'] }
   ];
 
   describe('filterProducts', () => {

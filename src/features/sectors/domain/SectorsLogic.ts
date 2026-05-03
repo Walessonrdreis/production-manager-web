@@ -7,8 +7,14 @@ export const SectorsLogic = {
   calculateProductCounts(products: Product[]): Record<string, number> {
     const counts: Record<string, number> = {};
     products.forEach(p => {
-      if (p.sectorId) {
-        counts[p.sectorId] = (counts[p.sectorId] || 0) + 1;
+      if (p.sectorIds && Array.isArray(p.sectorIds)) {
+        p.sectorIds.forEach(sectorId => {
+          counts[sectorId] = (counts[sectorId] || 0) + 1;
+        });
+      } else if ((p as any).sectorId) {
+        // Fallback para dados legados durante a transição
+        const sid = (p as any).sectorId;
+        counts[sid] = (counts[sid] || 0) + 1;
       }
     });
     return counts;

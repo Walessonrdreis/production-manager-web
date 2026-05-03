@@ -24,7 +24,8 @@ export const CatalogLogic = {
         p.family.toLowerCase().includes(searchLower);
       
       const matchesFamily = !familyFilter || familyFilter === 'Todas' || p.family === familyFilter;
-      const matchesSector = !sectorFilter || (sectorFilter === 'none' ? !p.sectorId : p.sectorId === sectorFilter);
+      const sectors = p.sectorIds || ((p as any).sectorId ? [(p as any).sectorId] : []);
+      const matchesSector = !sectorFilter || (sectorFilter === 'none' ? sectors.length === 0 : sectors.includes(sectorFilter));
       const matchesStock = stockLevel === 'all' || (stockLevel === 'low' ? p.stock <= 10 : p.stock > 10);
       
       return matchesSearch && matchesFamily && matchesSector && matchesStock;

@@ -18,7 +18,8 @@ export interface Product {
   familyDescription?: string;
   price: number;
   stock: number;
-  sectorId?: string;
+  minStock?: number;
+  sectorIds?: string[];
 }
 
 export interface Sector {

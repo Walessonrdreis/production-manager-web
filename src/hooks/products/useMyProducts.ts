@@ -4,7 +4,9 @@ import {
   selectProduct as selectProductUseCase, 
   unselectProduct as unselectProductUseCase,
   getSelectedProducts,
-  clearMyProducts
+  clearMyProducts,
+  updateProductSector,
+  updateProduct as updateProductUseCase
 } from '../../features/products';
 import { Product } from '../../types/api';
 import { useToast } from '../../components/ui/Toast';
@@ -20,6 +22,22 @@ export function useMyProducts() {
       toastError(res.error);
     } else {
       success('Produto salvo nos favoritos.');
+    }
+    return res;
+  };
+
+  const assignSector = async (productId: string, sectorId: string | undefined) => {
+    const res = await updateProductSector(productId, sectorId);
+    if (!res.success) {
+      toastError(res.error);
+    }
+    return res;
+  };
+
+  const updateProduct = async (productId: string, data: Partial<Product>) => {
+    const res = await updateProductUseCase(productId, data);
+    if (!res.success) {
+      toastError(res.error);
     }
     return res;
   };
@@ -51,6 +69,8 @@ export function useMyProducts() {
   return {
     savedProducts,
     saveProduct,
+    assignSector,
+    updateProduct,
     removeProduct,
     clearAll,
     isSaved,

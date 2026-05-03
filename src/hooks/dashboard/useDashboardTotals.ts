@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { getStage20Totals } from '../../features/dashboard';
+import { getProductionTotals } from '../../features/production';
 
 export function useDashboardTotals() {
   const query = useQuery({
     queryKey: ['stage20-totals'],
-    queryFn: getStage20Totals,
+    queryFn: getProductionTotals,
     refetchInterval: 30000,
     refetchOnWindowFocus: true,
   });

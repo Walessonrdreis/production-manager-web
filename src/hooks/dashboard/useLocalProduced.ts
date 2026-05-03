@@ -2,9 +2,9 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db';
 import { 
   toggleProducedOrder, 
-  toggleAllProduced, 
+  toggleAllProduction, 
   removeLocalProduced 
-} from '../../features/dashboard';
+} from '../../features/production';
 import { useToast } from '../../components/ui/Toast';
 
 export function useLocalProduced() {
@@ -18,7 +18,7 @@ export function useLocalProduced() {
   };
 
   const toggleAll = async (description: string, totalNeeded: number) => {
-    const res = await toggleAllProduced(description, totalNeeded);
+    const res = await toggleAllProduction(description, totalNeeded);
     if (!res.success) error(res.error);
     return res;
   };

@@ -5,6 +5,8 @@ export function useSectors() {
   const query = useQuery({
     queryKey: ['sectors'],
     queryFn: getSectors,
+    staleTime: 5 * 60 * 1000, // 5 minutos de cache
+    gcTime: 30 * 60 * 1000,   // Perdurar por 30 minutos
   });
 
   const result = query.data;

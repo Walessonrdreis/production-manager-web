@@ -13,6 +13,7 @@ export const ENDPOINTS = {
   },
   SECTORS: {
     BASE: 'admin/sectors',
+    SYNC: 'admin/omie/sync/sectors',
   },
   PLANNING: {
     BASE: 'planning',

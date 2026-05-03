@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getProducedRecords } from '../../features/dashboard';
+import { getProducedRecords } from '../../features/production';
 
 export function useProducedRecords() {
   const query = useQuery({

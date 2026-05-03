@@ -13,6 +13,7 @@ interface PlanningProductListProps {
   onBulkAdd: () => void;
   onAddItem: (p: any, qty: number) => void;
   activeSectorName?: string;
+  sectors: any[];
 }
 
 export function PlanningProductList({
@@ -23,7 +24,8 @@ export function PlanningProductList({
   onToggleSelectAll,
   onBulkAdd,
   onAddItem,
-  activeSectorName
+  activeSectorName,
+  sectors
 }: PlanningProductListProps) {
   return (
     <Card>
@@ -81,7 +83,21 @@ export function PlanningProductList({
             <div className="flex-1 min-w-0 pr-2">
                 <div className="font-bold text-slate-900 uppercase text-xs truncate">{p.description}</div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
-                  <div className="text-[10px] text-blue-600 font-mono font-bold">ID: {p.id}</div>
+                  <div className="text-[10px] text-blue-600 font-mono font-bold">CÓD: {p.code || p.id}</div>
+                  {p.sectorIds && p.sectorIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {p.sectorIds.map((sid: string) => (
+                        <div key={sid} className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tight">
+                          🏠 {sectors.find(s => s.id === sid)?.name || 'Setor desconhecido'}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {!p.sectorIds && p.sectorId && (
+                    <div className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tight">
+                      🏠 {sectors.find(s => s.id === p.sectorId)?.name || 'Setor desconhecido'}
+                    </div>
+                  )}
                   {p.family && <div className="text-[10px] text-zinc-500 font-bold uppercase">Família: {p.family}</div>}
                   <div className="text-[10px] text-slate-500 font-bold uppercase">ESTOQUE: {p.stock} {p.unit}</div>
                   <div className="text-[10px] text-slate-900 font-bold">

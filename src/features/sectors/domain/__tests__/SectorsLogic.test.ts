@@ -6,16 +6,16 @@ describe('SectorsLogic', () => {
   describe('calculateProductCounts', () => {
     it('should correctly count products per sector', () => {
       const products: Partial<Product>[] = [
-        { id: '1', sectorId: 'S1' },
-        { id: '2', sectorId: 'S1' },
-        { id: '3', sectorId: 'S2' },
-        { id: '4', sectorId: undefined }
+        { id: '1', sectorIds: ['S1'] },
+        { id: '2', sectorIds: ['S1', 'S2'] },
+        { id: '3', sectorIds: ['S2'] },
+        { id: '4', sectorIds: [] }
       ];
 
       const counts = SectorsLogic.calculateProductCounts(products as Product[]);
 
       expect(counts['S1']).toBe(2);
-      expect(counts['S2']).toBe(1);
+      expect(counts['S2']).toBe(2);
       expect(counts['S3']).toBeUndefined();
     });
   });

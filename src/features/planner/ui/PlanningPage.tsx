@@ -81,6 +81,7 @@ export function PlanningPage() {
           onBulkAdd={handleBulkAdd}
           onAddItem={handleAddItem}
           activeSectorName={activeSector?.name}
+          sectors={sectors}
         />
 
         <PlanningSelectedItems 

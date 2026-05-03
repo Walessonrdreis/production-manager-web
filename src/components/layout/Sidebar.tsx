@@ -9,13 +9,15 @@ import {
   LogOut,
   X,
   User,
-  Users
+  Users,
+  Activity
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuthStore } from '../../services/auth/authService';
 
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { id: 'dashboard', label: 'Estatísticas', path: '/dashboard', icon: LayoutDashboard },
+  { id: 'production-control', label: 'Controle de Produção', path: '/production-control', icon: Activity },
   { id: 'products', label: 'Produtos Omie', path: '/products', icon: Package },
   { id: 'my-products', label: 'Meus Produtos', path: '/my-products', icon: User },
   { id: 'customers', label: 'Clientes', path: '/customers', icon: Users },

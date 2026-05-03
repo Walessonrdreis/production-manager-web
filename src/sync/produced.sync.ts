@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { markProducedAsSynced } from '../features/dashboard';
+import { markProducedAsSynced } from '../features/production';
 import { apiClient } from '../services/api/client';
 import { ENDPOINTS } from '../services/api/endpoints';
 

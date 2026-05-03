@@ -27,7 +27,7 @@ export const PlanningLogic = {
     });
 
     productsToAdd.forEach(({ product, quantity, sectorId, sectorName }) => {
-      const productCode = String(product.id);
+      const productCode = product.code || String(product.id);
       const key = `${productCode}-${sectorId}`;
       const existing = itemsByKey.get(key);
 

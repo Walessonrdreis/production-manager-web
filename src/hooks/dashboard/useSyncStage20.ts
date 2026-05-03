@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { syncStage20 as syncStage20UseCase } from '../../features/dashboard';
+import { syncProduction as syncProductionUseCase } from '../../features/production';
 import { useToast } from '../../components/ui/Toast';
 
 export function useSyncStage20() {
@@ -7,7 +7,7 @@ export function useSyncStage20() {
   const { success, error } = useToast();
 
   return useMutation({
-    mutationFn: syncStage20UseCase,
+    mutationFn: syncProductionUseCase,
     onSuccess: (result) => {
       if (result.success) {
         success('Sincronização concluída.', `Foram atualizados ${result.data.count} itens.`);

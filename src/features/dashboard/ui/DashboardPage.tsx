@@ -1,113 +1,53 @@
-import { useDashboardTotals } from '../../../hooks/dashboard/useDashboardTotals';
-import { useSyncStage20 } from '../../../hooks/dashboard/useSyncStage20';
-import { useOrders } from '../../../hooks/orders/useOrders';
-import { Button } from '../../../components/ui/Button';
-import { AlertCircle } from 'lucide-react';
-import { useState, useMemo } from 'react';
-import { useLocalProduced } from '../../../hooks/dashboard/useLocalProduced';
-
-import { DashboardHeader } from './components/DashboardHeader';
-import { DashboardStats } from './components/DashboardStats';
-import { DashboardPlanningTable } from './components/DashboardPlanningTable';
-import { DashboardDetailsModal } from './components/DashboardDetailsModal';
-import { DashboardLogic } from '../domain/DashboardLogic';
+import { Card } from '../../../components/ui/Card';
+import { LayoutDashboard, TrendingUp, AlertCircle, BarChart3 } from 'lucide-react';
 
 export function DashboardPage() {
-  const { data: totals, isLoading: isApiLoading, isError, error, refetch: refetchTotals, isFetching } = useDashboardTotals();
-  const syncStage20 = useSyncStage20();
-  const { orders, isLoading: isOrdersLoading } = useOrders();
-  const { producedRecords, toggleOrder, toggleAll, isLoading: isLocalLoading } = useLocalProduced();
-  
-  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  return (
+    <div className="space-y-6">
+      <header>
+        <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Painel Estratégico</h1>
+        <p className="text-sm text-zinc-500">Visão geral do desempenho da fábrica</p>
+      </header>
 
-  const isLoading = isApiLoading || isLocalLoading || isOrdersLoading;
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-zinc-50/50 border-dashed border-zinc-200">
+          <div className="flex flex-col items-center justify-center py-6">
+            <TrendingUp size={24} className="text-zinc-300 mb-2" />
+            <span className="text-xs font-medium text-zinc-400">Em Breve: Eficiência</span>
+          </div>
+        </Card>
+        <Card className="bg-zinc-50/50 border-dashed border-zinc-200">
+          <div className="flex flex-col items-center justify-center py-6">
+            <BarChart3 size={24} className="text-zinc-300 mb-2" />
+            <span className="text-xs font-medium text-zinc-400">Em Breve: Gargalos</span>
+          </div>
+        </Card>
+        <Card className="bg-zinc-50/50 border-dashed border-zinc-200">
+          <div className="flex flex-col items-center justify-center py-6">
+            <AlertCircle size={24} className="text-zinc-300 mb-2" />
+            <span className="text-xs font-medium text-zinc-400">Em Breve: Atrasos</span>
+          </div>
+        </Card>
+        <Card className="bg-zinc-50/50 border-dashed border-zinc-200">
+          <div className="flex flex-col items-center justify-center py-6">
+            <LayoutDashboard size={24} className="text-zinc-300 mb-2" />
+            <span className="text-xs font-medium text-zinc-400">Em Breve: KPIs</span>
+          </div>
+        </Card>
+      </div>
 
-  const currentProductData = useMemo(() => {
-    if (!selectedProduct || !totals) return null;
-    return totals.data.find(p => p.description === selectedProduct) || null;
-  }, [selectedProduct, totals]);
-
-  const ordersWithProduct = useMemo(() => {
-    if (!selectedProduct || !orders) return [];
-    return DashboardLogic.filterOrdersByProduct(orders, selectedProduct);
-  }, [selectedProduct, orders]);
-
-  const handleToggleProduct = (description: string, totalNeeded: number) => {
-    toggleAll(description, totalNeeded);
-  };
-
-  const handleToggleOrder = (orderId: string, description: string, quantity: number, orderNumber: string) => {
-    const id = DashboardLogic.generateProducedId(orderId, description);
-    toggleOrder(id, description, quantity, orderId, orderNumber);
-  };
-
-  const isOrderProduced = (orderId: string, description: string) => {
-    const id = DashboardLogic.generateProducedId(orderId, description);
-    return producedRecords.some(r => r.id === id);
-  };
-
-  const getProducedQuantity = (description: string) => {
-    return DashboardLogic.calculateProducedQuantity(producedRecords, description);
-  };
-
-  const totalProducedItemsCount = DashboardLogic.calculateTotalProduced(producedRecords);
-  const adjustedTotal = Math.max(0, (totals?.totalItems || 0) - totalProducedItemsCount);
-
-  if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-center">
-        <div className="bg-red-50 p-6 rounded-2xl border border-red-100 max-w-sm">
-          <AlertCircle size={32} className="text-red-500 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-red-900 mb-1">Atenção</h2>
-          <p className="text-red-700 text-sm mb-6 bg-white py-2 px-4 rounded border border-red-100 italic">
-            {typeof error === 'string' ? error : 'Ocorreu um erro ao carregar os dados.'}
+      <div className="bg-white p-12 rounded-2xl border border-zinc-100 flex flex-col items-center justify-center text-center space-y-4">
+        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
+          <BarChart3 className="text-blue-500" size={32} />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-zinc-900">Configurando seu novo Painel</h3>
+          <p className="text-sm text-zinc-500 max-w-md mx-auto">
+            A funcionalidade de acompanhamento foi movida para a aba <strong>"Acompanhamento"</strong> no menu lateral.
+            Este espaço será transformado em uma central de inteligência para sua fábrica.
           </p>
-          <Button onClick={() => refetchTotals()} variant="outline" size="sm" className="w-full">
-            Tentar Novamente
-          </Button>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4 sm:space-y-8">
-      <DashboardHeader 
-        isFetching={isFetching}
-        isSyncing={syncStage20.isPending}
-        onSync={() => syncStage20.mutate()}
-      />
-
-      <DashboardStats 
-        totalItems={adjustedTotal}
-        uniqueSkus={totals?.data.length || 0}
-        lastUpdate={totals?.lastUpdate}
-        isLoading={isLoading}
-      />
-
-      <DashboardPlanningTable 
-        isLoading={isLoading}
-        data={totals?.data || []}
-        getProducedQuantity={getProducedQuantity}
-        onToggleProduct={handleToggleProduct}
-        onSelectProduct={(desc) => {
-          setSelectedProduct(desc);
-          setShowDetailsModal(true);
-        }}
-      />
-
-      <DashboardDetailsModal 
-        isOpen={showDetailsModal}
-        onClose={() => setShowDetailsModal(false)}
-        selectedProduct={selectedProduct}
-        currentProductData={currentProductData}
-        producedQuantity={selectedProduct ? getProducedQuantity(selectedProduct) : 0}
-        ordersWithProduct={ordersWithProduct}
-        isOrderProduced={isOrderProduced}
-        onToggleProduct={handleToggleProduct}
-        onToggleOrder={handleToggleOrder}
-      />
     </div>
   );
 }

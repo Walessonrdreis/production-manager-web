@@ -1,18 +1,20 @@
 import { Button } from '../../../../components/ui/Button';
 import { RefreshCw } from 'lucide-react';
 
-interface DashboardHeaderProps {
+interface MonitoringHeaderProps {
   isFetching: boolean;
   isSyncing: boolean;
   onSync: () => void;
+  title?: string;
+  subtitle?: string;
 }
 
-export function DashboardHeader({ isFetching, isSyncing, onSync }: DashboardHeaderProps) {
+export function MonitoringHeader({ isFetching, isSyncing, onSync, title, subtitle }: MonitoringHeaderProps) {
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Status de Produção</h1>
-        <p className="text-xs sm:text-sm text-zinc-500">Etapa 20 - Produtos e Vendas em Aberto</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">{title || "Status de Produção"}</h1>
+        <p className="text-xs sm:text-sm text-zinc-500">{subtitle || "Etapa 20 - Produtos e Vendas em Aberto"}</p>
       </div>
       <div className="flex items-center gap-4 w-full sm:w-auto">
         {(isFetching || isSyncing) && <RefreshCw size={16} className="animate-spin text-blue-500" />}

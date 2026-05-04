@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v2.4.0 (Atualizado em 03/05/2026 - Melhoria na Visibilidade de Pedidos no Dashboard)
+**Versão:** v2.6.0 (Atualizado em 04/05/2026 - Integração Planejamento x Controle de Produção)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento e rastreamento de progresso.
@@ -8,6 +8,15 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 
 ### 1. Separação de Responsabilidades (Novo)
 - **Feature Produção (Controle de Produção):** Criada uma feature dedicada para o rastreamento de itens produzidos (antigo Dashboard). Acompanhada da rota `/production-control`.
+- **Programação de Produção (CRUD Completo):** 
+  - **Create/Update:** Possibilidade de atribuir e editar datas de produção e observações detalhadas para cada item.
+  - **Relacionamento com Planejamento:** Integração automática; ao planejar itens na aba "Planejamento", as datas de produção são automaticamente sincronizadas com o "Controle de Produção".
+  - **Read:** Visualização clara de prazos na tabela com badges de status (Atrasado, Hoje, Futuro).
+  - **Delete:** Opção de remover a programação de um item específico.
+  - **Persistência Móvel:** Dados salvos localmente via IndexedDB para resiliência.
+- **Gestão de Prazos:** Filtros inteligentes por período (Hoje, Amanhã, Semana) e alertas visuais para itens em atraso (past-due).
+
+### 2. Dashboard Estratégico (Novo)
 - **Feature Dashboard (Estratégico):** O dashboard agora é um espaço reservado para métricas de alto nível e inteligência de dados, desvinculado das operações de checklist diário.
 
 ### 2. Otimização e Sincronização de Setores (Final)

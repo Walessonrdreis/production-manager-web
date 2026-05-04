@@ -41,3 +41,10 @@ export interface Customer {
 export type SavedProduct = Product & {
   savedAt: string;
 };
+
+export interface ProductionSchedule {
+  description: string;
+  scheduledAt: string;
+  notes?: string;
+  updatedAt: string;
+}

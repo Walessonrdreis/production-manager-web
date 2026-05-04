@@ -28,9 +28,10 @@ const styles = StyleSheet.create({
 interface PlanningPDFProps {
   items: any[];
   period: string;
+  scheduledAt: string;
 }
 
-export const PlanningPDF = ({ items, period }: PlanningPDFProps) => {
+export const PlanningPDF = ({ items, period, scheduledAt }: PlanningPDFProps) => {
   const periodLabel = {
     daily: 'Diário',
     weekly: 'Semanal',
@@ -65,7 +66,11 @@ export const PlanningPDF = ({ items, period }: PlanningPDFProps) => {
                 SETOR: {groupedItems[sectorId].name.toUpperCase()}
               </Text>
             </View>
-            <Text style={styles.subtitle}>Período: {periodLabel} | Gerado em: {new Date().toLocaleString()}</Text>
+            <Text style={styles.subtitle}>
+              Prazos: {new Date(scheduledAt + 'T12:00:00').toLocaleDateString('pt-BR')} | 
+              Período: {periodLabel} | 
+              Gerado em: {new Date().toLocaleString()}
+            </Text>
           </View>
 
           <View style={styles.table}>

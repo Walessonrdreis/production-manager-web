@@ -7,9 +7,10 @@ interface PlanningSelectedItemsProps {
   items: any[];
   onUpdateQuantity: (id: string, qty: number) => void;
   onRemoveItem: (id: string) => void;
+  scheduledAt: string;
 }
 
-export function PlanningSelectedItems({ items, onUpdateQuantity, onRemoveItem }: PlanningSelectedItemsProps) {
+export function PlanningSelectedItems({ items, onUpdateQuantity, onRemoveItem, scheduledAt }: PlanningSelectedItemsProps) {
   // Agrupa itens por setor
   const groupedItems = items.reduce((acc: any, item) => {
     const sectorKey = item.sectorId || 'unassigned';
@@ -52,7 +53,12 @@ export function PlanningSelectedItems({ items, onUpdateQuantity, onRemoveItem }:
                 <div key={item.id} className="flex items-center gap-4 p-4 rounded-xl border border-blue-100 bg-blue-50/30">
                   <div className="flex-1 min-w-0">
                       <div className="font-bold text-slate-900 uppercase text-xs truncate">{item.description}</div>
-                      <div className="text-[10px] text-slate-500 font-mono italic">Cód: {item.code}</div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-slate-500 font-mono italic">Cód: {item.code}</span>
+                        <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">
+                          {scheduledAt.split('-').reverse().join('/')}
+                        </span>
+                      </div>
                   </div>
                   <div className="w-20">
                       <Input 

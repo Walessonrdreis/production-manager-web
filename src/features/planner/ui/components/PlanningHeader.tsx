@@ -6,6 +6,8 @@ import { PlanningPDF } from '../PlanningPDF';
 interface PlanningHeaderProps {
   period: 'daily' | 'weekly' | 'monthly';
   onPeriodChange: (val: 'daily' | 'weekly' | 'monthly') => void;
+  scheduledAt: string;
+  onScheduledAtChange: (val: string) => void;
   onClear: () => void;
   items: any[];
   sectors: any[];
@@ -14,8 +16,8 @@ interface PlanningHeaderProps {
 }
 
 export function PlanningHeader({ 
-  period, onPeriodChange, onClear, items, 
-  sectors, activeSectorId, onActiveSectorChange 
+  period, onPeriodChange, scheduledAt, onScheduledAtChange,
+  onClear, items, sectors, activeSectorId, onActiveSectorChange 
 }: PlanningHeaderProps) {
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -44,11 +46,21 @@ export function PlanningHeader({
             <option value="weekly">Semanal</option>
             <option value="monthly">Mensal</option>
          </select>
+
+         <div className="flex items-center gap-2 bg-white border border-slate-200 h-10 px-3 rounded-xl shadow-sm flex-1 sm:flex-none">
+           <span className="text-[10px] uppercase font-bold text-zinc-400">Data Produção:</span>
+           <input 
+             type="date"
+             value={scheduledAt}
+             onChange={(e) => onScheduledAtChange(e.target.value)}
+             className="text-sm font-bold outline-none bg-transparent"
+           />
+         </div>
          
          <Button variant="outline" size="sm" onClick={onClear} className="text-xs flex-1 sm:flex-none h-10 px-4">Limpar</Button>
          
          <PDFDownloadLink 
-           document={<PlanningPDF items={items} period={period} />} 
+           document={<PlanningPDF items={items} period={period} scheduledAt={scheduledAt} />} 
            fileName={`planejamento-${period}-${new Date().toISOString().split('T')[0]}.pdf`}
            className="w-full sm:w-auto"
          >

@@ -14,7 +14,11 @@ export function PlanningPage() {
   const [activeSectorId, setActiveSectorId] = useState<string>('');
   
   const { savedProducts } = useMyProducts();
-  const { items, addItem, addBulkItems, removeItem, period, setPeriod, clearPlanning, updateQuantity } = usePlanning();
+  const { 
+    items, addItem, addBulkItems, removeItem, 
+    period, setPeriod, clearPlanning, updateQuantity,
+    scheduledAt, setScheduledAt 
+  } = usePlanning();
   const { data: sectors = [] } = useSectors();
   
   // Define o primeiro setor como ativo inicialmente se houver setores
@@ -63,6 +67,8 @@ export function PlanningPage() {
       <PlanningHeader 
         period={period}
         onPeriodChange={setPeriod}
+        scheduledAt={scheduledAt}
+        onScheduledAtChange={setScheduledAt}
         onClear={clearPlanning}
         items={items}
         sectors={sectors}
@@ -88,6 +94,7 @@ export function PlanningPage() {
           items={items}
           onUpdateQuantity={updateQuantity}
           onRemoveItem={removeItem}
+          scheduledAt={scheduledAt}
         />
       </div>
     </div>

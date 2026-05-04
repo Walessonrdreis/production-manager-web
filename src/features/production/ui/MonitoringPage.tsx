@@ -2,36 +2,88 @@ import { useDashboardTotals } from '../../../hooks/dashboard/useDashboardTotals'
 import { useSyncStage20 } from '../../../hooks/dashboard/useSyncStage20';
 import { useOrders } from '../../../hooks/orders/useOrders';
 import { Button } from '../../../components/ui/Button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Filter, Calendar as CalendarIcon } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useLocalProduced } from '../../../hooks/dashboard/useLocalProduced';
+import { useProductionSchedules } from '../../../hooks/production/useProductionSchedules';
 
 import { MonitoringHeader } from './components/MonitoringHeader';
 import { MonitoringStats } from './components/MonitoringStats';
 import { MonitoringTable } from './components/MonitoringTable';
 import { MonitoringDetailsModal } from './components/MonitoringDetailsModal';
+import { ScheduleEditModal } from './components/ScheduleEditModal';
 import { TrackingLogic } from '../domain/TrackingLogic';
+import { cn } from '../../../utils/cn';
 
 export function MonitoringPage() {
   const { data: totals, isLoading: isApiLoading, isError, error, refetch: refetchTotals, isFetching } = useDashboardTotals();
   const syncStage20 = useSyncStage20();
   const { orders, isLoading: isOrdersLoading } = useOrders();
   const { producedRecords, toggleOrder, toggleAll, isLoading: isLocalLoading } = useLocalProduced();
+  const { schedules, setSchedule, removeSchedule, isSetting } = useProductionSchedules();
   
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  
+  const [editingScheduleDesc, setEditingScheduleDesc] = useState<string | null>(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+  const [filter, setFilter] = useState<'all' | 'today' | 'tomorrow' | 'week' | 'overdue'>('all');
 
   const isLoading = isApiLoading || isLocalLoading || isOrdersLoading;
+
+  const getProducedQuantity = (description: string) => {
+    return TrackingLogic.calculateProducedQuantity(producedRecords, description);
+  };
+
+  const filteredData = useMemo(() => {
+    if (!totals?.data) return [];
+    
+    let result = [...totals.data];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (filter !== 'all') {
+      result = result.filter(p => {
+        const schedule = schedules.find(s => s.description === p.description);
+        if (!schedule) return false;
+
+        const [year, month, day] = schedule.scheduledAt.split('-').map(Number);
+        const scheduledDate = new Date(year, month - 1, day);
+        scheduledDate.setHours(0, 0, 0, 0);
+
+        if (filter === 'today') return scheduledDate.getTime() === today.getTime();
+        if (filter === 'tomorrow') {
+          const tomorrow = new Date(today);
+          tomorrow.setDate(today.getDate() + 1);
+          return scheduledDate.getTime() === tomorrow.getTime();
+        }
+        if (filter === 'week') {
+          const nextWeek = new Date(today);
+          nextWeek.setDate(today.getDate() + 7);
+          return scheduledDate >= today && scheduledDate <= nextWeek;
+        }
+        if (filter === 'overdue') {
+          const isProduced = getProducedQuantity(p.description) >= p.totalQuantity;
+          return scheduledDate < today && !isProduced;
+        }
+        return true;
+      });
+    }
+
+    return result;
+  }, [totals, schedules, filter, producedRecords]);
 
   const currentProductData = useMemo(() => {
     if (!selectedProduct || !totals) return null;
     return totals.data.find(p => p.description === selectedProduct) || null;
   }, [selectedProduct, totals]);
 
-  const ordersWithProduct = useMemo(() => {
-    if (!selectedProduct || !orders) return [];
-    return TrackingLogic.filterOrdersByProduct(orders, selectedProduct);
-  }, [selectedProduct, orders]);
+  const currentSchedule = useMemo(() => {
+    if (!editingScheduleDesc) return undefined;
+    return schedules.find(s => s.description === editingScheduleDesc);
+  }, [editingScheduleDesc, schedules]);
 
   const handleToggleProduct = (description: string, totalNeeded: number) => {
     toggleAll(description, totalNeeded);
@@ -45,10 +97,6 @@ export function MonitoringPage() {
   const isOrderProduced = (orderId: string, description: string) => {
     const id = TrackingLogic.generateProducedId(orderId, description);
     return producedRecords.some(r => r.id === id);
-  };
-
-  const getProducedQuantity = (description: string) => {
-    return TrackingLogic.calculateProducedQuantity(producedRecords, description);
   };
 
   const totalProducedItemsCount = TrackingLogic.calculateTotalProduced(producedRecords);
@@ -77,7 +125,7 @@ export function MonitoringPage() {
         isFetching={isFetching}
         isSyncing={syncStage20.isPending}
         onSync={() => syncStage20.mutate()}
-        title="Acompanhamento de Produção"
+        title="Controle de Produção"
         subtitle="Monitoramento em tempo real (Etapa 20)"
       />
 
@@ -88,14 +136,53 @@ export function MonitoringPage() {
         isLoading={isLoading}
       />
 
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-zinc-100">
+        <div className="flex items-center gap-3">
+          <Filter size={18} className="text-zinc-400" />
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'all', label: 'Todos' },
+              { id: 'today', label: 'Para Hoje' },
+              { id: 'tomorrow', label: 'Amanhã' },
+              { id: 'week', label: 'Esta Semana' },
+              { id: 'overdue', label: 'Atrasados', color: 'text-red-600 font-bold' }
+            ].map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id as any)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                  filter === f.id 
+                    ? "bg-zinc-900 text-white shadow-sm" 
+                    : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100",
+                  f.color && filter !== f.id ? f.color : ""
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
+          <CalendarIcon size={14} />
+          {filteredData.length} itens mostrados
+        </div>
+      </div>
+
       <MonitoringTable 
         isLoading={isLoading}
-        data={totals?.data || []}
+        data={filteredData}
         getProducedQuantity={getProducedQuantity}
         onToggleProduct={handleToggleProduct}
         onSelectProduct={(desc) => {
           setSelectedProduct(desc);
           setShowDetailsModal(true);
+        }}
+        schedules={schedules}
+        onOpenSchedule={(desc) => {
+          setEditingScheduleDesc(desc);
+          setShowScheduleModal(true);
         }}
       />
 
@@ -105,10 +192,28 @@ export function MonitoringPage() {
         selectedProduct={selectedProduct}
         currentProductData={currentProductData}
         producedQuantity={selectedProduct ? getProducedQuantity(selectedProduct) : 0}
-        ordersWithProduct={ordersWithProduct}
+        ordersWithProduct={selectedProduct ? TrackingLogic.filterOrdersByProduct(orders, selectedProduct) : []}
         isOrderProduced={isOrderProduced}
         onToggleProduct={handleToggleProduct}
         onToggleOrder={handleToggleOrder}
+      />
+
+      <ScheduleEditModal 
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        description={editingScheduleDesc || ''}
+        currentSchedule={currentSchedule}
+        isLoading={isSetting}
+        onSave={(date, notes) => {
+          if (editingScheduleDesc) {
+            setSchedule({ description: editingScheduleDesc, date, notes });
+          }
+        }}
+        onRemove={() => {
+          if (editingScheduleDesc) {
+            removeSchedule(editingScheduleDesc);
+          }
+        }}
       />
     </div>
   );

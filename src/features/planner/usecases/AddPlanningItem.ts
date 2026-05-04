@@ -2,6 +2,7 @@ import { Product } from '../../../types/api';
 import { PlanningRepository } from '../infra/PlanningRepository';
 import { PlanningLogic } from '../domain/PlanningLogic';
 import { Result } from '../../../lib/Result';
+import { setProductionSchedule } from '../../production';
 
 /**
  * UseCase: Adiciona um item ao planejamento.
@@ -11,7 +12,8 @@ export async function addPlanningItem(
   product: Product, 
   quantity: number, 
   sectorId: string, 
-  sectorName: string
+  sectorName: string,
+  scheduledAt?: string
 ): Promise<Result<void>> {
   try {
     if (quantity <= 0) {
@@ -30,6 +32,10 @@ export async function addPlanningItem(
 
     if (toUpdate.length > 0) {
       await PlanningRepository.update(toUpdate[0].id, { quantity: toUpdate[0].quantity });
+    }
+
+    if (scheduledAt) {
+      await setProductionSchedule(product.description, scheduledAt, `Planejado via setor: ${sectorName}`);
     }
 
     return Result.ok(undefined);

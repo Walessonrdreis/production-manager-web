@@ -2,6 +2,7 @@ import { Product } from '../../../types/api';
 import { PlanningRepository } from '../infra/PlanningRepository';
 import { PlanningLogic } from '../domain/PlanningLogic';
 import { Result } from '../../../lib/Result';
+import { setProductionSchedule } from '../../production';
 
 /**
  * UseCase: Adiciona múltiplos produtos ao planejamento com quantidade padrão 1.
@@ -10,7 +11,8 @@ import { Result } from '../../../lib/Result';
 export async function addBulkPlanningItems(
   products: Product[], 
   sectorId: string, 
-  sectorName: string
+  sectorName: string,
+  scheduledAt?: string
 ): Promise<Result<void>> {
   try {
     const currentItems = await PlanningRepository.getAll();
@@ -29,6 +31,13 @@ export async function addBulkPlanningItems(
 
     if (toUpdate.length > 0) {
       await PlanningRepository.bulkUpdate(toUpdate);
+    }
+
+    if (scheduledAt) {
+      // Sincroniza cada produto com a agenda de produção
+      await Promise.all(products.map(p => 
+        setProductionSchedule(p.description, scheduledAt, `Planejado via setor (lote): ${sectorName}`)
+      ));
     }
 
     return Result.ok(undefined);

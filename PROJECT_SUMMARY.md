@@ -1,8 +1,19 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v2.6.0 (Atualizado em 04/05/2026 - Integração Planejamento x Controle de Produção)
+**Versão:** v3.0.0-draft (Atualizado em 04/05/2026 - Roadmap de Gestão de Lotes e Metas)
 
 ## 🎯 Objetivo
-Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento e rastreamento de progresso.
+Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e, futuramente, gestão de metas e lotes.
+
+---
+
+## 🚀 Próximos Passos (Roadmap v3.0)
+
+Documentação detalhada disponível em `/FEATURE-DOCS/`:
+- **Evolução do Planejamento:** `PLANNING_EVOLUTION.md` (Gestão por Lotes e Preview PDF).
+- **Gestão de Metas:** `GOALS_SPECIFICATION.md` (Metas por SKU e Indicadores).
+- **Persistência & API:** `DATA_PERSISTENCE_STRATEGY.md` e `LOCAL_STORAGE_MAPPING.md`.
+
+---
 
 ## 🏗️ Arquitetura Técnica (ADR-003 & Guia Operacional)
 

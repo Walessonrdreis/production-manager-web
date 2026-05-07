@@ -28,7 +28,7 @@ describe('PlanningLogic', () => {
 
       expect(result.toAdd).toHaveLength(1);
       expect(result.toAdd[0]).toMatchObject({
-        code: 'P1',
+        productCode: 'P1-CODE',
         description: 'Produto 1',
         quantity: 5,
         sectorId: 'S1'
@@ -38,7 +38,7 @@ describe('PlanningLogic', () => {
 
     it('should suggest updating an existing item when codes and sectors match', () => {
       const currentItems: PlanningItem[] = [
-        { id: 'uuid-1', code: 'P1', description: 'P1', quantity: 2, unit: 'UN', synced: false, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA' }
+        { id: 'uuid-1', productCode: 'P1-CODE', description: 'P1', quantity: 2, unit: 'UN', synced: false, lastModified: Date.now(), version: 1, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA', batchId: 'B1' }
       ];
       const productsToAdd = [{ 
         product: mockProduct, 
@@ -59,7 +59,7 @@ describe('PlanningLogic', () => {
 
     it('should suggest adding a new item even if code exists but sector is different', () => {
       const currentItems: PlanningItem[] = [
-        { id: 'uuid-1', code: 'P1', description: 'P1', quantity: 2, unit: 'UN', synced: false, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA' }
+        { id: 'uuid-1', productCode: 'P1-CODE', description: 'P1', quantity: 2, unit: 'UN', synced: false, lastModified: Date.now(), version: 1, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA', batchId: 'B1' }
       ];
       const productsToAdd = [{ 
         product: mockProduct, 
@@ -77,12 +77,12 @@ describe('PlanningLogic', () => {
 
     it('should handle multiple products and cumulative additions in the same batch', () => {
       const currentItems: PlanningItem[] = [
-        { id: 'uuid-1', code: 'P1', description: 'P1', quantity: 2, unit: 'UN', synced: false, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA' }
+        { id: 'uuid-1', productCode: 'P1-CODE', description: 'P1', quantity: 2, unit: 'UN', synced: false, lastModified: Date.now(), version: 1, updatedAt: '', sectorId: 'S1', sectorName: 'SOLDA', batchId: 'B1' }
       ];
       const productsToAdd = [
         { product: mockProduct, quantity: 3, sectorId: 'S1', sectorName: 'SOLDA' },
         { product: mockProduct, quantity: 10, sectorId: 'S1', sectorName: 'SOLDA' },
-        { product: { ...mockProduct, id: 'P2', description: 'P2' }, quantity: 1, sectorId: 'S1', sectorName: 'SOLDA' }
+        { product: { ...mockProduct, id: 'P2', code: 'P2', description: 'P2' }, quantity: 1, sectorId: 'S1', sectorName: 'SOLDA' }
       ];
 
       const result = PlanningLogic.calculateAdditions(currentItems, productsToAdd);
@@ -92,7 +92,7 @@ describe('PlanningLogic', () => {
       expect(result.toUpdate[1].quantity).toBe(15);
       
       expect(result.toAdd).toHaveLength(1); // P2 é novo
-      expect(result.toAdd[0].code).toBe('P2');
+      expect(result.toAdd[0].productCode).toBe('P2');
     });
   });
 

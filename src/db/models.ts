@@ -10,16 +10,22 @@ export interface ProducedRecord {
   updatedAt: string;
 }
 
-export interface PlanningItem {
-  id: string;
-  code: string;
+export interface PlanningItem extends Syncable {
+  batchId: string;      // ID do lote de planejamento
+  productCode: string;  // SKU como link universal
   description: string;
   unit: string;
   quantity: number;
   sectorId?: string;
   sectorName?: string;
-  synced: boolean;
   updatedAt: string;
+}
+
+export interface PlanningBatch extends Syncable {
+  name: string;         // Nome do lote (ex: "Semana 18 - Maranhão")
+  date: string;         // Data do planejamento
+  status: 'draft' | 'published' | 'completed';
+  createdBy: string;
 }
 
 export interface APICache {
@@ -38,11 +44,27 @@ export interface Customer {
   updatedAt: string;
 }
 
-export type SavedProduct = Product & {
+export interface Syncable {
+  id: string;          // UUID gerado localmente
+  synced: boolean;     // false = alteração local pendente
+  lastModified: number; // Timestamp para resolução de conflitos
+  version: number;     // Controle de concorrência
+}
+
+export interface SectorSync extends Syncable {
+  name: string;
+  description?: string;
+  productCodes: string[]; // Lista de SKUs associados a este setor
+}
+
+export type SavedProduct = Product & Syncable & {
   savedAt: string;
+  category?: string;
+  sectorIds: string[]; // Relacionamento com setores
 };
 
-export interface ProductionSchedule {
+export interface ProductionSchedule extends Syncable {
+  productCode: string; // SKU como link universal
   description: string;
   scheduledAt: string;
   notes?: string;

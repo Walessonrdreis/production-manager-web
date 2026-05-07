@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Menu, Cloud, RefreshCw } from 'lucide-react';
 import { useSyncStatus } from '../../hooks/ui/useSyncStatus';
+import { PendingChangesModal } from '../modals/PendingChangesModal';
 
 interface TopbarProps {
   onToggleSidebar: () => void;
@@ -9,6 +10,7 @@ interface TopbarProps {
 
 export function Topbar({ onToggleSidebar, title }: TopbarProps) {
   const { pendingCount, isSynced } = useSyncStatus();
+  const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-40 transition-all">
@@ -28,8 +30,16 @@ export function Topbar({ onToggleSidebar, title }: TopbarProps) {
       </div>
       
       <div className="flex items-center gap-4">
-        {/* Sync Status */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100">
+        {/* Sync Status - Transformed into a clickable button */}
+        <button 
+          onClick={() => setIsPendingModalOpen(true)}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all hover:shadow-sm active:scale-95 ${
+            isSynced 
+              ? 'bg-slate-50 border-slate-100 hover:bg-slate-100' 
+              : 'bg-amber-50 border-amber-100 hover:bg-amber-100'
+          }`}
+          title={isSynced ? "Todos os dados estão sincronizados" : "Ver alterações pendentes"}
+        >
           {isSynced ? (
             <>
               <Cloud size={14} className="text-emerald-500" />
@@ -43,13 +53,18 @@ export function Topbar({ onToggleSidebar, title }: TopbarProps) {
               </span>
             </>
           )}
-        </div>
+        </button>
 
         <div className="flex flex-col items-end">
           <span className="text-[10px] sm:text-xs font-medium text-slate-500">Matriz</span>
           <span className="text-[8px] sm:text-[10px] text-emerald-600 font-bold uppercase">Conectado</span>
         </div>
       </div>
+
+      <PendingChangesModal 
+        isOpen={isPendingModalOpen} 
+        onClose={() => setIsPendingModalOpen(false)} 
+      />
     </header>
   );
 }

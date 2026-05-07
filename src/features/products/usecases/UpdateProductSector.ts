@@ -1,4 +1,5 @@
 import { MyProductsRepository } from '../infra/MyProductsRepository';
+import { sectorsLocalRepository } from '../../sectors/infra/SectorsIndexedDBRepo';
 import { Result } from '../../../lib/Result';
 
 /**
@@ -13,19 +14,25 @@ export async function updateProductSector(productId: string, sectorId: string | 
       return Result.fail('Produto não encontrado no catálogo local.');
     }
 
+    const productCode = product.code;
     const currentSectors = product.sectorIds || [];
     let updatedSectors: string[];
 
     if (sectorId === undefined) {
-      // Clear all
+      // Remover de todos os setores
+      for (const sId of currentSectors) {
+        await sectorsLocalRepository.removeProductFromSector(sId, productCode);
+      }
       updatedSectors = [];
     } else {
       const exists = currentSectors.includes(sectorId);
       if (exists) {
-        // Remove
+        // Remover vínculo específico
+        await sectorsLocalRepository.removeProductFromSector(sectorId, productCode);
         updatedSectors = currentSectors.filter(id => id !== sectorId);
       } else {
-        // Add
+        // Adicionar vínculo específico
+        await sectorsLocalRepository.addProductToSector(sectorId, productCode);
         updatedSectors = [...currentSectors, sectorId];
       }
     }

@@ -26,11 +26,28 @@ export const OmieOrderSchema = z.object({
   }).optional(),
   cliente: z.string().optional().default('Cliente Omie'),
   detalhe: z.object({
-    itens: z.array(OmieOrderItemSchema).optional().default([]),
+    itens: z.array(z.any()).optional().default([]),
   }).optional(),
   status: z.string().optional(),
   cancelado: z.string().optional().default('N'),
   encerrado: z.string().optional().default('N'),
+  
+  // V1 format
+  order: z.object({
+    omieCode: z.string().optional(),
+    orderNumber: z.string().optional(),
+    stage: z.string().optional(),
+    expectedDate: z.string().optional(),
+    cancelled: z.boolean().optional(),
+    closed: z.boolean().optional(),
+  }).optional(),
+  client: z.object({
+    omieClientCode: z.string().optional(),
+    legalName: z.string().optional(),
+    tradeName: z.string().optional(),
+    document: z.string().optional(),
+  }).optional(),
+  
   // Aliases e campos extras que o normalizer pode usar
   omieCode: z.union([z.string(), z.number()]).optional(),
   id: z.union([z.string(), z.number()]).optional(),

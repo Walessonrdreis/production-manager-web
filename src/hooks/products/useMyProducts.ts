@@ -1,5 +1,8 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../db';
+import { useEffect } from 'react';
+import { catalogDb } from '../../features/catalog/infra/CatalogDB';
+import { productRepository } from '../../features/catalog/infra/ProductIndexedDBRepo';
+import { MyProductsRepository } from '../../features/products/infra/MyProductsRepository';
 import { 
   selectProduct as selectProductUseCase, 
   unselectProduct as unselectProductUseCase,
@@ -13,7 +16,23 @@ import { useToast } from '../../components/ui/Toast';
 
 export function useMyProducts() {
   const { success, error: toastError } = useToast();
-  const products = useLiveQuery(() => db.myProducts.toArray());
+  
+  // Garantimos que a migração ocorra fora do liveQuery para evitar erros de transação
+  useEffect(() => {
+    productRepository.ensureMigration();
+    // Gatilho de sincronização inicial com a API (Local-First)
+    const sync = async () => {
+      try {
+        await MyProductsRepository.getAll();
+      } catch (e) {
+        console.warn('Falha na sincronização inicial de produtos:', e);
+      }
+    };
+    sync();
+  }, []);
+
+  const products = useLiveQuery(() => catalogDb.products.toArray(), []);
+
   const savedProducts = products || [];
 
   const saveProduct = async (product: Product) => {

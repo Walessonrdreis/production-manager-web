@@ -5,11 +5,11 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { Users, Plus, Search, Trash2, Edit2, Mail, Phone, FileText } from 'lucide-react';
+import { Users, Plus, Search, Trash2, Edit2, Mail, Phone, FileText, RefreshCw } from 'lucide-react';
 import { type CustomerInput, CustomerSchema } from '../../features/customers/infra/CustomerSchemas';
 
 export function CustomersPage() {
-  const { customers, isLoading, saveCustomer, deleteCustomer } = useCustomers();
+  const { customers, isLoading, isSyncing, syncWithOmie, saveCustomer, deleteCustomer } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<CustomerInput | null>(null);
@@ -25,11 +25,17 @@ export function CustomersPage() {
     updatedAt: new Date().toISOString()
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
   const filteredCustomers = customers.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.document?.includes(searchTerm) ||
-    c.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (c.document || '').includes(searchTerm) ||
+    (c.email || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+  const paginatedCustomers = filteredCustomers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handleOpenModal = (customer?: any) => {
     if (customer) {
@@ -65,10 +71,21 @@ export function CustomersPage() {
           <h1 className="text-2xl font-bold text-slate-900">Base de Clientes</h1>
           <p className="text-slate-500 text-sm">Gerencie os clientes para identificação em ordens de serviço.</p>
         </div>
-        <Button onClick={() => handleOpenModal()} className="flex items-center gap-2">
-          <Plus size={18} />
-          Novo Cliente
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            onClick={syncWithOmie} 
+            disabled={isSyncing}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw size={18} className={isSyncing ? "animate-spin" : ""} />
+            {isSyncing ? "Sincronizando..." : "Sincronizar Omie"}
+          </Button>
+          <Button onClick={() => handleOpenModal()} className="flex items-center gap-2">
+            <Plus size={18} />
+            Novo Cliente
+          </Button>
+        </div>
       </div>
 
       <Card className="p-4">
@@ -78,7 +95,10 @@ export function CustomersPage() {
             placeholder="Buscar por nome, documento ou e-mail..." 
             className="pl-10"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
       </Card>
@@ -87,49 +107,75 @@ export function CustomersPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1,2,3].map(i => <div key={i} className="h-40 bg-slate-100 animate-pulse rounded-xl" />)}
         </div>
-      ) : filteredCustomers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCustomers.map((customer) => (
-            <Card key={customer.id} className="p-5 hover:shadow-md transition-shadow border-slate-200 group">
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                  {customer.name.charAt(0).toUpperCase()}
+      ) : paginatedCustomers.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginatedCustomers.map((customer) => (
+              <Card key={customer.id} className="p-5 hover:shadow-md transition-shadow border-slate-200 group">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="px-2.5 py-1 rounded-md bg-blue-50 text-blue-600 text-xs font-bold font-mono border border-blue-100 flex items-center justify-center">
+                    {customer.omieCode || 'LOCAL'}
+                  </div>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" onClick={() => handleOpenModal(customer)} className="h-8 w-8 p-0">
+                      <Edit2 size={14} className="text-slate-600" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => deleteCustomer(customer.id)} className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="ghost" size="sm" onClick={() => handleOpenModal(customer)} className="h-8 w-8 p-0">
-                    <Edit2 size={14} className="text-slate-600" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => deleteCustomer(customer.id)} className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
-                    <Trash2 size={14} />
-                  </Button>
+                
+                <h3 className="font-bold text-slate-900 mb-1">{customer.name}</h3>
+                
+                <div className="space-y-2">
+                  {customer.document && (
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <FileText size={14} />
+                      <span>{customer.document}</span>
+                    </div>
+                  )}
+                  {customer.email && (
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <Mail size={14} />
+                      <span className="truncate">{customer.email}</span>
+                    </div>
+                  )}
+                  {customer.phone && (
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <Phone size={14} />
+                      <span>{customer.phone}</span>
+                    </div>
+                  )}
                 </div>
+              </Card>
+            ))}
+          </div>
+          
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 pt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              >
+                Anterior
+              </Button>
+              <div className="text-sm font-medium text-slate-500">
+                Página {currentPage} de {totalPages}
               </div>
-              
-              <h3 className="font-bold text-slate-900 mb-1">{customer.name}</h3>
-              
-              <div className="space-y-2">
-                {customer.document && (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <FileText size={14} />
-                    <span>{customer.document}</span>
-                  </div>
-                )}
-                {customer.email && (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Mail size={14} />
-                    <span className="truncate">{customer.email}</span>
-                  </div>
-                )}
-                {customer.phone && (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Phone size={14} />
-                    <span>{customer.phone}</span>
-                  </div>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              >
+                Próxima
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
         <EmptyState 
           icon={<Users size={40} />}

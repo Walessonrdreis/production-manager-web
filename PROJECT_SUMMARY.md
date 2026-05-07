@@ -1,23 +1,67 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v3.0.0-draft (Atualizado em 04/05/2026 - Roadmap de Gestão de Lotes e Metas)
+**Versão:** v4.6.1 (Atualizado em 07/05/2026 - Consolidação da Estrutura Legacy Concluída)
 
 ## 🎯 Objetivo
-Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e, futuramente, gestão de metas e lotes.
+Sistema de gerenciamento de produção industrial que utiliza uma arquitetura Local-First híbrida, evoluindo para um modelo Monorepo (Web + API) para máxima escalabilidade e controle.
 
 ---
 
-## 🚀 Próximos Passos (Roadmap v3.0)
+## 🏗️ Arquitetura Técnica (Estrutura Monolito)
 
-Documentação detalhada disponível em `/FEATURE-DOCS/`:
-- **Evolução do Planejamento:** `PLANNING_EVOLUTION.md` (Gestão por Lotes e Preview PDF).
-- **Gestão de Metas:** `GOALS_SPECIFICATION.md` (Metas por SKU e Indicadores).
-- **Persistência & API:** `DATA_PERSISTENCE_STRATEGY.md` e `LOCAL_STORAGE_MAPPING.md`.
+### 1. Organização Monorepo (ADR-004)
+- **Separação apps/web e apps/api:** O projeto agora segue uma estrutura de monolito modularizado (Monorepo), onde o frontend (React) e a backend (Express) coexistem.
+- **Fase 1: Legacy Isolation (CONCLUÍDA):** Todos os diretórios de código e dados foram isolados em `/legacy_project/`. Isso inclui a pasta `/src` original (movida para `/legacy_project/src`), dados e servidor legado.
+- **Entry Points:** A raiz do projeto contém apenas manifestos de configuração (`package.json`, `tsconfig.json`, `vite.config.ts`), `index.html` e o entry-point do servidor (`server.ts`). Todos reconfigurados para operar o código a partir da pasta legacy.
+- **Obrigação de Preservação:** Esta mudança é estrutural e organizacional. Todas as funcionalidades de planejamento, consulta Omie e sincronização de produção existentes são mantidas integralmente e validadas.
+- **Contratos Compartilhados:** Utilização de interfaces e Schemas Zod comuns para garantir integridade de dados (Single Source of Truth).
+- **Estrutura detalhada:** Consultar o arquivo `/Estrutura_Monolito.md` e a `/docs/adr/004-transicao-para-monolito-modular.md`.
 
----
+### 2. Persistência de Dados Local (SQLite/IndexedDB)
+- **Hibridismo de Persistência:** Cache local via IndexedDB (Web) e persistência consolidada via SQLite/Backend API.
+- **Migração JSON para SQLite:** Todos os dados locais sincronizados residem em `/data/local_storage.sqlite`.
+- **Otimização Exclusão em Lote (Bulk Delete) (v4.0.7):** Correção do botão "Limpar Tudo" na página Meus Produtos. Substituído loop manual assíncrono problemático que travava a API, por endpoint único otimizado `DELETE /admin/products` garantindo que os itens não voltem mais com o unmount/mount.
+- **Correção de Persistência em Produção (v4.0.6):** Atualizadas as tabelas `produced` e `schedules` no SQLite e endpoints do proxy em `server.ts` para capturarem e salvarem os campos corretos emitidos pelo frontend na tela de `/production-control` (`orderId`, `orderNumber` e `scheduledAt` agora são devidamente persistidos sem serem descartados).
+- **Correção de Reversão de Edição (v4.0.5):** Resolvido problema em Repositórios Locais (Sectors e Products) onde edições não eram enviadas para o servidor se o item estivesse ausente no `IndexedDB`, causando reversão visual após invalidação do cache. Não usamos mais `db.json`.
+- **CRUD e Validações Adicionais:** Telas e modais de Metas de Produção com confirmações contra deletes por acidentes, bem como navegação por abas para categorizar Diárias, Semanais e Mensais.
+- **Vantagens:** Melhor performance em buscas complexas, integridade referencial e suporte a transações bulk.
+- **Tabelas Implementadas:** `sectors`, `products` (híbrido Omie + Local), `orders`, `planning`, `goals`, `produced` e `schedules`.
 
-## 🏗️ Arquitetura Técnica (ADR-003 & Guia Operacional)
+### 2. Sincronização e Hibridismo (Omie Sync & Configuração em Background - v4.0.1)
+- **Sincronização Contínua Automática:** Itens com flag `synced: false` no IndexedDB agora são sincronizados automaticamente a cada 10 segundos chamando os endpoints do servidor com as alterações pendentes de catálogo, planejamento, produção, setores e metas de forma granular. Ícones reagem instantaneamente a essa sincronização.
+- **Cache Local da API:** Páginas que consomem dados externos (Produtos e Pedidos) agora possuem uma camada de cache no SQLite para leitura em fallback.
+- **Botão Sincronizar na Dashboard:** Aciona endpoints `/admin/omie/sync/*` que buscam dados frescos do Omie.
+- **Extensibilidade Local:** É possível associar dados puramente locais (como 'Setores') a objetos vindos da API diretamente no banco SQLite.
 
-### 1. Separação de Responsabilidades (Novo)
+### 3. Gestão Total (Proxy vs SQLite)
+- **Interceção de Proxy:** O `server.ts` intercepta as chamadas locais dependendo das flags `VITE_USE_LOCAL_*` e as processa usando consultas SQL (SELECT, INSERT, UPDATE, DELETE).
+- **Tratamento de Booleans:** A camada local IndexedDB utiliza booleanos `true/false`, que são perfeitamente normalizados no SQL via `1/0` para a flag `synced` no proxy.
+
+### 2. Transparência de Sincronização (v3.4.2)
+- **Modal de Pendências:** Implementado um modal detalhado que pode ser acessado ao clicar no indicador de sincronização no `Topbar`.
+- **Informação Contextual:** O modal exibe exatamente quais registros de Produção, Planejamento, Catálogo ou Setores estão salvos apenas localmente (unsynced), oferecendo maior segurança ao usuário sobre o estado dos seus dados Offline-First.
+
+### 3. Gestão de Metas de Produção (v3.1.0)
+- **Feature Goals:** Implementada a funcionalidade para definir objetivos numéricos (Metas) por SKU.
+- **Relacionamento com Produtos:** As metas são vinculadas ao `productCode` (SKU) do catálogo "Meus Produtos", garantindo integridade entre planejamento e objetivos.
+- **Persistência Isolada:** Utiliza o novo `GoalsDB` (IndexedDB) para armazenamento local, permitindo operação offline e resiliência.
+- **Validações:** Impede a criação de metas duplicadas para o mesmo SKU no mesmo período (Diário, Semanal, Mensal).
+- **Acesso:** Nova rota `/goals` e ícone de "Atividade" na barra lateral.
+
+### 2. Evolução da Persistência (IndexedDB Modular)
+- **Bancos Independentes:** Migração completa do banco monolítico `ProductionManagerDB` para bancos especializados, aumentando a escalabilidade e reduzindo a concorrência:
+    - `CatalogDB`: Gerenciador de produtos salvos (favoritos).
+    - `SectorsDB`: Gestão de setores e seus vínculos com produtos.
+    - `PlanningDB`: Gerenciador de lotes e itens de planejamento.
+    - `GoalsDB`: Armazenamento de metas de produção.
+- **Migração Transparente e Resiliente:** Implementados `ensureMigration` gateways em todos os repositórios.
+    - **Correção de Loop Infinito:** Adicionada uma tabela `config` em cada banco modular para rastrear o status da migração (`migration_done`). Isso evita que o sistema re-importe dados legados caso o usuário delete todos os registros de uma nova tabela (resolvendo o bug onde setores deletados reapareciam).
+- **Reatividade Garantida:** Atualização dos hooks `useMyProducts` e `usePlanning` para garantir que a migração ocorra de forma transparente ao usuário sem perder a reatividade do `useLiveQuery`.
+
+### 3. Ajustes de Identidade e SKUs
+- **Priorização de ID:** Ajustada a lógica de seleção de produtos para usar o `id` interno (Dexie) para navegação e `code` (SKU) para lógica de negócio e exportação, resolvendo conflitos em listas de seleção.
+- **Normalização de Campo:** Padronização do uso de `productCode` em todos os novos modelos (`PlanningItem`, `ProductionGoal`, `ProductionSchedule`).
+
+### 4. Separação de Responsabilidades
 - **Feature Produção (Controle de Produção):** Criada uma feature dedicada para o rastreamento de itens produzidos (antigo Dashboard). Acompanhada da rota `/production-control`.
 - **Programação de Produção (CRUD Completo):** 
   - **Create/Update:** Possibilidade de atribuir e editar datas de produção e observações detalhadas para cada item.
@@ -62,10 +106,16 @@ Documentação detalhada disponível em `/FEATURE-DOCS/`:
 - **Endpoints Admin:** Configurado o uso de `/v1/admin/sectors` para CRUD completo (Create, Read, Update, Delete).
 - **Consistência de Dados:** Mantido o padrão de normalização e `Result Pattern` nos usecases de setores.
 
-### 3. Feature de Clientes
-- **Persistência Local-First:** Cadastro completo de clientes no IndexedDB (Dexie).
-- **Enriquecimento Dinâmico:** Implementado o `CustomerEnricher` que resolve o nome do cliente em pedidos da Omie usando a base local (match via `omieCode`).
+### 3. Feature de Clientes (v4.0.8 e v4.0.9)
+- **Integração Plena com API (v4.0.8):** O repositório de clientes foi migrado de ser puramente local (IndexedDB) para ser Híbrido, consumindo diretamente o endpoint `v1/clients` da API remota.
+- **Sincronização em Lote e Paginação (v4.0.9):** Sincronização offline-first aprimorada, iterando nativamente sobre todas as páginas do endpoint API até a última e cacheando os dados com segurança. Adicionado paginação (20 itens/página) nativa na UI da tela de Clientes para evitar travamento da renderização/DOM em bases com milhares de registros.
 - **Navegação:** Adicionado link dedicado na Sidebar e rota protegida `/customers`.
+- **Ordens para v1/orders (v4.0.10):** A API de sincronização local de pedidos (Orders) foi atualizada para consumir do `/v1/orders`, mapeando schemas atualizados.
+
+### 4. Correções e Estabilidade (v4.0.11)
+- **Mapeamento de Schema de Pedidos:** Atualizado o arquivo de sync via SQLite para adicionar a coluna `customer_id` e extrair com sucesso o `omieClientCode` proveniente do endpoint remoto `/v1/orders`. O valor agora é normalizado corretamente e aparece visivelmente na interface. 
+- **Setores (Cache e Storage):** Corrigido o bug na base IndexedDB Dexie que forçava salvamentos locais silenciosos, causando conflitos em edições. Adicionado headers de `Cache-Control` restritos a todas as rotas servidas no NodeJS (SQLite) para inativar recarregamento de caches errôneos de requisições `GET` feitas localmente após edições em componentes.
+- **Fim do Loop de Deletados:** Implementada lógica de "Sync de Deletados" no `SectorsRepository`. Ao buscar a lista da API (agora local), o sistema remove automaticamente do IndexedDB qualquer setor que não esteja presente no retorno da API, garantindo que a UI reflita apenas a realidade persistida.
 
 ### 4. Governança e Estrutura Modular
 - **Guia Operacional:** Implementado o `docs/GUIA_OPERACIONAL.md` com 8 Pilares Arquiteturais definidos.
@@ -100,26 +150,16 @@ Documentação detalhada disponível em `/FEATURE-DOCS/`:
 
 ### 3. Estrutura de Diretórios (Shape Oficial)
 ```text
-/src
-  ├── app/                # Bootstrap e composição global (Router, Providers)
-  ├── components/
-  │   ├── layout/         # Layouts compartilhados
-  │   ├── ui/             # Design System (componentes atômicos)
-  │   └── auth/           # Componentes visuais de autenticação
-  ├── pages/              # Pontos de entrada das rotas (Re-exports das Features)
-  ├── hooks/              # Camada de Hooks Atômicos (Feature-based)
-  │   ├── <feature>/      # Hooks específicos (Ex: useDashboardTotals.ts)
-  │   └── ...
-  ├── services/           # Infra de baixo nível (Client API, Endpoints, Auth Store)
-  ├── types/              # Tipos globais
-  └── features/           # Núcleo de negócio (Evolução Modular)
-      └── <feature>/
-          ├── usecases/   # Ações granulares (1 por arquivo)
-          ├── domain/     # Regras puras e tipos de domínio
-          ├── infra/      # Adapters (API, DB, etc.)
-          ├── state/      # Estado local (se necessário)
-          ├── ui/         # Views e componentes específicos da feature (Pages)
-          └── index.ts    # Interface pública da feature
+/root
+  ├── legacy_project/
+  │   ├── src/            # Código fonte do frontend (React)
+  │   ├── server/         # Lógica de banco de dados legado
+  │   └── data/           # Dados e backups
+  ├── index.html          # Entry point Web
+  ├── server.ts           # Entry point API/Proxy
+  ├── package.json
+  ├── tsconfig.json
+  └── vite.config.ts
 ```
 
 ## 🧠 Lógica de Negócio Principal

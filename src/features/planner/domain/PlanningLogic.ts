@@ -13,16 +13,16 @@ export const PlanningLogic = {
     currentItems: PlanningItem[],
     productsToAdd: { product: Product, quantity: number, sectorId: string, sectorName: string }[]
   ): { 
-    toAdd: Omit<PlanningItem, 'id' | 'synced' | 'updatedAt'>[], 
+    toAdd: Omit<PlanningItem, 'id' | 'synced' | 'lastModified' | 'version' | 'updatedAt'>[], 
     toUpdate: { id: string, quantity: number }[] 
   } {
-    const toAdd: Omit<PlanningItem, 'id' | 'synced' | 'updatedAt'>[] = [];
+    const toAdd: Omit<PlanningItem, 'id' | 'synced' | 'lastModified' | 'version' | 'updatedAt'>[] = [];
     const toUpdate: { id: string, quantity: number }[] = [];
 
-    // Map para facilitar busca por composto [code-sectorId] no estado atual
+    // Map para facilitar busca por composto [productCode-sectorId] no estado atual
     const itemsByKey = new Map<string, PlanningItem>();
     currentItems.forEach(item => {
-      const key = `${item.code}-${item.sectorId || 'default'}`;
+      const key = `${item.productCode}-${item.sectorId || 'default'}`;
       itemsByKey.set(key, item);
     });
 
@@ -40,7 +40,8 @@ export const PlanningLogic = {
         itemsByKey.set(key, { ...existing, quantity: existing.quantity + quantity });
       } else {
         toAdd.push({
-          code: productCode,
+          batchId: '', // Será definido pelo repositório ou caso de uso
+          productCode: productCode,
           description: product.description,
           unit: product.unit || 'UN',
           quantity: quantity,
@@ -50,13 +51,16 @@ export const PlanningLogic = {
         // Mock de item para o map caso o mesmo produto venha duplicado no lote de entrada
         itemsByKey.set(key, {
           id: 'temp',
-          code: productCode,
+          batchId: '',
+          productCode: productCode,
           description: product.description,
           unit: product.unit || 'UN',
           quantity: quantity,
           sectorId,
           sectorName,
           synced: false,
+          lastModified: Date.now(),
+          version: 1,
           updatedAt: ''
         });
       }
@@ -77,7 +81,7 @@ export const PlanningLogic = {
    */
   filterProducts(products: Product[], search: string): Product[] {
     const normalize = (str: string) => 
-      str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     
     const searchNormalized = normalize(search);
     if (!searchNormalized) return products;

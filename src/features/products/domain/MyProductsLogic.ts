@@ -12,8 +12,8 @@ export const MyProductsLogic = {
     if (!searchNormalized) return products;
 
     return products.filter(p => {
-      const descriptionMatch = normalize(p.description).includes(searchNormalized);
-      const idMatch = normalize(String(p.id)).includes(searchNormalized);
+      const descriptionMatch = normalize(p.description || '').includes(searchNormalized);
+      const idMatch = normalize(String(p.id || '')).includes(searchNormalized);
       const familyMatch = p.family ? normalize(p.family).includes(searchNormalized) : false;
       const codeMatch = p.code ? normalize(p.code).includes(searchNormalized) : false;
       

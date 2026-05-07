@@ -1,62 +1,110 @@
-import { db } from '../../../db';
 import { type PlanningItem } from '../../../db/models';
+import { planningLocalRepository } from './PlanningIndexedDBRepo';
+import { v4 as uuidv4 } from 'uuid';
+import { apiClient } from '../../../services/api/client';
+import { ENDPOINTS } from '../../../services/api/endpoints';
 
 export const PlanningRepository = {
   async getAll() {
-    return await db.planning.toArray();
+    // Busca do IndexedDB local e da API
+    try {
+      const { data: apiItems } = await apiClient.get<PlanningItem[]>(ENDPOINTS.PLANNING.BASE);
+      
+      if (apiItems && Array.isArray(apiItems)) {
+        const localItems = await planningLocalRepository.getAllItems();
+        const apiIds = new Set(apiItems.map(i => i.id));
+        
+        // Remove locais que sumiram na API e já estavam sincronizados
+        for (const local of localItems) {
+          if (!apiIds.has(local.id) && local.synced) {
+            await planningLocalRepository.deleteItem(local.id);
+          }
+        }
+
+        // Salva/Atualiza com dados da API
+        for (const apiItem of apiItems) {
+          await planningLocalRepository.saveItem({ ...apiItem, synced: true });
+        }
+      }
+    } catch (error) {
+      console.warn('[PlanningRepository] Modo offline: não foi possível buscar da API.', error);
+    }
+    
+    return await planningLocalRepository.getAllItems();
   },
 
-  async add(item: Omit<PlanningItem, 'id' | 'synced' | 'updatedAt'>) {
+  async add(item: Omit<PlanningItem, 'id' | 'synced' | 'lastModified' | 'version' | 'updatedAt'>) {
     const newItem: PlanningItem = {
       ...item,
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       synced: false,
+      lastModified: Date.now(),
+      version: 1,
       updatedAt: new Date().toISOString()
     };
-    await db.planning.add(newItem);
-    return newItem;
+    
+    // Salva local (Offline-first)
+    await planningLocalRepository.saveItem(newItem);
+    
+    // Tenta API
+    try {
+      const { data } = await apiClient.post(ENDPOINTS.PLANNING.BASE, newItem);
+      await planningLocalRepository.saveItem({ ...newItem, ...data, synced: true });
+      return data || newItem;
+    } catch (error) {
+      console.warn('[PlanningRepository] Erro ao sincronizar planejamento na API:', error);
+      return newItem;
+    }
   },
 
   async update(id: string, updates: Partial<PlanningItem>) {
-    await db.planning.update(id, {
+    const existing = await planningLocalRepository.getAllItems().then(items => items.find(i => i.id === id));
+    if (!existing) return;
+
+    const updated = {
+      ...existing,
       ...updates,
       synced: false,
+      lastModified: Date.now(),
       updatedAt: new Date().toISOString()
-    });
+    };
+    
+    // Atualiza local (Offline-first)
+    await planningLocalRepository.saveItem(updated);
+
+    // Tenta API
+    try {
+      const { data } = await apiClient.patch(`${ENDPOINTS.PLANNING.BASE}/${id}`, updates);
+      await planningLocalRepository.saveItem({ ...updated, ...data, synced: true });
+    } catch (error) {
+      console.warn('[PlanningRepository] Erro ao atualizar planejamento na API:', error);
+    }
   },
 
   async delete(id: string) {
-    await db.planning.delete(id);
+    // Tenta API
+    try {
+      await apiClient.delete(`${ENDPOINTS.PLANNING.BASE}/${id}`);
+    } catch (error) {
+      console.warn('[PlanningRepository] Erro ao deletar planejamento na API:', error);
+    }
+
+    // Deleta local (seja falha ou não)
+    await planningLocalRepository.deleteItem(id);
   },
 
-  async bulkAdd(items: Omit<PlanningItem, 'id' | 'synced' | 'updatedAt'>[]) {
-    const newItems = items.map(item => ({
-      ...item,
-      id: crypto.randomUUID(),
-      synced: false,
-      updatedAt: new Date().toISOString()
-    }));
-    await db.planning.bulkAdd(newItems);
-    return newItems;
+  async bulkAdd(items: Omit<PlanningItem, 'id' | 'synced' | 'lastModified' | 'version' | 'updatedAt'>[]) {
+    const promises = items.map(item => this.add(item));
+    return await Promise.all(promises);
   },
 
   async bulkUpdate(updates: { id: string, quantity: number }[]) {
-    const timestamp = new Date().toISOString();
-    const promises = updates.map(u => 
-      db.planning.update(u.id, { 
-        quantity: u.quantity, 
-        synced: false, 
-        updatedAt: timestamp 
-      })
-    );
+    const promises = updates.map(u => this.update(u.id, { quantity: u.quantity }));
     await Promise.all(promises);
   },
 
-  async markAsSynced(id: string) {
-    await db.planning.update(id, { synced: true });
-  },
-
   async clear() {
-    return await db.planning.clear();
+    const all = await planningLocalRepository.getAllItems();
+    return Promise.all(all.map(i => this.delete(i.id)));
   }
 };

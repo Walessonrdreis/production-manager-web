@@ -18,10 +18,10 @@ export const CatalogLogic = {
 
     return products.filter(p => {
       const matchesSearch = !search || 
-        p.description.toLowerCase().includes(searchLower) || 
-        p.code.toLowerCase().includes(searchLower) ||
-        p.id.toLowerCase().includes(searchLower) ||
-        p.family.toLowerCase().includes(searchLower);
+        (p.description || '').toLowerCase().includes(searchLower) || 
+        (p.code || '').toLowerCase().includes(searchLower) ||
+        (p.id || '').toLowerCase().includes(searchLower) ||
+        (p.family || '').toLowerCase().includes(searchLower);
       
       const matchesFamily = !familyFilter || familyFilter === 'Todas' || p.family === familyFilter;
       const sectors = p.sectorIds || ((p as any).sectorId ? [(p as any).sectorId] : []);

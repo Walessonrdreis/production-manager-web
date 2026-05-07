@@ -27,9 +27,9 @@ export const SectorsLogic = {
     if (!searchTerm) return sectors;
     const term = searchTerm.toLowerCase();
     return sectors.filter(s => 
-      s.name.toLowerCase().includes(term) ||
-      s.description?.toLowerCase().includes(term) ||
-      s.id.toLowerCase().includes(term)
+      (s.name || '').toLowerCase().includes(term) ||
+      (s.description || '').toLowerCase().includes(term) ||
+      (s.id || '').toLowerCase().includes(term)
     );
   }
 };

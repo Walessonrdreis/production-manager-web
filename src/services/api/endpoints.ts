@@ -10,15 +10,27 @@ export const ENDPOINTS = {
   PRODUCTS: {
     LIST: 'products',
     SYNC: 'admin/omie/sync/products',
+    ADMIN: 'admin/products',
   },
   SECTORS: {
     BASE: 'admin/sectors',
     SYNC: 'admin/omie/sync/sectors',
   },
   PLANNING: {
-    BASE: 'planning',
+    BASE: 'admin/planning',
+  },
+  PRODUCTION: {
+    PRODUCED: 'admin/produced',
+    SCHEDULES: 'admin/schedules',
+  },
+  GOALS: {
+    BASE: 'admin/goals',
   },
   ORDERS: {
-    BASE: 'admin/orders',
+    BASE: 'orders',
+  },
+  CUSTOMERS: {
+    BASE: 'clients',
+    SYNC: 'admin/omie/clients/sync',
   }
 } as const;

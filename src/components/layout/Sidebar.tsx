@@ -24,6 +24,7 @@ const navItems = [
   { id: 'sectors', label: 'Setores', path: '/sectors', icon: Layers },
   { id: 'orders', label: 'Ordens Pendentes', path: '/orders', icon: ShoppingCart },
   { id: 'planning', label: 'Gerador de Plano', path: '/planning', icon: CalendarRange },
+  { id: 'goals', label: 'Metas', path: '/goals', icon: Activity },
 ];
 
 interface SidebarProps {

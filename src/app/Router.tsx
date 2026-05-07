@@ -6,6 +6,7 @@ import { MyProductsPage } from '../pages/products/MyProductsPage';
 import { SectorsPage } from '../pages/sectors/SectorsPage';
 import { OrdersPage } from '../pages/orders/OrdersPage';
 import { PlanningPage } from '../pages/planner/PlanningPage';
+import { GoalsManagementPage } from '../features/goals/ui/GoalsManagementPage';
 import { CustomersPage } from '../pages/customers/CustomersPage';
 import { MonitoringPage } from '../pages/production/MonitoringPage';
 import { AuthGuard } from './AuthGuard';
@@ -25,6 +26,7 @@ export function AppRouter() {
         <Route path="/sectors" element={<SectorsPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/planning" element={<PlanningPage />} />
+        <Route path="/goals" element={<GoalsManagementPage />} />
         
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Route>

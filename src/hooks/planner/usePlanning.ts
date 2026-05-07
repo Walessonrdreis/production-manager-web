@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../db';
-import { useState } from 'react';
+import { planningDb } from '../../features/planner/infra/PlanningDB';
+import { planningLocalRepository } from '../../features/planner/infra/PlanningIndexedDBRepo';
+import { useState, useEffect } from 'react';
 import { 
   addPlanningItem, 
   addBulkPlanningItems,
@@ -14,7 +15,14 @@ import { useToast } from '../../components/ui/Toast';
 
 export function usePlanning() {
   const { success, error: toastError } = useToast();
-  const rawItems = useLiveQuery(() => db.planning.toArray());
+  
+  // Garantimos que a migração ocorra fora do liveQuery para evitar erros de transação
+  useEffect(() => {
+    planningLocalRepository.ensureMigration();
+  }, []);
+
+  const rawItems = useLiveQuery(() => planningDb.items.toArray(), []);
+
   const items = rawItems || [];
 
   const [period, setPeriodState] = useState<'daily' | 'weekly' | 'monthly'>('daily');

@@ -6,7 +6,7 @@ export const OrderLogic = {
    */
   filterOrders(orders: Order[], search: string): Order[] {
     const normalize = (str: string) => 
-      str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
     const term = normalize(search);
     if (!term) return orders;

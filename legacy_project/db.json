@@ -1,0 +1,69 @@
+{
+  "sectors": [
+    {
+      "name": "Temperagem",
+      "description": "",
+      "id": "70f227f0-8c1f-4627-87a8-b82658f7149a"
+    },
+    {
+      "name": "Refino",
+      "description": "",
+      "id": "3b8c82be-141a-467f-8c46-8ba630934ebd"
+    },
+    {
+      "name": "Embalagem",
+      "description": "",
+      "id": "3ac4eaeb-52f7-443a-830c-a637212b60f2"
+    }
+  ],
+  "planning": [],
+  "dashboard_produced": [],
+  "goals": [],
+  "products": [
+    {
+      "id": "42atbm",
+      "code": "",
+      "description": "42%  Adoçado com Tâmaras 80g",
+      "family": "Barra Grande",
+      "stock": -12,
+      "minStock": 0,
+      "price": 0,
+      "unit": "UN",
+      "sectorIds": [],
+      "synced": false,
+      "lastModified": 1777923951465,
+      "version": 1,
+      "savedAt": "2026-05-04T19:45:51.465Z"
+    },
+    {
+      "id": "42bpbm",
+      "code": "",
+      "description": "42% cacau - Banana e Pequi - 80g",
+      "family": "Barra Grande",
+      "stock": -186,
+      "minStock": 0,
+      "price": 0,
+      "unit": "UN",
+      "sectorIds": [],
+      "synced": false,
+      "lastModified": 1777923951465,
+      "version": 1,
+      "savedAt": "2026-05-04T19:45:51.465Z"
+    },
+    {
+      "id": "53avcbm",
+      "code": "",
+      "description": "53% aveia e Caramelo de Caja  80g",
+      "family": "Barra Grande",
+      "stock": -1,
+      "minStock": 0,
+      "price": 0,
+      "unit": "UN",
+      "sectorIds": [],
+      "synced": false,
+      "lastModified": 1777923951465,
+      "version": 1,
+      "savedAt": "2026-05-04T19:45:51.465Z"
+    }
+  ]
+}

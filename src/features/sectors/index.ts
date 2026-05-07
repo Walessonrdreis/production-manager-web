@@ -7,3 +7,4 @@ export * from './usecases/UpdateSector';
 export * from './usecases/DeleteSector';
 export * from './usecases/SyncSectors';
 export * from './infra/SectorsRepository';
+export * from './infra/SectorsIndexedDBRepo';

@@ -1,7 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { getSectors } from '../../features/sectors';
+import { useEffect } from 'react';
+import { getSectors, sectorsLocalRepository } from '../../features/sectors';
 
 export function useSectors() {
+  // Garantimos que a migração ocorra
+  useEffect(() => {
+    sectorsLocalRepository.ensureMigration();
+  }, []);
+
   const query = useQuery({
     queryKey: ['sectors'],
     queryFn: getSectors,

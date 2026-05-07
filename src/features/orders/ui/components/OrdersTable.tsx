@@ -54,7 +54,7 @@ export function OrdersTable({ orders, isLoading, onOpenDetails }: OrdersTablePro
                       <span className="bg-blue-100 text-blue-600 text-[8px] font-bold px-1 rounded-sm uppercase tracking-tighter">LOCAL</span>
                     )}
                   </div>
-                  <div className="text-[10px] text-slate-400">Cod: {o.customerId || 'N/A'}</div>
+                  <div className="text-[10px] text-slate-400 font-mono">Cod: {o.customerId || 'N/A'}</div>
               </td>
               <td className="py-4 px-4">
                   <div className="flex items-center gap-2">

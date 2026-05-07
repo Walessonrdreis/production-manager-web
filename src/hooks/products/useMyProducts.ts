@@ -1,7 +1,5 @@
-import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect } from 'react';
-import { catalogDb } from '../../features/catalog/infra/CatalogDB';
-import { productRepository } from '../../features/catalog/infra/ProductIndexedDBRepo';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { MyProductsRepository } from '../../features/products/infra/MyProductsRepository';
 import { 
   selectProduct as selectProductUseCase, 
@@ -16,24 +14,18 @@ import { useToast } from '../../components/ui/Toast';
 
 export function useMyProducts() {
   const { success, error: toastError } = useToast();
+  const queryClient = useQueryClient();
   
-  // Garantimos que a migração ocorra fora do liveQuery para evitar erros de transação
-  useEffect(() => {
-    productRepository.ensureMigration();
-    // Gatilho de sincronização inicial com a API (Local-First)
-    const sync = async () => {
-      try {
-        await MyProductsRepository.getAll();
-      } catch (e) {
-        console.warn('Falha na sincronização inicial de produtos:', e);
-      }
-    };
-    sync();
-  }, []);
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['myProducts'],
+    queryFn: () => MyProductsRepository.getAll()
+  });
 
-  const products = useLiveQuery(() => catalogDb.products.toArray(), []);
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['myProducts'] });
+  }, [queryClient]);
 
-  const savedProducts = products || [];
+  const savedProducts = products;
 
   const saveProduct = async (product: Product) => {
     const res = await selectProductUseCase(product);
@@ -41,6 +33,7 @@ export function useMyProducts() {
       toastError(res.error);
     } else {
       success('Produto salvo nos favoritos.');
+      invalidate();
     }
     return res;
   };
@@ -49,6 +42,8 @@ export function useMyProducts() {
     const res = await updateProductSector(productId, sectorId);
     if (!res.success) {
       toastError(res.error);
+    } else {
+      invalidate();
     }
     return res;
   };
@@ -57,6 +52,8 @@ export function useMyProducts() {
     const res = await updateProductUseCase(productId, data);
     if (!res.success) {
       toastError(res.error);
+    } else {
+      invalidate();
     }
     return res;
   };
@@ -67,6 +64,7 @@ export function useMyProducts() {
       toastError(res.error);
     } else {
       success('Produto removido dos favoritos.');
+      invalidate();
     }
     return res;
   };
@@ -77,6 +75,7 @@ export function useMyProducts() {
       toastError(res.error);
     } else {
       success('Lista de favoritos limpa.');
+      invalidate();
     }
     return res;
   };
@@ -93,7 +92,7 @@ export function useMyProducts() {
     removeProduct,
     clearAll,
     isSaved,
-    isLoading: products === undefined,
+    isLoading,
     error: null,
   };
 }

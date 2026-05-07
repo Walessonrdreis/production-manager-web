@@ -2,10 +2,20 @@ import { LoginForm } from '../../../components/auth/LoginForm';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../../../services/auth/authService';
 import { Layers } from 'lucide-react';
-import { login } from '../index';
 
 export function LoginPage() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { isAuthenticated, isLoading } = useAuthStore();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center p-8 bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600"></div>
+          <p className="text-slate-500">Agardando...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
@@ -24,7 +34,7 @@ export function LoginPage() {
           <h1 className="text-2xl font-bold tracking-tight">Production Management</h1>
         </div>
         
-        <LoginForm onLogin={login} />
+        <LoginForm />
         
         <p className="mt-8 text-slate-400 text-xs font-medium uppercase tracking-widest bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full border border-white/5">
           Versão 1.2.0 • 2026

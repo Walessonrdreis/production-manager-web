@@ -1,15 +1,22 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.0.11 (Atualizado em 06/05/2026 - Schema do Pedido Fix de CustomerId)
+**Versão:** v4.1.0 (Atualizado em 07/05/2026 - Migração para Backend Estratégico Firebase)
 
 ## 🎯 Objetivo
-Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas.
+Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Agora evoluindo para uma arquitetura escalável com Google Firebase.
 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
 
-### 1. Persistência de Dados Local (SQLite - v4.0.7)
-- **Migração JSON para SQLite:** Todos os dados locais que anteriormente eram salvos em múltiplos arquivos JSON foram consolidados em um banco de dados **SQLite** (`/data/local_storage.sqlite`) no backend.
+### 0. Migração para Firebase (v4.1.0 - Atual)
+- **Firebase Infrastructure:** Adicionada camada de persistência em nuvem robusta com **Google Cloud Firestore**.
+- **Blueprint de Dados:** Criado `firebase-blueprint.json` mapeando todas as entidades (Setores, Produtos, Planejamento, Metas, Produção, Clientes) para coleções do Firestore.
+- **Segurança de Dados:** Implementado `firestore.rules` seguindo os 8 pilares de segurança do Firebase (Pilar Master Gate, Validação Schema, Proteção PII).
+- **Service Layer (Result Pattern):** Criado `FirestoreService.ts` seguindo rigorosamente o padrão de retorno `{ success, data, error }` exigido pela ADR.
+- **Hibridismo Seguro:** O sistema mantém a compatibilidade com o proxy SQLite local enquanto prepara a transição total para a nuvem.
+
+### 1. Persistência de Dados Local (SQLite - v4.0.12)
+- **Consolidação SQLite:** Dados anteriormente em arquivos JSON foram migrados para o banco `/data/local_storage.sqlite`.
 - **Otimização Exclusão em Lote (Bulk Delete) (v4.0.7):** Correção do botão "Limpar Tudo" na página Meus Produtos. Substituído loop manual assíncrono problemático que travava a API, por endpoint único otimizado `DELETE /admin/products` garantindo que os itens não voltem mais com o unmount/mount.
 - **Correção de Persistência em Produção (v4.0.6):** Atualizadas as tabelas `produced` e `schedules` no SQLite e endpoints do proxy em `server.ts` para capturarem e salvarem os campos corretos emitidos pelo frontend na tela de `/production-control` (`orderId`, `orderNumber` e `scheduledAt` agora são devidamente persistidos sem serem descartados).
 - **Correção de Reversão de Edição (v4.0.5):** Resolvido problema em Repositórios Locais (Sectors e Products) onde edições não eram enviadas para o servidor se o item estivesse ausente no `IndexedDB`, causando reversão visual após invalidação do cache. Não usamos mais `db.json`.

@@ -1,4 +1,5 @@
 # Instruções para Agentes de IA
+Siga rigorosamente se precisar fazer algo que seja imcompativel pergunte
 Este projeto utiliza um arquivo de documentação viva chamado `PROJECT_SUMMARY.md`.
 
 ## 1. Regra de Auto-Atualização
@@ -8,7 +9,8 @@ Atualizar as seções pertinentes com a nova lógica ou infraestrutura.
 Incrementar a versão no cabeçalho seguindo o padrão `v1.x.x` (correções menores) ou `vX.0.0` (mudanças estruturais grandes).
 Data da atualização deve ser a data atual da conversa.
 Isso garante que o proprietário do projeto sempre tenha um guia atualizado para estudo e evolução do sistema.
-##2. Nunna quebrar a aplicação no final da implementação.
+##2. Nunna quebrar a aplicação no final da implementação. Os dados que são consumidos de https://production-manager-api.onrender.com/v1 não devem ser 
+removidos, qualquer endpoint, pode ser salvo no banco de dados mas nunca removidos da aplicação, sem confirmação
 
 ## 2. Regra de Granularidade (SRP Global)
 1 Arquivo = 1 Intenção: Se um arquivo faz "Fetch e Normalização", deve ser dividido em dois.

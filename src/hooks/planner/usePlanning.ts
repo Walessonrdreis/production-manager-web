@@ -1,7 +1,5 @@
-import { useLiveQuery } from 'dexie-react-hooks';
-import { planningDb } from '../../features/planner/infra/PlanningDB';
-import { planningLocalRepository } from '../../features/planner/infra/PlanningIndexedDBRepo';
-import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState, useCallback } from 'react';
 import { 
   addPlanningItem, 
   addBulkPlanningItems,
@@ -12,16 +10,20 @@ import {
 } from '../../features/planner';
 import { Product } from '../../types/api';
 import { useToast } from '../../components/ui/Toast';
+import { PlanningRepository } from '../../features/planner/infra/PlanningRepository';
 
 export function usePlanning() {
   const { success, error: toastError } = useToast();
+  const queryClient = useQueryClient();
   
-  // Garantimos que a migração ocorra fora do liveQuery para evitar erros de transação
-  useEffect(() => {
-    planningLocalRepository.ensureMigration();
-  }, []);
+  const { data: rawItems = [], isLoading } = useQuery({
+    queryKey: ['planningItems'],
+    queryFn: () => PlanningRepository.getAll()
+  });
 
-  const rawItems = useLiveQuery(() => planningDb.items.toArray(), []);
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['planningItems'] });
+  }, [queryClient]);
 
   const items = rawItems || [];
 
@@ -37,6 +39,7 @@ export function usePlanning() {
       toastError(result.error);
     } else {
       success('Item adicionado e programado.');
+      invalidate();
     }
     return result;
   };
@@ -47,6 +50,7 @@ export function usePlanning() {
       toastError(result.error);
     } else {
       success(`${products.length} itens adicionados.`);
+      invalidate();
     }
     return result;
   };
@@ -55,6 +59,8 @@ export function usePlanning() {
     const result = await updatePlanningItem(id, quantity);
     if (!result.success) {
       toastError(result.error);
+    } else {
+      invalidate();
     }
     return result;
   };
@@ -65,6 +71,7 @@ export function usePlanning() {
       toastError(result.error);
     } else {
       success('Item removido do planejamento.');
+      invalidate();
     }
     return result;
   };
@@ -75,13 +82,14 @@ export function usePlanning() {
       toastError(result.error);
     } else {
       success('Planejamento limpo.');
+      invalidate();
     }
     return result;
   };
 
   return {
     items,
-    isLoading: rawItems === undefined,
+    isLoading,
     error: null,
     addItem,
     addBulkItems,

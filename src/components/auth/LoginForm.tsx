@@ -1,57 +1,28 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { useAuthStore } from '../../services/auth/authService';
-import { login } from '../../features/auth';
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../ui/Toast';
 import { LogIn, AlertCircle } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { useAuthStore } from '../../services/auth/authService';
 
-const loginSchema = z.object({
-  email: z.string().email('E-mail inválido'),
-  password: z.string().min(4, 'A senha deve ter pelo menos 4 caracteres'),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
-interface LoginFormProps {
-  onLogin?: (email: string, password: string) => Promise<any>;
-}
-
-export function LoginForm({ onLogin }: LoginFormProps) {
+export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuthStore();
   const navigate = useNavigate();
   const { addToast } = useToast();
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: ''
-    }
-  });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const handleLogin = async () => {
     try {
+      setIsSubmitting(true);
       setError(null);
-      // Usa a função injetada ou a padrão da feature
-      const loginFn = onLogin || login;
-      const response = await loginFn(data.email, data.password);
       
-      setAuth(response.user, response.token);
+      await login();
       
       addToast({
         title: 'Sucesso',
-        message: `Bem-vindo, ${response.user.name}!`,
+        message: 'Login realizado com sucesso!',
         type: 'success'
       });
       
@@ -59,6 +30,8 @@ export function LoginForm({ onLogin }: LoginFormProps) {
     } catch (err: any) {
       const message = err.message || 'Ocorreu um erro ao tentar entrar.';
       setError(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -74,28 +47,10 @@ export function LoginForm({ onLogin }: LoginFormProps) {
             <LogIn className="text-white" size={24} />
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Acesse sua conta</h2>
-          <p className="mt-2 text-sm text-slate-500">Insira suas credenciais para gerenciar a produção</p>
+          <p className="mt-2 text-sm text-slate-500">Faça login com sua conta do Google para gerenciar a produção</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <Input
-            label="E-mail de acesso"
-            type="email"
-            placeholder="seu@email.com"
-            error={errors.email?.message}
-            {...register('email')}
-            autoComplete="email"
-          />
-          
-          <Input
-            label="Senha"
-            type="password"
-            placeholder="••••••••"
-            error={errors.password?.message}
-            {...register('password')}
-            autoComplete="current-password"
-          />
-
+        <div className="space-y-5">
           {error && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
@@ -108,19 +63,13 @@ export function LoginForm({ onLogin }: LoginFormProps) {
           )}
 
           <Button 
-            type="submit" 
-            className="w-full h-11 text-sm font-semibold mt-4" 
+            type="button" 
+            onClick={handleLogin}
+            className="w-full h-12 text-sm font-semibold mt-4 bg-slate-900 hover:bg-slate-800 text-white" 
             isLoading={isSubmitting}
-            icon={<LogIn size={18} />}
           >
-            Entrar no sistema
+            Entrar com Google
           </Button>
-        </form>
-
-        <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-          <p className="text-xs text-slate-400">
-            Esqueceu sua senha? Entre em contato com o suporte.
-          </p>
         </div>
       </div>
     </motion.div>

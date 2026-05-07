@@ -1,96 +1,31 @@
-import { db } from '../../../db';
 import { type Customer } from '../../../db/models';
 import { Result } from '../../../lib/Result';
 import { CustomerSchema, type CustomerInput } from './CustomerSchemas';
 import { apiClient } from '../../../services/api/client';
 import { ENDPOINTS } from '../../../services/api/endpoints';
+import { FirebaseCustomerRepository } from './FirebaseCustomerRepository';
 
 export class CustomersRepository {
   static async getAll(params?: { pageSize?: number; page?: number }): Promise<Result<Customer[]>> {
     try {
-      const response = await apiClient.get(ENDPOINTS.CUSTOMERS.BASE, { params });
-      const apiData = response.data;
-      
-      let customersList: any[] = [];
-      if (apiData && Array.isArray(apiData.data)) {
-        customersList = apiData.data;
-      } else if (Array.isArray(apiData)) {
-        customersList = apiData;
+      const response = await FirebaseCustomerRepository.getAll();
+      if (response.success && response.data) {
+         return Result.ok(response.data);
       }
-
-      // Convert API payload to local standard
-      const validCustomers: Customer[] = customersList.map(c => ({
-        id: c.omieClientCode || crypto.randomUUID(),
-        name: c.tradeName || c.legalName || 'Sem Nome',
-        document: c.document || undefined,
-        email: c.email || undefined,
-        phone: c.phone || undefined,
-        omieCode: c.omieClientCode || undefined,
-        updatedAt: new Date().toISOString()
-      }));
-
-      // Cache locally
-      await db.transaction('rw', db.customers, async () => {
-        const apiIds = new Set(validCustomers.map(c => c.id));
-        const localCustomers = await db.customers.toArray();
-        const now = new Date().toISOString();
-
-        // Delete locals not in API (soft sync)
-        for (const local of localCustomers) {
-           if (local.omieCode && !apiIds.has(local.omieCode)) {
-             // In a true sync, we wouldn't delete them if they are paginated
-             // but if we do a full sync maybe we can. For now let's just insert/update
-           }
-        }
-
-        // Insert / Update
-        for (const c of validCustomers) {
-           const existing = await db.customers.get(c.id);
-           await db.customers.put({
-             ...existing,
-             ...c,
-             updatedAt: existing?.updatedAt || c.updatedAt
-           });
-        }
-      });
-
-      return Result.ok(validCustomers);
+      return Result.ok([]);
     } catch (error) {
       console.error('[CustomersRepository] Erro ao buscar da API, faling back para local:', error);
-      try {
-        const customers = await db.customers.toArray();
-        return Result.ok(customers);
-      } catch (err) {
-        return Result.fail('Erro ao carregar clientes do banco local');
-      }
+      return Result.fail('Erro ao carregar clientes do banco local');
     }
   }
 
   static async getById(id: string): Promise<Result<Customer | undefined>> {
     try {
-      // First try to fetch from API
-      try {
-        const response = await apiClient.get(`${ENDPOINTS.CUSTOMERS.BASE}/${id}`);
-        const c = response.data;
-        if (c && c.omieClientCode) {
-          const customer: Customer = {
-            id: c.omieClientCode,
-            name: c.tradeName || c.legalName || 'Sem Nome',
-            document: c.document || undefined,
-            email: c.email || undefined,
-            phone: c.phone || undefined,
-            omieCode: c.omieClientCode || undefined,
-            updatedAt: new Date().toISOString()
-          };
-          await db.customers.put(customer);
-          return Result.ok(customer);
-        }
-      } catch (e) {
-        console.warn(`[CustomersRepository] Could not fetch customer ${id} from API, using local.`);
+      const response = await FirebaseCustomerRepository.getById(id);
+      if (response.success && response.data) {
+        return Result.ok(response.data);
       }
-
-      const customer = await db.customers.get(id);
-      return Result.ok(customer);
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail('Erro ao buscar cliente');
     }
@@ -101,12 +36,11 @@ export class CustomersRepository {
       const validated = CustomerSchema.parse(input);
       const customer: Customer = {
         ...validated,
+        id: validated.id || crypto.randomUUID(),
         updatedAt: new Date().toISOString()
       };
 
-      // Na arquitetura de read-only clientes via OMIE, talvez não possamos salvar.
-      // Se pudermos, faríamos um POST aqui.
-      await db.customers.put(customer);
+      await FirebaseCustomerRepository.save(customer);
       return Result.ok(customer);
     } catch (error) {
       if (error instanceof Error) return Result.fail(error.message);
@@ -116,7 +50,7 @@ export class CustomersRepository {
 
   static async delete(id: string): Promise<Result<void>> {
     try {
-      await db.customers.delete(id);
+      await FirebaseCustomerRepository.delete(id);
       return Result.success();
     } catch (error) {
       return Result.fail('Erro ao excluir cliente');
@@ -156,16 +90,9 @@ export class CustomersRepository {
           updatedAt: new Date().toISOString()
         }));
 
-        await db.transaction('rw', db.customers, async () => {
-          for (const c of validCustomers) {
-            const existing = await db.customers.get(c.id);
-            await db.customers.put({
-              ...existing,
-              ...c,
-              updatedAt: existing?.updatedAt || c.updatedAt
-            });
-          }
-        });
+        for (const c of validCustomers) {
+          await FirebaseCustomerRepository.save(c);
+        }
 
         allProcessed += validCustomers.length;
 
@@ -176,7 +103,7 @@ export class CustomersRepository {
         }
 
         // Safety break
-        if (page > 500) hasMore = false;
+        if (page > 50) hasMore = false;
       }
 
       // Optional backend trigger

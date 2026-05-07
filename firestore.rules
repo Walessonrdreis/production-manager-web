@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Catch-all deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Sectors
+    match /sectors/{sectorId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn(); // Add more granular rules later if needed
+    }
+
+    // Products
+    match /products/{productId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Planning
+    match /planning/{itemId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Produced
+    match /produced/{recordId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Goals
+    match /goals/{goalId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Customers
+    match /customers/{customerId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "entities": {
+    "Sector": {
+      "title": "Sector",
+      "description": "Represents a production sector/area",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier" },
+        "name": { "type": "string", "description": "Sector name" },
+        "color": { "type": "string", "description": "Visual color (hex)" },
+        "description": { "type": "string", "description": "Sector description" },
+        "productCodes": { "type": "array", "description": "List of associated SKUs" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Hybrid Omie + Local product data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string", "description": "SKU" },
+        "description": { "type": "string" },
+        "family": { "type": "string" },
+        "unit": { "type": "string" },
+        "stock": { "type": "number" },
+        "sectorIds": { "type": "array" },
+        "savedAt": { "type": "string", "format": "date-time" },
+        "synced": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "PlanningItem": {
+      "title": "Planning Item",
+      "description": "Item scheduled for production",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "batchId": { "type": "string" },
+        "productCode": { "type": "string" },
+        "description": { "type": "string" },
+        "quantity": { "type": "number" },
+        "sectorId": { "type": "string" },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["draft", "published", "completed"] },
+        "synced": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "ProducedRecord": {
+      "title": "Produced Record",
+      "description": "Log of produced quantities",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "description": { "type": "string" },
+        "quantity": { "type": "number" },
+        "orderId": { "type": "string" },
+        "orderNumber": { "type": "string" },
+        "synced": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "ProductionGoal": {
+      "title": "Production Goal",
+      "description": "Production targets per SKU",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productCode": { "type": "string" },
+        "productDescription": { "type": "string" },
+        "targetQuantity": { "type": "number" },
+        "period": { "type": "string", "enum": ["daily", "weekly", "monthly"] },
+        "sectorId": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "synced": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Client profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "document": { "type": "string" },
+        "emieCode": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "sectors": {
+      "schema": "Sector",
+      "description": "Collection of production sectors"
+    },
+    "products": {
+      "schema": "Product",
+      "description": "Collection of favored products"
+    },
+    "planning": {
+      "schema": "PlanningItem",
+      "description": "Collection of production planning items"
+    },
+    "produced": {
+      "schema": "ProducedRecord",
+      "description": "Collection of actual production logs"
+    },
+    "goals": {
+      "schema": "ProductionGoal",
+      "description": "Collection of production targets"
+    },
+    "customers": {
+      "schema": "Customer",
+      "description": "Collection of client data"
+    }
+  }
+}

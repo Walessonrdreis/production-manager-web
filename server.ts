@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 import fs from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import * as dotenv from 'dotenv';
-import db, { initDb, migrateFromJson } from './legacy_project/server/db.ts';
+import db, { initDb, migrateFromJson } from './server/db.js';
 
 // Carrega variáveis de ambiente do .env
 dotenv.config();
@@ -34,7 +34,7 @@ async function startServer() {
   
   // Helper to read JSON (duplicated here temporarily for migration)
   const getOldJsonData = (name: string) => {
-    const p = path.join(process.cwd(), 'legacy_project', 'data', `${name}.json`);
+    const p = path.join(process.cwd(), 'data', `${name}.json`);
     if (fs.existsSync(p)) {
       try {
         return JSON.parse(fs.readFileSync(p, 'utf-8'));
@@ -48,7 +48,7 @@ async function startServer() {
     if (data.length > 0) {
       migrateFromJson(coll, data);
       // Optional: rename old file to .json.bak to avoid re-migration
-      const oldPath = path.join(process.cwd(), 'legacy_project', 'data', `${coll}.json`);
+      const oldPath = path.join(process.cwd(), 'data', `${coll}.json`);
       fs.renameSync(oldPath, `${oldPath}.bak`);
     }
   }

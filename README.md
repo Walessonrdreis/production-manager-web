@@ -1,20 +1,33 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Production Manager - Professional Bootstrap
 
-# Run and deploy your AI Studio app
+Sistema de gestão de produção industrial com integração Omie e monitoramento de etapas de produção.
 
-This contains everything you need to run your app locally.
+## Arquitetura
 
-View your app in AI Studio: https://ai.studio/apps/d9e8128a-5dd3-4219-b5fc-6d3374580199
+O projeto segue uma arquitetura orientada a **Features**, organizada nas seguintes camadas:
 
-## Run Locally
+- `src/app`: Provedores globais, configurações de rotas e inicialização.
+- `src/pages`: Componentes de nível de página que agregam features.
+- `src/features`: Unidades de negócio independentes (ex: auth, products, planning).
+- `src/shared`: Componentes, hooks, APIs e utilitários reutilizáveis.
+- `docs/adr`: Architectural Decision Records.
 
-**Prerequisites:**  Node.js
+## Tecnologias Principais
 
+- **React + TS (Vite)**
+- **Tailwind CSS**: Estilização utility-first.
+- **Zustand**: Gerenciamento de estado (Auth).
+- **TanStack Query**: Data fetching e cache.
+- **Lucide React**: Ícones.
+- **Express (Proxy)**: Ponte para contornar restrições de CORS da API externa.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Como Executar
+
+1. Instale as dependências: `npm install`
+2. Configure o `.env` (veja `.env.example`)
+3. Inicie o servidor de desenvolvimento: `npm run dev`
+4. Execute os testes: `npm run test`
+
+## Decisões de Projeto
+
+Veja a pasta `docs/adr` para detalhes sobre escolhas técnicas.

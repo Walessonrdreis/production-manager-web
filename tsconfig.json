@@ -17,19 +17,10 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": [
-        "./legacy_project/src/*"
+        "./*"
       ]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  },
-  "include": [
-    "legacy_project/src",
-    "legacy_project/server",
-    "server.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  }
 }

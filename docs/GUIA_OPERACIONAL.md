@@ -31,7 +31,7 @@ Antes de escrever qualquer linha de código, responda mentalmente (ou no chat):
 - **Performance:** Prefira testes baseados em lógica pura (vitest) que não dependem de renderização de browser para regras de negócio.
 
 ## 5. Padrão de Resposta do Agente (Protocolo Obrigatório)
-Para toda e qualquer tarefa, o agente deve iniciar a resposta com:
+Para toda e qualquer tarefa, o agente duma arqeve iniciar a resposta com:
 
 1.  **Citação da ADR/Guia:** Indicar quais seções estão sendo respeitadas.
 2.  **Classificação da Mudança:**

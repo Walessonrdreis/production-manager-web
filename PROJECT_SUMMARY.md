@@ -1,24 +1,15 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.6.1 (Atualizado em 07/05/2026 - Consolidação da Estrutura Legacy Concluída)
+**Versão:** v4.0.11 (Atualizado em 06/05/2026 - Schema do Pedido Fix de CustomerId)
 
 ## 🎯 Objetivo
-Sistema de gerenciamento de produção industrial que utiliza uma arquitetura Local-First híbrida, evoluindo para um modelo Monorepo (Web + API) para máxima escalabilidade e controle.
+Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas.
 
 ---
 
-## 🏗️ Arquitetura Técnica (Estrutura Monolito)
+## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
 
-### 1. Organização Monorepo (ADR-004)
-- **Separação apps/web e apps/api:** O projeto agora segue uma estrutura de monolito modularizado (Monorepo), onde o frontend (React) e a backend (Express) coexistem.
-- **Fase 1: Legacy Isolation (CONCLUÍDA):** Todos os diretórios de código e dados foram isolados em `/legacy_project/`. Isso inclui a pasta `/src` original (movida para `/legacy_project/src`), dados e servidor legado.
-- **Entry Points:** A raiz do projeto contém apenas manifestos de configuração (`package.json`, `tsconfig.json`, `vite.config.ts`), `index.html` e o entry-point do servidor (`server.ts`). Todos reconfigurados para operar o código a partir da pasta legacy.
-- **Obrigação de Preservação:** Esta mudança é estrutural e organizacional. Todas as funcionalidades de planejamento, consulta Omie e sincronização de produção existentes são mantidas integralmente e validadas.
-- **Contratos Compartilhados:** Utilização de interfaces e Schemas Zod comuns para garantir integridade de dados (Single Source of Truth).
-- **Estrutura detalhada:** Consultar o arquivo `/Estrutura_Monolito.md` e a `/docs/adr/004-transicao-para-monolito-modular.md`.
-
-### 2. Persistência de Dados Local (SQLite/IndexedDB)
-- **Hibridismo de Persistência:** Cache local via IndexedDB (Web) e persistência consolidada via SQLite/Backend API.
-- **Migração JSON para SQLite:** Todos os dados locais sincronizados residem em `/data/local_storage.sqlite`.
+### 1. Persistência de Dados Local (SQLite - v4.0.7)
+- **Migração JSON para SQLite:** Todos os dados locais que anteriormente eram salvos em múltiplos arquivos JSON foram consolidados em um banco de dados **SQLite** (`/data/local_storage.sqlite`) no backend.
 - **Otimização Exclusão em Lote (Bulk Delete) (v4.0.7):** Correção do botão "Limpar Tudo" na página Meus Produtos. Substituído loop manual assíncrono problemático que travava a API, por endpoint único otimizado `DELETE /admin/products` garantindo que os itens não voltem mais com o unmount/mount.
 - **Correção de Persistência em Produção (v4.0.6):** Atualizadas as tabelas `produced` e `schedules` no SQLite e endpoints do proxy em `server.ts` para capturarem e salvarem os campos corretos emitidos pelo frontend na tela de `/production-control` (`orderId`, `orderNumber` e `scheduledAt` agora são devidamente persistidos sem serem descartados).
 - **Correção de Reversão de Edição (v4.0.5):** Resolvido problema em Repositórios Locais (Sectors e Products) onde edições não eram enviadas para o servidor se o item estivesse ausente no `IndexedDB`, causando reversão visual após invalidação do cache. Não usamos mais `db.json`.
@@ -150,16 +141,26 @@ Sistema de gerenciamento de produção industrial que utiliza uma arquitetura Lo
 
 ### 3. Estrutura de Diretórios (Shape Oficial)
 ```text
-/root
-  ├── legacy_project/
-  │   ├── src/            # Código fonte do frontend (React)
-  │   ├── server/         # Lógica de banco de dados legado
-  │   └── data/           # Dados e backups
-  ├── index.html          # Entry point Web
-  ├── server.ts           # Entry point API/Proxy
-  ├── package.json
-  ├── tsconfig.json
-  └── vite.config.ts
+/src
+  ├── app/                # Bootstrap e composição global (Router, Providers)
+  ├── components/
+  │   ├── layout/         # Layouts compartilhados
+  │   ├── ui/             # Design System (componentes atômicos)
+  │   └── auth/           # Componentes visuais de autenticação
+  ├── pages/              # Pontos de entrada das rotas (Re-exports das Features)
+  ├── hooks/              # Camada de Hooks Atômicos (Feature-based)
+  │   ├── <feature>/      # Hooks específicos (Ex: useDashboardTotals.ts)
+  │   └── ...
+  ├── services/           # Infra de baixo nível (Client API, Endpoints, Auth Store)
+  ├── types/              # Tipos globais
+  └── features/           # Núcleo de negócio (Evolução Modular)
+      └── <feature>/
+          ├── usecases/   # Ações granulares (1 por arquivo)
+          ├── domain/     # Regras puras e tipos de domínio
+          ├── infra/      # Adapters (API, DB, etc.)
+          ├── state/      # Estado local (se necessário)
+          ├── ui/         # Views e componentes específicos da feature (Pages)
+          └── index.ts    # Interface pública da feature
 ```
 
 ## 🧠 Lógica de Negócio Principal

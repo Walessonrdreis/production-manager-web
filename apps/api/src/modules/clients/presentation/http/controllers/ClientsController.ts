@@ -6,7 +6,9 @@ export class ClientsController {
   static async sync(req: Request, res: Response, next: NextFunction) {
     console.log('[SYNC] Clients Sync triggered via Domain Controller');
     try {
-      const result = await SyncClientsUseCase.execute();
+      const page = Number(req.query.page) || 1;
+      const pageSize = Number(req.query.pageSize) || 5000;
+      const result = await SyncClientsUseCase.execute(page, pageSize);
       return HttpResponseBuilder.success(res, result.data, 200, result.count);
     } catch (err: any) {
       console.error('[SYNC CLIENTS ERROR]', err.message);

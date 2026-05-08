@@ -1,8 +1,8 @@
 # Instruções para Agentes de IA
 Siga rigorosamente se precisar fazer algo que seja imcompativel pergunte
 Este projeto utiliza um arquivo de documentação viva chamado `PROJECT_SUMMARY.md`.
-Toda pergunta que eu fizer que terminar com ok? não é permitido codar é para responder via chat somente
-Toda pergunta que eu fizer que terminar com verifique! Busque o problema na plicação faz um relatorio crie um documentoem em docs/BUGS com nome objetivo do problema e enel deve conter  a descrição do problema e apresente no chat sem codar, e agurde minha decisão.
+#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:# Toda pergunta que eu fizer que terminar com ok? não é permitido codar é para responder via chat somente
+#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda pergunta que eu fizer que terminar com verifique! Busque o problema na plicação faz um relatorio crie um documentoem em docs/BUGS com nome objetivo do problema e enel deve conter  a descrição do problema e apresente no chat sem codar, e agurde minha decisão.
 
 ## 1. Regra de Auto-Atualização
 Sempre que houver uma alteração na estrutura de arquivos, na arquitetura técnica ou na lógica de negócio (ex: novos endpoints no proxy, novas regras de dedução, novos hooks de persistência), você DEVE:

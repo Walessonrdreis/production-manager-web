@@ -8,6 +8,7 @@ export const useToast = () => {
       });
     },
     error: (message: string, title?: string) => {
+      console.error('[Toast Error]', title ? `${title}: ${message}` : message);
       toast.error(title || message, {
         description: title ? message : undefined,
       });

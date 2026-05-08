@@ -31,6 +31,14 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('[API Error]', {
+      url: error?.config?.url,
+      method: error?.config?.method,
+      status: error?.response?.status,
+      data: error?.response?.data,
+      message: error?.message,
+    });
+
     if (!error?.response) {
       toast.error('Erro de Conexão', {
         description: 'Não foi possível conectar ao servidor. Verifique sua internet.'

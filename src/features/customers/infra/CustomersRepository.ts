@@ -59,63 +59,39 @@ export class CustomersRepository {
 
   static async syncWithOmie(): Promise<Result<void>> {
     try {
-      let page = 1;
-      let hasMore = true;
-      let expectedTotal: number | null = null;
-      let allProcessed = 0;
-
-      while (hasMore) {
-        const response = await apiClient.get(ENDPOINTS.CUSTOMERS.BASE, { 
-          params: { page, pageSize: 100 } 
-        });
-        const res = response.data;
-        
-        if (expectedTotal === null && res.total) {
-          expectedTotal = res.total;
-        }
-        
-        const pageData = res.data || [];
-        if (!Array.isArray(pageData) || pageData.length === 0) {
-          hasMore = false;
-          break;
-        }
-
-        const validCustomers: Customer[] = pageData.map(c => ({
-          id: c.omieClientCode || crypto.randomUUID(),
-          name: c.tradeName || c.legalName || 'Sem Nome',
-          document: c.document || undefined,
-          email: c.email || undefined,
-          phone: c.phone || undefined,
-          omieCode: c.omieClientCode || undefined,
-          updatedAt: new Date().toISOString()
-        }));
-
-        for (const c of validCustomers) {
-          await FirebaseCustomerRepository.save(c);
-        }
-
-        allProcessed += validCustomers.length;
-
-        if (expectedTotal !== null && allProcessed >= expectedTotal) {
-          hasMore = false;
-        } else {
-          page++;
-        }
-
-        // Safety break
-        if (page > 50) hasMore = false;
+      console.log('[CustomersRepository] Iniciando sincronização Omie de clientes...');
+      const response = await apiClient.post(ENDPOINTS.CUSTOMERS.SYNC, {}, { timeout: 120000 });
+      
+      const res = response.data;
+      if (!res.success || !res.data) {
+        return Result.fail('Falha na resposta do proxy ao sincronizar clientes');
       }
 
-      // Optional backend trigger
-      try {
-        await apiClient.post(ENDPOINTS.CUSTOMERS.SYNC, {});
-      } catch(e) {
-        // Just ignore if it fails
+      const pageData = res.data || [];
+      if (!Array.isArray(pageData) || pageData.length === 0) {
+        console.log('[CustomersRepository] Nenhum cliente retornado do Omie.');
+        return Result.success();
       }
 
+      const validCustomers: Customer[] = pageData.map((c: any) => ({
+        id: c.omieClientCode || c.id || crypto.randomUUID(),
+        name: c.tradeName || c.legalName || c.name || 'Sem Nome',
+        document: c.document || undefined,
+        email: c.email || undefined,
+        phone: c.phone || undefined,
+        omieCode: c.omieClientCode || c.omieCode || undefined,
+        updatedAt: new Date().toISOString()
+      }));
+
+      console.log(`[CustomersRepository] Processando ${validCustomers.length} clientes...`);
+
+      // Salva no firebase sequencialmente em background em lotes
+      await (FirebaseCustomerRepository as any).saveMany(validCustomers);
+
+      console.log('[CustomersRepository] Sincronização Omie de clientes concluída.');
       return Result.success();
     } catch (error) {
-       console.error('[CustomersRepository] Erro no sync Omie', error);
+       console.error('[CustomersRepository] Erro no sync Omie:', error);
        return Result.fail('Erro ao sincronizar clientes com Omie');
     }
   }

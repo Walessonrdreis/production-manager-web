@@ -1,6 +1,8 @@
 import { type PlanningItem } from '../../../db/models';
 import { v4 as uuidv4 } from 'uuid';
 import { FirebasePlanningRepository } from '../../planning/infra/FirebasePlanningRepository';
+import { apiClient } from '../../../services/api/client';
+import { ENDPOINTS } from '../../../services/api/endpoints';
 
 export const PlanningRepository = {
   async getAll() {
@@ -28,6 +30,7 @@ export const PlanningRepository = {
     
     try {
       await FirebasePlanningRepository.save(newItem);
+      apiClient.post(ENDPOINTS.PLANNING.BASE, newItem).catch(e => console.warn('[PlanningRepository] falha sync na api backend', e));
     } catch (error) {
       console.warn('[PlanningRepository] Erro ao sincronizar planejamento na API:', error);
     }
@@ -37,6 +40,7 @@ export const PlanningRepository = {
   async update(id: string, updates: Partial<PlanningItem>) {
     try {
       await FirebasePlanningRepository.update(id, updates);
+      apiClient.put(`${ENDPOINTS.PLANNING.BASE}/${id}`, updates).catch(e => console.warn('[PlanningRepository] falha sync na api backend', e));
     } catch (error) {
       console.warn('[PlanningRepository] Erro ao atualizar planejamento na API:', error);
     }
@@ -45,6 +49,7 @@ export const PlanningRepository = {
   async delete(id: string) {
     try {
       await FirebasePlanningRepository.delete(id);
+      apiClient.delete(`${ENDPOINTS.PLANNING.BASE}/${id}`).catch(e => console.warn('[PlanningRepository] falha sync na api backend', e));
     } catch (error) {
       console.warn('[PlanningRepository] Erro ao deletar planejamento na API:', error);
     }

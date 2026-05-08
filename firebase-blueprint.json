@@ -92,6 +92,20 @@
         "phone": { "type": "string" },
         "updatedAt": { "type": "string", "format": "date-time" }
       }
+    },
+    "Schedule": {
+      "title": "Schedule",
+      "description": "Production Schedule",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productCode": { "type": "string" },
+        "description": { "type": "string" },
+        "scheduledAt": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" },
+        "synced": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "firestore": {
@@ -118,6 +132,10 @@
     "customers": {
       "schema": "Customer",
       "description": "Collection of client data"
+    },
+    "schedules": {
+      "schema": "Schedule",
+      "description": "Collection of production schedules"
     }
   }
 }

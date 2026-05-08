@@ -4,11 +4,15 @@ import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { PageContainer } from './PageContainer';
 import { useAuthStore } from '../../services/auth/authService';
+import { useAutoSync } from '../../hooks/sync/useAutoSync';
 
 export function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
+
+  // Initialize auto background sync (runs every 15 minutes by default)
+  useAutoSync();
 
   const handleLogout = () => {
     logout();

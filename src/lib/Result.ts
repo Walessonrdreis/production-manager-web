@@ -11,8 +11,13 @@ export const Result = {
     return { success: true, data };
   },
   
-  fail<T = any>(error: string): Result<T> {
-    return { success: false, error };
+  fail<T = any>(error: string | object | Error): Result<T> {
+    const errorMsg = error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error);
+    console.error('[Result.fail] Error:', errorMsg);
+    if (error && typeof error === 'object' && 'stack' in error) {
+      console.error('[Result.fail] Stack:', (error as Error).stack);
+    }
+    return { success: false, error: errorMsg };
   },
 
   /**

@@ -3,11 +3,29 @@ import { type ProducedRecord } from '../../../db/models';
 
 export const DashboardLogic = {
   /**
-   * Agrega os dados crus da API Omie para o formato de exibição do dashboard.
+   * Agrega os dados crus da API Omie (ou array de Orders do Firebase) para o formato de exibição do dashboard.
    */
   aggregateStage20Totals(rawData: any): DashboardTotalsResponse {
-    const rawProducts = Array.isArray(rawData) ? rawData : (rawData.data || []);
+    let rawProducts = Array.isArray(rawData) ? rawData : (rawData.data || []);
     
+    // Se o dataset contiver ordens (algum item tem "items"), agregamos manualmente
+    const isOrdersDataset = rawProducts.some(p => p && p.items && Array.isArray(p.items));
+    if (isOrdersDataset) {
+      const aggregated = new Map<string, number>();
+      for (const order of rawProducts) {
+        if (!order || !order.items) continue;
+        for (const item of order.items) {
+          const desc = item.product?.description || item.description || item.descricao || item.descr || 'Item sem descrição';
+          const qty = Number(item.quantity || item.quantidade || 0);
+          aggregated.set(desc, (aggregated.get(desc) || 0) + qty);
+        }
+      }
+      rawProducts = Array.from(aggregated.entries()).map(([desc, qty]) => ({
+        description: desc,
+        totalQuantity: qty
+      }));
+    }
+
     // Normalizar campos para garantir compatibilidade com a UI
     const products = rawProducts.map((p: any) => ({
       description: p.description || p.descricao || 'Sem descrição',

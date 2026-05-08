@@ -1,19 +1,24 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.1.0 (Atualizado em 07/05/2026 - Migração para Backend Estratégico Firebase)
+**Versão:** v4.2.2 (Atualizado em 07/05/2026 - Sync Otimizado e Envio Imediato ao Render)
 
 ## 🎯 Objetivo
-Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Agora evoluindo para uma arquitetura escalável com Google Firebase.
+Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
 
-### 0. Migração para Firebase (v4.1.0 - Atual)
+### 0. Refatoração de Sincronização (v4.2.2 - Atual)
+- **Sync Otimizado e Calmo:** O hook `useAutoSync` foi ajustado para executar sincronizações de endpoints ultraleves ou essenciais (Estoque, Stage20 e Planejamento) a cada 5 minutos, e removeu-se os bloqueios pesados (sincronizações de pacotes inteiros de produtos e clientes que costumavam causar sobrecarga na renderização e no backend) priorizando que essas sejam feitas no clique do usuário (manualmente).
+- **CRUD e Proxy Imediatos:** Todos os repositórios (Produced, Planning, Schedule, Goals, MyProducts) agora realizam envio imediato das requisições mutacionais (POST, PUT, DELETE) para o proxy (`apiClient` apontando para a Render API) imediatamente após o salvamento offline no Firebase Google. Isso garante que qualquer CRUD local não possua atrasos virtuais e a backend API receba o alerta imediatamente.
+
+### 0.5. Migração para Firebase (v4.2.1)
 - **Firebase Infrastructure:** Adicionada camada de persistência em nuvem robusta com **Google Cloud Firestore**.
-- **Blueprint de Dados:** Criado `firebase-blueprint.json` mapeando todas as entidades (Setores, Produtos, Planejamento, Metas, Produção, Clientes) para coleções do Firestore.
-- **Segurança de Dados:** Implementado `firestore.rules` seguindo os 8 pilares de segurança do Firebase (Pilar Master Gate, Validação Schema, Proteção PII).
-- **Service Layer (Result Pattern):** Criado `FirestoreService.ts` seguindo rigorosamente o padrão de retorno `{ success, data, error }` exigido pela ADR.
-- **Hibridismo Seguro:** O sistema mantém a compatibilidade com o proxy SQLite local enquanto prepara a transição total para a nuvem.
+- **Segurança de Dados Reforçada:** As regras `firestore.rules` foram ajustadas para lidar com faltas de permissão (Missing or insufficient permissions) nas coleções cruciais, resolvendo bloqueios nas listagem de pedidos.
+- **Acesso Prioritário ao Firebase:** Modificada a mecânica de todas as listagens para priorizarem sempre a leitura do backend Cloud Firestore. Caso omissos, eles buscam da API de Integração e performam caching local através de `.saveMany()`.
+- **Prevenção de Errors Uncaught:** Removida a obrigatoriedade de ID nos inserts em massa e blindados the `FirestoreService.ts`.
+- **Zustand & Firebase:** Atualizamos `useAuthStore` e implementamos autologin silencioso.
+- **Blueprint de Dados:** Criado `firebase-blueprint.json` mapeando entidades.
 
 ### 1. Persistência de Dados Local (SQLite - v4.0.12)
 - **Consolidação SQLite:** Dados anteriormente em arquivos JSON foram migrados para o banco `/data/local_storage.sqlite`.

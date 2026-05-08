@@ -8,6 +8,7 @@ import {
   deleteDoc, 
   query, 
   where,
+  writeBatch,
   type DocumentData,
   type QueryConstraint
 } from 'firebase/firestore';
@@ -71,7 +72,10 @@ export class FirestoreService {
    */
   static async getOne<T>(collectionPath: string, id: string): Promise<ServiceResult<T>> {
     try {
-      const docRef = doc(db, collectionPath, id);
+      if (id === undefined || id === null) {
+        throw new Error(`Cannot get item with missing id from ${collectionPath}`);
+      }
+      const docRef = doc(db, collectionPath, String(id));
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
@@ -108,8 +112,17 @@ export class FirestoreService {
    */
   static async save<T extends { id: string }>(collectionPath: string, item: T): Promise<ServiceResult<T>> {
     try {
-      const docRef = doc(db, collectionPath, item.id);
-      await setDoc(docRef, { ...item, updatedAt: new Date().toISOString() });
+      if (!item || item.id === undefined || item.id === null) {
+        throw new Error(`Cannot save item with missing id to ${collectionPath}`);
+      }
+      const docRef = doc(db, collectionPath, String(item.id));
+      
+      // Remove undefined values to prevent Firebase errors
+      const cleanItem = Object.fromEntries(
+        Object.entries({ ...item, updatedAt: new Date().toISOString() }).filter(([_, v]) => v !== undefined)
+      );
+      
+      await setDoc(docRef, cleanItem);
       return { success: true, data: item };
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, collectionPath);
@@ -121,8 +134,17 @@ export class FirestoreService {
    */
   static async update<T>(collectionPath: string, id: string, data: Partial<T>): Promise<ServiceResult<boolean>> {
     try {
-      const docRef = doc(db, collectionPath, id);
-      await updateDoc(docRef, { ...data, updatedAt: new Date().toISOString() } as DocumentData);
+      if (id === undefined || id === null) {
+        throw new Error(`Cannot update item with missing id in ${collectionPath}`);
+      }
+      const docRef = doc(db, collectionPath, String(id));
+      
+      // Remove undefined values to prevent Firebase errors
+      const cleanData = Object.fromEntries(
+        Object.entries({ ...data, updatedAt: new Date().toISOString() }).filter(([_, v]) => v !== undefined)
+      );
+
+      await updateDoc(docRef, cleanData as DocumentData);
       return { success: true, data: true };
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `${collectionPath}/${id}`);
@@ -134,11 +156,46 @@ export class FirestoreService {
    */
   static async delete(collectionPath: string, id: string): Promise<ServiceResult<boolean>> {
     try {
-      const docRef = doc(db, collectionPath, id);
+      if (id === undefined || id === null) {
+        throw new Error(`Cannot delete item with missing id from ${collectionPath}`);
+      }
+      const docRef = doc(db, collectionPath, String(id));
       await deleteDoc(docRef);
       return { success: true, data: true };
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `${collectionPath}/${id}`);
+    }
+  }
+
+  /**
+   * Save multiple items in batches (max 500 per batch)
+   */
+  static async saveMany<T extends { id: string }>(collectionPath: string, items: T[]): Promise<ServiceResult<boolean>> {
+    try {
+      const validItems = items.filter(item => item && item.id !== undefined && item.id !== null);
+      if (validItems.length < items.length) {
+        console.warn(`[FirestoreService] saveMany on ${collectionPath} ignored ${items.length - validItems.length} items due to missing 'id'`);
+      }
+      if (validItems.length === 0) return { success: true, data: true };
+
+      const chunkSize = 500;
+      for (let i = 0; i < validItems.length; i += chunkSize) {
+        const chunk = validItems.slice(i, i + chunkSize);
+        const batch = writeBatch(db);
+        
+        for (const item of chunk) {
+          const docRef = doc(db, collectionPath, String(item.id));
+          const cleanItem = Object.fromEntries(
+            Object.entries({ ...item, updatedAt: new Date().toISOString() }).filter(([_, v]) => v !== undefined)
+          );
+          batch.set(docRef, cleanItem);
+        }
+        
+        await batch.commit();
+      }
+      return { success: true, data: true };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, collectionPath);
     }
   }
 }

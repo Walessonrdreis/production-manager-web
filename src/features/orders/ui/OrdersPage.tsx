@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useOrders, Order } from '../../../hooks/orders/useOrders';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
+import { useToast } from '../../../components/ui/Toast';
 import { AlertCircle, Search } from 'lucide-react';
 import { OrderLogic } from '../domain/OrderLogic';
+import { OrdersRepository } from '../infra/OrdersRepository';
 
 import { OrdersHeader } from './components/OrdersHeader';
 import { OrdersTable } from './components/OrdersTable';
@@ -14,6 +17,18 @@ export function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
+
+  const queryClient = useQueryClient();
+  const { success: toastSuccess, error: toastError } = useToast();
+
+  const syncMutation = useMutation({
+    mutationFn: () => OrdersRepository.syncWithOmie(),
+    onSuccess: () => {
+      toastSuccess('Sincronização Finalizada', 'Pedidos atualizados.');
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: () => toastError('Erro ao Sincronizar', 'Não foi possível buscar pedidos na V1.')
+  });
 
   const filteredOrders = useMemo(() => {
     return OrderLogic.filterOrders(orders || [], search);
@@ -45,8 +60,8 @@ export function OrdersPage() {
     <div className="space-y-6 sm:space-y-8">
       <OrdersHeader 
         ordersCount={orders?.length || 0}
-        isLoading={isLoading}
-        onRefresh={refetchOrders}
+        isLoading={isLoading || syncMutation.isPending}
+        onRefresh={() => syncMutation.mutate()}
       />
 
       <div className="relative">

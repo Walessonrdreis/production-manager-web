@@ -18,6 +18,10 @@ export const FirebaseProductRepository: IProductRepository = {
     return await FirestoreService.save<Product>(COLLECTION, product);
   },
   
+  saveMany: async (products: Product[]) => {
+    return await FirestoreService.saveMany<Product>(COLLECTION, products);
+  },
+  
   update: async (id: string, data: Partial<Product>) => {
     return await FirestoreService.update<Product>(COLLECTION, id, data);
   },

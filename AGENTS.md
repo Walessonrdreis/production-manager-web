@@ -1,6 +1,7 @@
 # Instruções para Agentes de IA
 Siga rigorosamente se precisar fazer algo que seja imcompativel pergunte
 Este projeto utiliza um arquivo de documentação viva chamado `PROJECT_SUMMARY.md`.
+Toda conversa que terminar com ok? não é permitido codar é para responder via chat somente
 
 ## 1. Regra de Auto-Atualização
 Sempre que houver uma alteração na estrutura de arquivos, na arquitetura técnica ou na lógica de negócio (ex: novos endpoints no proxy, novas regras de dedução, novos hooks de persistência), você DEVE:

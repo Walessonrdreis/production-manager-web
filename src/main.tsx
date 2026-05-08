@@ -5,6 +5,14 @@ import './styles/global.css';
 import { initSyncService } from './sync/produced.sync';
 
 async function prepareApp() {
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('[Unhandled Rejection]', event.reason);
+  });
+
+  window.addEventListener('error', (event) => {
+    console.error('[Global Error]', event.error || event.message);
+  });
+
   initSyncService();
   const env = (import.meta as any).env;
   if (env?.VITE_USE_MOCKS === 'true') {

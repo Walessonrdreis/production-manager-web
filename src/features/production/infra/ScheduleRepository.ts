@@ -1,6 +1,8 @@
 import { ProductionSchedule } from '../../../db/models';
 import { FirebaseScheduleRepository } from './FirebaseScheduleRepository';
 import { v4 as uuidv4 } from 'uuid';
+import { apiClient } from '../../../services/api/client';
+import { ENDPOINTS } from '../../../services/api/endpoints';
 
 export const ScheduleRepository = {
   async getAll(): Promise<ProductionSchedule[]> {
@@ -20,6 +22,7 @@ export const ScheduleRepository = {
     try {
        const toSave = { ...schedule, id: schedule.id || uuidv4() };
        await FirebaseScheduleRepository.save(toSave);
+       apiClient.post(ENDPOINTS.PRODUCTION.SCHEDULES, toSave).catch(e => console.warn('[ScheduleRepository] fail post to render', e));
     } catch (error) {
       console.warn('[ScheduleRepository] Erro ao sincronizar agendamento:', error);
     }
@@ -28,6 +31,7 @@ export const ScheduleRepository = {
   async delete(id: string): Promise<void> {
     try {
       await FirebaseScheduleRepository.delete(id);
+      apiClient.delete(`${ENDPOINTS.PRODUCTION.SCHEDULES}/${id}`).catch(e => console.warn('[ScheduleRepository] fail del to render', e));
     } catch (error) {
       console.warn('[ScheduleRepository] Erro ao deletar agendamento:', error);
     }

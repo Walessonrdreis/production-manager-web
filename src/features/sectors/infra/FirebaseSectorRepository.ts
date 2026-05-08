@@ -17,6 +17,10 @@ export const FirebaseSectorRepository: ISectorRepository = {
     return await FirestoreService.save<Sector>(COLLECTION, sector);
   },
   
+  saveMany: async (sectors: Sector[]) => {
+    return await FirestoreService.saveMany<Sector>(COLLECTION, sectors);
+  },
+  
   update: async (id: string, data: Partial<Sector>) => {
     return await FirestoreService.update<Sector>(COLLECTION, id, data);
   },

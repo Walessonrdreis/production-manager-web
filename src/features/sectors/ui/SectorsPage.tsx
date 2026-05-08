@@ -2,14 +2,13 @@ import { useSectors } from '../../../hooks/sectors/useSectors';
 import { useCreateSector } from '../../../hooks/sectors/useCreateSector';
 import { useUpdateSector } from '../../../hooks/sectors/useUpdateSector';
 import { useDeleteSector } from '../../../hooks/sectors/useDeleteSector';
-import { useSyncSectors } from '../../../hooks/sectors/useSyncSectors';
 import { useMyProducts } from '../../../hooks/products/useMyProducts';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Modal } from '../../../components/ui/Modal';
 import { useToast } from '../../../components/ui/Toast';
-import { Plus, Trash2, Edit2, LayoutPanelLeft, Search, Check, X, Box, Tag, AlertCircle, RefreshCcw } from 'lucide-react';
+import { Plus, Trash2, Edit2, LayoutPanelLeft, Search, Check, X, Box, Tag, AlertCircle } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Sector } from '../../../types/api';
 import { SectorsLogic } from '../domain/SectorsLogic';
@@ -20,7 +19,6 @@ export function SectorsPage() {
   const createSector = useCreateSector();
   const updateSector = useUpdateSector();
   const deleteSector = useDeleteSector();
-  const syncSectors = useSyncSectors();
   const { savedProducts, assignSector, updateProduct, isLoading: isLoadingProducts } = useMyProducts();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -181,16 +179,6 @@ export function SectorsPage() {
           <p className="text-xs sm:text-sm text-zinc-500">Gerencie a organização física e lógica da fábrica</p>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
-          <Button 
-            variant="outline" 
-            onClick={() => syncSectors.mutate()} 
-            disabled={syncSectors.isPending}
-            size="sm" 
-            className="w-full sm:w-auto h-10 px-4 font-bold border-zinc-200"
-          >
-            <RefreshCcw size={18} className={`mr-2 ${syncSectors.isPending ? 'animate-spin' : ''}`} />
-            Sincronizar
-          </Button>
           <Button onClick={() => handleOpenModal()} size="sm" className="w-full sm:w-auto h-10 px-4 font-bold">
             <Plus size={18} className="mr-2" />
             Novo Setor

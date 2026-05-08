@@ -5,9 +5,13 @@ import https from 'https';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as dotenv from 'dotenv';
+import events from 'events';
 
 // Carrega variáveis de ambiente do .env
 dotenv.config();
+
+// Aumenta o limite global de ouvintes para evitar "MaxListenersExceededWarning" no TLSSocket
+events.EventEmitter.defaultMaxListeners = 100;
 
 // Criamos um agente HTTPS persistente
 const httpsAgent = new https.Agent({ 
@@ -15,6 +19,7 @@ const httpsAgent = new https.Agent({
   maxSockets: 50,
   timeout: 60000
 });
+httpsAgent.setMaxListeners(100);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -104,6 +109,29 @@ async function startServer() {
       }
     }
 
+    // SYNC CLIENTS/CUSTOMERS
+    if (req.method === 'POST' && targetPath === 'admin/omie/clients/sync') {
+      console.log('[SYNC] Clients Sync triggered via Proxy');
+      try {
+        const targetUrl = `https://production-manager-api.onrender.com/v1/clients`;
+        // Timeout bem grande para sync
+        const response = await axios.get(targetUrl, { 
+          timeout: 120000, 
+          params: { page: 1, pageSize: 5000 },
+          httpsAgent: httpsAgent 
+        });
+        
+        const responseData = response.data || {};
+        const clients = responseData.data || responseData.clients || [];
+        
+        // Retorna a lista completa localmente para o frontend
+        return res.json({ success: true, count: clients.length, data: clients });
+      } catch (err: any) {
+        console.error('[SYNC CLIENTS ERROR]', err.message);
+        return res.status(500).json({ error: 'Sync failed', message: err.message });
+      }
+    }
+
     try {
       const targetUrl = `https://production-manager-api.onrender.com/v1/${targetPath}`;
       
@@ -126,8 +154,10 @@ async function startServer() {
         httpsAgent: httpsAgent
       });
       
+      console.log(`[PROXY] Success ${targetUrl}`);
       res.json(response.data);
     } catch (error: any) {
+      console.error(`[PROXY] Error ${targetPath}`, error.message);
       if (error.response) {
         return res.status(error.response.status).json(error.response.data);
       }
@@ -148,7 +178,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('*all', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

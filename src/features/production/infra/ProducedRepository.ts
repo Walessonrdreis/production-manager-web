@@ -1,6 +1,8 @@
 import { type ProducedRecord } from '../../../db/models';
 import { FirebaseProductionRepository } from './FirebaseProductionRepository';
 import { v4 as uuidv4 } from 'uuid';
+import { apiClient } from '../../../services/api/client';
+import { ENDPOINTS } from '../../../services/api/endpoints';
 
 export const ProducedRepository = {
   async getAll() {
@@ -36,6 +38,8 @@ export const ProducedRepository = {
     
     try {
       await FirebaseProductionRepository.save(newRecord);
+      // Imediato sync to Server
+      apiClient.post(ENDPOINTS.PRODUCTION.PRODUCED, newRecord).catch(e => console.warn('[ProducedRepository] Erro no sync ao render', e));
     } catch (error) {
       console.warn('[ProducedRepository] Erro ao sincronizar item produzido:', error);
     }
@@ -54,6 +58,8 @@ export const ProducedRepository = {
     try {
       for (const item of newRecords) {
         await FirebaseProductionRepository.save(item);
+        // Imediato sync to Server
+        apiClient.post(ENDPOINTS.PRODUCTION.PRODUCED, item).catch(e => console.warn('[ProducedRepository] Erro no sync ao render em massa', e));
       }
     } catch (error) {
        console.warn('[ProducedRepository] Erro ao sincronizar itens produzidos em massa:', error);
@@ -63,7 +69,10 @@ export const ProducedRepository = {
 
   async bulkDelete(ids: string[]): Promise<void> {
     try {
-       await Promise.all(ids.map(id => FirebaseProductionRepository.delete(id)));
+       await Promise.all(ids.map(id => {
+         FirebaseProductionRepository.delete(id);
+         apiClient.delete(`${ENDPOINTS.PRODUCTION.PRODUCED}/${id}`).catch(e => console.warn('[ProducedRepository] Erro no del bulk server', e));
+       }));
     } catch (error) {
        console.warn('[ProducedRepository] Erro ao deletar itens produzidos:', error);
     }
@@ -78,6 +87,7 @@ export const ProducedRepository = {
   async delete(id: string) {
     try {
       await FirebaseProductionRepository.delete(id);
+      apiClient.delete(`${ENDPOINTS.PRODUCTION.PRODUCED}/${id}`).catch(e => console.warn('[ProducedRepository] Erro no sync del server', e));
     } catch (error) {
       console.warn('[ProducedRepository] Erro ao deletar item produzido:', error);
     }

@@ -18,6 +18,10 @@ export const FirebaseCustomerRepository: ICustomerRepository = {
     return await FirestoreService.save<Customer>(COLLECTION, item);
   },
   
+  saveMany: async (items: Customer[]) => {
+    return await FirestoreService.saveMany<Customer>(COLLECTION, items);
+  },
+  
   update: async (id: string, data: Partial<Customer>) => {
     return await FirestoreService.update<Customer>(COLLECTION, id, data);
   },

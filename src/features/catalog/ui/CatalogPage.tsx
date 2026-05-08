@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useOmieProducts } from '../../../hooks/catalog/useOmieProducts';
-import { useSyncCatalog } from '../../../hooks/catalog/useSyncCatalog';
+import { useSyncCatalog, useSyncStock } from '../../../hooks/catalog/useSyncCatalog';
 import { useSectors } from '../../../hooks/sectors/useSectors';
 import { useMyProducts } from '../../../hooks/products/useMyProducts';
 import { Card } from '../../../components/ui/Card';
@@ -19,6 +19,7 @@ export function CatalogPage() {
   const { addToast } = useToast();
   const { data: products = [], isLoading, isError, error, isFetching, refetch: refetchProducts } = useOmieProducts();
   const syncWithOmie = useSyncCatalog();
+  const syncStock = useSyncStock();
   const { data: sectors = [] } = useSectors();
   const { saveProduct, isSaved, removeProduct } = useMyProducts();
   
@@ -103,6 +104,8 @@ export function CatalogPage() {
         isFetching={isFetching}
         onSync={() => syncWithOmie.mutate()}
         isSyncing={syncWithOmie.isPending}
+        onSyncStock={() => syncStock.mutate()}
+        isSyncingStock={syncStock.isPending}
       />
 
       <Card>

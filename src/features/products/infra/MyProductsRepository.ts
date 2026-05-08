@@ -33,7 +33,6 @@ export const MyProductsRepository = {
     
     try {
       await FirebaseProductRepository.save(savedProduct);
-      apiClient.post(ENDPOINTS.PRODUCTS.ADMIN, savedProduct).catch(e => console.warn('Falha sync backend admin product', e));
     } catch (error) {
       console.error('[MyProductsRepository] Erro ao salvar produto:', error);
     }
@@ -44,7 +43,6 @@ export const MyProductsRepository = {
   async remove(productId: string) {
     try {
       await FirebaseProductRepository.delete(productId);
-      apiClient.delete(`${ENDPOINTS.PRODUCTS.ADMIN}/${productId}`).catch(e => console.warn('Falha del sync backend product', e));
     } catch (error) {
       console.error('[MyProductsRepository] Erro ao remover produto:', error);
     }
@@ -53,7 +51,6 @@ export const MyProductsRepository = {
   async update(productId: string, data: Partial<SavedProduct>) {
     try {
       await FirebaseProductRepository.update(productId, data);
-      apiClient.put(`${ENDPOINTS.PRODUCTS.ADMIN}/${productId}`, data).catch(e => console.warn('Falha update sync backend product', e));
     } catch (error) {
       console.error('[MyProductsRepository] Erro ao atualizar produto:', error);
     }

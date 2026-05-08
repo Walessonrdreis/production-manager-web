@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.2.2 (Atualizado em 07/05/2026 - Sync Otimizado e Envio Imediato ao Render)
+**Versão:** v4.3.0 (Atualizado em 07/05/2026 - Rastreamento Total em Nuvem e Remoção de Dependência de Proxy no CRUD)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -8,9 +8,9 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
 
-### 0. Refatoração de Sincronização (v4.2.2 - Atual)
-- **Sync Otimizado e Calmo:** O hook `useAutoSync` foi ajustado para executar sincronizações de endpoints ultraleves ou essenciais (Estoque, Stage20 e Planejamento) a cada 5 minutos, e removeu-se os bloqueios pesados (sincronizações de pacotes inteiros de produtos e clientes que costumavam causar sobrecarga na renderização e no backend) priorizando que essas sejam feitas no clique do usuário (manualmente).
-- **CRUD e Proxy Imediatos:** Todos os repositórios (Produced, Planning, Schedule, Goals, MyProducts) agora realizam envio imediato das requisições mutacionais (POST, PUT, DELETE) para o proxy (`apiClient` apontando para a Render API) imediatamente após o salvamento offline no Firebase Google. Isso garante que qualquer CRUD local não possua atrasos virtuais e a backend API receba o alerta imediatamente.
+### 0. Refatoração de Sincronização (v4.3.0 - Atual)
+- **Persistência Exclusiva e Direta no Firebase:** As operações em "Meus Produtos" (`/my-products`) e "Controle de Produção" (`/production-control`) foram completamente migradas para utilizarem SOMENTE o Firebase API. Nenhuma requisição (`POST`, `PUT`, `DELETE`) de lógica de negócios ou cruds é enviada para a API do Render nas funcionalidades correspondentes, simplificando as mutações e aumentando a agilidade das transações off-line/local-first apoiadas pelo Firestore.
+- **Rastreabilidade Visual de Produção:** Ao marcar um pedido como "Produzido", um modal de confirmação protege contra remoção acidental. O rastreio agora indica localmente a data exata e a hora em que aquela finalização ocorreu (via `updatedAt`).
 
 ### 0.5. Migração para Firebase (v4.2.1)
 - **Firebase Infrastructure:** Adicionada camada de persistência em nuvem robusta com **Google Cloud Firestore**.

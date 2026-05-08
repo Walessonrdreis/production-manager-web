@@ -99,6 +99,11 @@ export function MonitoringPage() {
     return producedRecords.some(r => r.id === id);
   };
 
+  const getOrderProducedRecord = (orderId: string, description: string) => {
+    const id = TrackingLogic.generateProducedId(orderId, description);
+    return producedRecords.find(r => r.id === id);
+  };
+
   const totalProducedItemsCount = TrackingLogic.calculateTotalProduced(producedRecords);
   const adjustedTotal = Math.max(0, (totals?.totalItems || 0) - totalProducedItemsCount);
 
@@ -194,6 +199,7 @@ export function MonitoringPage() {
         producedQuantity={selectedProduct ? getProducedQuantity(selectedProduct) : 0}
         ordersWithProduct={selectedProduct ? TrackingLogic.filterOrdersByProduct(orders, selectedProduct) : []}
         isOrderProduced={isOrderProduced}
+        getOrderProducedRecord={getOrderProducedRecord}
         onToggleProduct={handleToggleProduct}
         onToggleOrder={handleToggleOrder}
       />

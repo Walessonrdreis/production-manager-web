@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
@@ -21,12 +22,13 @@ export async function startServer() {
   // Vite middleware for development (must be AFTER API routes)
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
+      root: path.join(process.cwd(), 'apps/web'),
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    const distPath = path.join(process.cwd(), 'dist/client');
     app.use(express.static(distPath));
     app.get('*all', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
@@ -37,3 +39,5 @@ export async function startServer() {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
+
+startServer();

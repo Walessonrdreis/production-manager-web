@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.5.2 (Atualizado em 08/05/2026 - Limpeza do db.ts legado movido para a API)
+**Versão:** v4.6.1 (Atualizado em 08/05/2026 - Migração de Gestão de Metas para Firebase Admin via API Backend)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -125,7 +125,7 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 - **Ordens para v1/orders (v4.0.10):** A API de sincronização local de pedidos (Orders) foi atualizada para consumir do `/v1/orders`, mapeando schemas atualizados.
 
 ### 4. Correções e Estabilidade (v4.0.11)
-- **Mapeamento de Schema de Pedidos:** Atualizado o arquivo de sync via SQLite para adicionar a coluna `customer_id` e extrair com sucesso o `omieClientCode` proveniente do endpoint remoto `/v1/orders`. O valor agora é normalizado corretamente e aparece visivelmente na interface. 
+- **Módulo de Metas (Goals):** A API passou as usar o Firebase Admin de forma unificada e exclusiva na camada do servidor para gestão das metas, removendo a dependência local (SQLite) ou acessos via Firebase Client no frontend. 
 - **Setores (Cache e Storage):** Corrigido o bug na base IndexedDB Dexie que forçava salvamentos locais silenciosos, causando conflitos em edições. Adicionado headers de `Cache-Control` restritos a todas as rotas servidas no NodeJS (SQLite) para inativar recarregamento de caches errôneos de requisições `GET` feitas localmente após edições em componentes.
 - **Fim do Loop de Deletados:** Implementada lógica de "Sync de Deletados" no `SectorsRepository`. Ao buscar a lista da API (agora local), o sistema remove automaticamente do IndexedDB qualquer setor que não esteja presente no retorno da API, garantindo que a UI reflita apenas a realidade persistida.
 
@@ -160,28 +160,30 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 - **Backend/Proxy:** Express.js com persistência local atômica e cache em RAM.
 - **Storage Local:** IndexedDB (via Dexie) para grandes volumes de dados no cliente.
 
-### 3. Estrutura de Diretórios (Shape Oficial)
+### 3. Estrutura de Diretórios (Shape Oficial V4.7.0)
 ```text
-/src
-  ├── app/                # Bootstrap e composição global (Router, Providers)
-  ├── components/
-  │   ├── layout/         # Layouts compartilhados
-  │   ├── ui/             # Design System (componentes atômicos)
-  │   └── auth/           # Componentes visuais de autenticação
-  ├── pages/              # Pontos de entrada das rotas (Re-exports das Features)
-  ├── hooks/              # Camada de Hooks Atômicos (Feature-based)
-  │   ├── <feature>/      # Hooks específicos (Ex: useDashboardTotals.ts)
-  │   └── ...
-  ├── services/           # Infra de baixo nível (Client API, Endpoints, Auth Store)
-  ├── types/              # Tipos globais
-  └── features/           # Núcleo de negócio (Evolução Modular)
-      └── <feature>/
-          ├── usecases/   # Ações granulares (1 por arquivo)
-          ├── domain/     # Regras puras e tipos de domínio
-          ├── infra/      # Adapters (API, DB, etc.)
-          ├── state/      # Estado local (se necessário)
-          ├── ui/         # Views e componentes específicos da feature (Pages)
-          └── index.ts    # Interface pública da feature
+/
+├── apps/
+│   ├── web/              # Frontend UI (React + Vite)
+│   │   ├── src/
+│   │   │   ├── app/      # Bootstrap e composição global
+│   │   │   ├── components/ # Componentes UI e Layout
+│   │   │   ├── features/ # Núcleo de negócio modular
+│   │   │   ├── hooks/    # Hooks atômicos
+│   │   │   ├── pages/    # Re-exports das rotas
+│   │   │   ├── services/ # Infra de baixo nível e Stores
+│   │   │   └── types/    # Tipos do frontend
+│   │   ├── public/       # Assets públicos
+│   │   └── vite.config.ts, tailwind.config.js, etc.
+│   │
+│   └── api/              # Backend Services (Express + SQLite/Omie)
+│       ├── src/
+│       │   ├── bootstrap/ # Setup do Express, Plugins, Vite middleware
+│       │   ├── config/    # Variáveis de ambiente
+│       │   ├── modules/   # Módulos autonômos (Auth, Dashboard, Products, etc.)
+│       │   ├── shared/    # Códigos compartilhados, AppError, etc.
+│       │   └── legacy/    # Códigos antigos mantidos por compatibilidade
+│       └── server.ts      # Entry point
 ```
 
 ## 🧠 Lógica de Negócio Principal

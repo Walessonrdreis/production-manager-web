@@ -6,13 +6,20 @@ import { ENDPOINTS } from '../../../services/api/endpoints';
 export const GoalsRepository = {
   async getAll(): Promise<ProductionGoal[]> {
     try {
+      // Prioritize Firebase since it handles real-time/auth well on the frontend
       const response = await FirebaseGoalsRepository.getAll();
       if (response.success && response.data) {
         return response.data;
       }
+      
+      // Fallback to API if Firebase fails
+      const apiResponse = await apiClient.get<{ success: boolean, data: ProductionGoal[] }>(ENDPOINTS.GOALS.BASE);
+      if (apiResponse.data && apiResponse.data.success && apiResponse.data.data) {
+        return apiResponse.data.data;
+      }
       return [];
     } catch (error) {
-      console.error('[GoalsRepository] Falha ao buscar do Firebase:', error);
+      console.error('[GoalsRepository] Falha ao buscar dados:', error);
       return [];
     }
   },
@@ -20,12 +27,17 @@ export const GoalsRepository = {
   async save(goal: ProductionGoal): Promise<ProductionGoal> {
     try {
       const toSave = { ...goal, synced: true, lastModified: Date.now() };
+      
+      // Save to Firebase Database
       await FirebaseGoalsRepository.save(toSave);
-      apiClient.post(ENDPOINTS.GOALS.BASE, toSave).catch(e => console.warn('[GoalsRepo] fail API', e));
+      
+      // Save to our Backend API
+      apiClient.post(ENDPOINTS.GOALS.BASE, toSave).catch(e => console.warn('[GoalsRepo] fail API save', e));
+      
       return toSave;
     } catch (error) {
       console.error('[GoalsRepository] Erro ao persistir meta:', error);
-      return goal;
+      return goal; // still return it optimistically for UI
     }
   },
 

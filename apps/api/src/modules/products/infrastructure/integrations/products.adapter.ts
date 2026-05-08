@@ -5,10 +5,30 @@ export class ProductsAdapter {
   static async fetchFromExternalAPI(limit: number = 1000) {
     try {
       const targetUrl = `https://production-manager-api.onrender.com/v1/products`;
-      const response = await externalClient.get(targetUrl, { 
-        params: { limit }
+      const firstResponse = await externalClient.get(targetUrl, { 
+        params: { page: 1 }
       });
-      return response.data.data || [];
+      const { data: firstPageData, meta } = firstResponse.data;
+      
+      let allProducts = [...(firstPageData || [])];
+      
+      if (meta && meta.pageSize > 0 && meta.total > meta.pageSize) {
+        const totalPages = Math.ceil(meta.total / meta.pageSize);
+        for (let i = 2; i <= totalPages; i += 5) {
+          const chunk = [];
+          for (let j = i; j < i + 5 && j <= totalPages; j++) {
+            chunk.push(externalClient.get(targetUrl, { params: { page: j } }));
+          }
+          const responses = await Promise.all(chunk);
+          for (const res of responses) {
+            if (res.data && res.data.data) {
+              allProducts = [...allProducts, ...res.data.data];
+            }
+          }
+        }
+      }
+
+      return allProducts;
     } catch (err: any) {
       throw new AppError(`Failed to fetch products: ${err.message}`, 502);
     }
@@ -37,8 +57,35 @@ export class ProductsAdapter {
   static async fetchList() {
     try {
       const targetUrl = `https://production-manager-api.onrender.com/v1/products`;
-      const response = await externalClient.get(targetUrl);
-      return response.data;
+      const firstResponse = await externalClient.get(targetUrl, { params: { page: 1 } });
+      const { data: firstPageData, meta } = firstResponse.data;
+      
+      let allProducts = [...(firstPageData || [])];
+      
+      if (meta && meta.pageSize > 0 && meta.total > meta.pageSize) {
+        const totalPages = Math.ceil(meta.total / meta.pageSize);
+        for (let i = 2; i <= totalPages; i += 5) {
+          const chunk = [];
+          for (let j = i; j < i + 5 && j <= totalPages; j++) {
+            chunk.push(externalClient.get(targetUrl, { params: { page: j } }));
+          }
+          const responses = await Promise.all(chunk);
+          for (const res of responses) {
+            if (res.data && res.data.data) {
+              allProducts = [...allProducts, ...res.data.data];
+            }
+          }
+        }
+      }
+
+      return {
+        data: allProducts,
+        meta: {
+          page: 1,
+          pageSize: allProducts.length,
+          total: allProducts.length
+        }
+      };
     } catch (err: any) {
       throw new AppError(`Failed to fetch products list: ${err.message}`, 502);
     }

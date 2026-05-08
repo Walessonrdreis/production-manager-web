@@ -149,3 +149,36 @@ Migração Autônoma Completa criando Adapters, UseCases, e Controllers e remove
 ATUALIZAÇÃO ENTREGUE
 
 Toda etapa relizazada no final dela coloque ATUALIZAÇÂO ENTREGUE em AGENTS.md 6. Plano de Refatoração da API backend, no final de cada Etapa.
+
+## 7. Planejamento e Passos para a Migração do Frontend para apps/web
+Passo 1: Criação e Espelhamento Progressivo (Shadowing)
+Criar o diretório /apps/web/.
+Copiar (ao invés de mover) as pastas /src e /public e todos os arquivos de configuração do frontend (vite.config.ts, tailwind.config.js, tsconfig.json, index.html, etc.) para /apps/web/.
+Porque é seguro: O sistema atual continuará operando 100% da raiz enquanto o clone é estruturado.
+ATUALIZAÇÃO ENTREGUE
+
+Passo 2: Configuração Isolada do Workspace (Ajuste de Caminhos)
+Entrar no recém-criado /apps/web/ e ajustar estritamente dentro dele o vite.config.ts, tsconfig.json e eventuais arquivos específicos (ex: components.json).
+Garantir que os aliases (como @/) apontem corretamente para /apps/web/src.
+Porque é seguro: O Vite antigo na raiz permance inalterado.
+ATUALIZAÇÃO ENTREGUE
+
+Passo 3: Chaveamento Transparente do Express (API ↔ Vite)
+Ajustar o apps/api/src/bootstrap/server.ts para direcionar o middleware do Vite (em dev) e a varredura (express.static) para o caminho path.join(process.cwd(), 'apps/web').
+Porque é seguro: Se algo der errado na leitura, temos os logs exatos de onde o Express está tentando achar os arquivos, podendo ser rapidamente revertido para a raiz.
+ATUALIZAÇÃO ENTREGUE
+
+Passo 4: Virada de Chave (Swapping) nos Scripts no package.json
+Atualizar os scripts no package.json da raiz:
+O comando de build será algo como vite build --config apps/web/vite.config.ts (ou rodar um npm script local se adotarmos package.json próprio no workspace no futuro).
+No Node, faremos o Vite trabalhar tendo /apps/web/ como pasta base de contexto.
+Reiniciar o servidor e testar minuciosamente se o frontend responde, consome o HMR perfeitamente e os Endpoints do Express são chamados corretamente.
+ATUALIZAÇÃO ENTREGUE
+
+Passo 5: Clean-up (Limpeza) e Documentação (Ponto de Retorno Seguro)
+Apenas após validarmos que o frontend sobe com sucesso puramente a partir de /apps/web/, nós faremos a remoção (delete) da pasta /src, /public e as de configs de UI que ficaram sobrando na raiz.
+Atualizar os documentos vivos (PROJECT_SUMMARY.md e AGENTS.md) validando as entregas.
+ATUALIZAÇÃO ENTREGUE
+
+
+Todo Passo relizazada no final dela coloque ATUALIZAÇÂO ENTREGUE em AGENTS.md 7. Planejamento e Passos para a Migração do Frontend para apps/web, no final de cada Etapa.

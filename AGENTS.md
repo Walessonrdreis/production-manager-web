@@ -1,7 +1,8 @@
 # Instruções para Agentes de IA
 Siga rigorosamente se precisar fazer algo que seja imcompativel pergunte
 Este projeto utiliza um arquivo de documentação viva chamado `PROJECT_SUMMARY.md`.
-Toda conversa que terminar com ok? não é permitido codar é para responder via chat somente
+Toda pergunta que eu fizer que terminar com ok? não é permitido codar é para responder via chat somente
+Toda pergunta que eu fizer que terminar com verifique! Busque o problema na plicação faz um relatorio crie um documentoem em docs/BUGS com nome objetivo do problema e enel deve conter  a descrição do problema e apresente no chat sem codar, e agurde minha decisão.
 
 ## 1. Regra de Auto-Atualização
 Sempre que houver uma alteração na estrutura de arquivos, na arquitetura técnica ou na lógica de negócio (ex: novos endpoints no proxy, novas regras de dedução, novos hooks de persistência), você DEVE:
@@ -131,3 +132,16 @@ apps/api/
 │     └─ index.ts
 │
 └─ server.ts
+
+## 6. Plano de Refatoração da API Backend
+A fim de manter o controle arquitetural e o avanço gradual da refatoração abordada no repositório, estão definidas as seguintes etapas a serem perseguidas:
+
+**Etapa 4: Setup do Bootstrap Server e App Base**
+Extração do Express: Atualmente nosso construtor `app = express()` principal e lógicas de vite estão no `server.ts` da raiz. A ideia nesta etapa é isolar essa montagem da API no `apps/api/src/bootstrap/app.ts` e chamar os plugins definidos em `error-handler.ts`, isolando 100% a camada de API.
+ATUALIZAÇÃO ENTREGUE
+
+**Etapa 5: Outros Módulos**
+Com a base pronta e o Proxy roteado, podemos estruturar outros endpoints legados ou futuras criações dentro de seus próprios domínios em `apps/api/src/modules/nome_do_modulo/`.
+ATUALIZAÇÃO ENTREGUE
+
+Toda etapa relizazada no final dela coloque ATUALIZAÇÂO ENTREGUE em AGENTS.md 6. Plano de Refatoração da API backend, no final de cada Etapa.

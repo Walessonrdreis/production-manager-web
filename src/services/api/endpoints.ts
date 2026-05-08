@@ -1,36 +1,36 @@
 export const ENDPOINTS = {
   AUTH: {
-    LOGIN: 'auth/login',
+    LOGIN: 'proxy/auth/login',
   },
   DASHBOARD: {
-    STAGE20_TOTALS: 'admin/orders/stage20/totals',
-    SYNC_STAGE20: 'admin/omie/orders/stage20/sync',
-    PRODUCED: 'dashboard/produced'
+    STAGE20_TOTALS: 'proxy/admin/orders/stage20/totals',
+    SYNC_STAGE20: 'orders/sync',
+    PRODUCED: 'proxy/dashboard/produced'
   },
   PRODUCTS: {
-    LIST: 'products',
-    SYNC: 'admin/omie/sync/products',
-    SYNC_STOCK: 'admin/omie/products/stock/refresh',
-    ADMIN: 'admin/products',
+    LIST: 'proxy/products',
+    SYNC: 'products/sync',
+    SYNC_STOCK: 'proxy/admin/omie/products/stock/refresh',
+    ADMIN: 'proxy/admin/products',
   },
   SECTORS: {
-    BASE: 'admin/sectors',
+    BASE: 'proxy/admin/sectors',
   },
   PLANNING: {
-    BASE: 'admin/planning',
+    BASE: 'proxy/admin/planning',
   },
   PRODUCTION: {
-    PRODUCED: 'admin/produced',
-    SCHEDULES: 'admin/schedules',
+    PRODUCED: 'proxy/admin/produced',
+    SCHEDULES: 'proxy/admin/schedules',
   },
   GOALS: {
-    BASE: 'admin/goals',
+    BASE: 'proxy/admin/goals',
   },
   ORDERS: {
-    BASE: 'orders',
+    BASE: 'proxy/orders',
   },
   CUSTOMERS: {
-    BASE: 'clients',
-    SYNC: 'admin/omie/clients/sync',
+    BASE: 'proxy/clients',
+    SYNC: 'clients/sync',
   }
 } as const;

@@ -51,9 +51,10 @@ describe('CatalogNormalizer', () => {
         description: 'Product One',
         family: 'Fam 1',
         stock: 10,
+        minStock: 0,
         price: 50.5,
         unit: 'UN',
-        sectorId: undefined
+        sectorIds: []
       });
     });
 

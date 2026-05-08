@@ -29,6 +29,6 @@ export const CatalogRepository = {
   },
 
   async syncStockWithOmie() {
-    return apiClient.post(ENDPOINTS.PRODUCTS.SYNC_STOCK, {}, { timeout: 60000 });
+    return apiClient.post(ENDPOINTS.PRODUCTS.SYNC_STOCK, {}, { timeout: 120000 });
   }
 };

@@ -1,5 +1,6 @@
 import { Request, NextFunction, Response } from 'express';
 import { SyncClientsUseCase } from '../../../application/use-cases/SyncClientsUseCase.js';
+import { GetClientsListUseCase } from '../../../application/use-cases/GetClientsListUseCase.js';
 import { HttpResponseBuilder } from '../../../../../shared/http/response.js';
 
 export class ClientsController {
@@ -12,6 +13,15 @@ export class ClientsController {
       return HttpResponseBuilder.success(res, result.data, 200, result.count);
     } catch (err: any) {
       console.error('[SYNC CLIENTS ERROR]', err.message);
+      next(err);
+    }
+  }
+
+  static async getClientsList(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await GetClientsListUseCase.execute(req.query);
+      return HttpResponseBuilder.success(res, result.data, 200);
+    } catch (err: any) {
       next(err);
     }
   }

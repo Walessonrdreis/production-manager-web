@@ -6,7 +6,7 @@ import https from 'https';
 const httpsAgent = new https.Agent({ 
   keepAlive: true, 
   maxSockets: 50,
-  timeout: 60000
+  timeout: 120000
 });
 httpsAgent.setMaxListeners(100);
 
@@ -36,7 +36,7 @@ export class ProxyController {
         data: req.body,
         params: req.query,
         headers: headers,
-        timeout: 60000,
+        timeout: 120000,
         httpsAgent: httpsAgent
       });
       

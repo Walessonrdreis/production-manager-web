@@ -7,6 +7,14 @@ export async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  });
+
+  process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+  });
+
   // Configuring core API functionalities, routes, etc.
   configureApp(app);
 

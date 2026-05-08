@@ -144,4 +144,8 @@ ATUALIZAÇÃO ENTREGUE
 Com a base pronta e o Proxy roteado, podemos estruturar outros endpoints legados ou futuras criações dentro de seus próprios domínios em `apps/api/src/modules/nome_do_modulo/`.
 ATUALIZAÇÃO ENTREGUE
 
+**Etapa 6: Criação dos diretórios para novas features (Dashboard, Sectors, Planning, Goals e Production)**
+Migração Autônoma Completa criando Adapters, UseCases, e Controllers e removendo `/proxy` dos chamados de endpoints do Front-end.
+ATUALIZAÇÃO ENTREGUE
+
 Toda etapa relizazada no final dela coloque ATUALIZAÇÂO ENTREGUE em AGENTS.md 6. Plano de Refatoração da API backend, no final de cada Etapa.

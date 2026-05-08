@@ -6,3 +6,4 @@ import { SyncClientsSchema } from './schemas.js';
 export const clientsRouter = Router();
 
 clientsRouter.post('/sync', validateRequest(SyncClientsSchema), ClientsController.sync);
+clientsRouter.get('/', ClientsController.getClientsList);

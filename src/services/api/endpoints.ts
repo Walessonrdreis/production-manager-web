@@ -1,36 +1,36 @@
 export const ENDPOINTS = {
   AUTH: {
-    LOGIN: 'proxy/auth/login',
+    LOGIN: 'auth/login',
   },
   DASHBOARD: {
-    STAGE20_TOTALS: 'proxy/admin/orders/stage20/totals',
+    STAGE20_TOTALS: 'dashboard/stage20/totals',
     SYNC_STAGE20: 'orders/sync',
-    PRODUCED: 'proxy/dashboard/produced'
+    PRODUCED: 'dashboard/produced'
   },
   PRODUCTS: {
-    LIST: 'proxy/products',
+    LIST: 'products',
     SYNC: 'products/sync',
-    SYNC_STOCK: 'proxy/admin/omie/products/stock/refresh',
-    ADMIN: 'proxy/admin/products',
+    SYNC_STOCK: 'products/stock/refresh',
+    ADMIN: 'products/admin',
   },
   SECTORS: {
-    BASE: 'proxy/admin/sectors',
+    BASE: 'sectors',
   },
   PLANNING: {
-    BASE: 'proxy/admin/planning',
+    BASE: 'planning',
   },
   PRODUCTION: {
-    PRODUCED: 'proxy/admin/produced',
-    SCHEDULES: 'proxy/admin/schedules',
+    PRODUCED: 'production/produced',
+    SCHEDULES: 'production/schedules',
   },
   GOALS: {
-    BASE: 'proxy/admin/goals',
+    BASE: 'goals',
   },
   ORDERS: {
-    BASE: 'proxy/orders',
+    BASE: 'orders',
   },
   CUSTOMERS: {
-    BASE: 'proxy/clients',
+    BASE: 'clients',
     SYNC: 'clients/sync',
   }
 } as const;

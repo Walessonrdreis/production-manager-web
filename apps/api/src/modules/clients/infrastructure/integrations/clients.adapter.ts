@@ -15,4 +15,14 @@ export class ClientsAdapter {
       throw new AppError(`Failed to fetch clients: ${err.message}`, 502);
     }
   }
+
+  static async fetchClientsList(params?: any) {
+    try {
+      const targetUrl = `https://production-manager-api.onrender.com/v1/clients`;
+      const response = await externalClient.get(targetUrl, { params });
+      return response.data || [];
+    } catch (err: any) {
+      throw new AppError(`Failed to fetch clients list: ${err.message}`, 502);
+    }
+  }
 }

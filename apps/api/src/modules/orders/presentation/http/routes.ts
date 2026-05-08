@@ -6,3 +6,4 @@ import { SyncOrdersSchema } from './schemas.js';
 export const ordersRouter = Router();
 
 ordersRouter.post('/sync', validateRequest(SyncOrdersSchema), OrdersController.sync);
+ordersRouter.get('/', OrdersController.getOrdersList);

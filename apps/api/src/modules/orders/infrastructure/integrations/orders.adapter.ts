@@ -14,4 +14,14 @@ export class OrdersAdapter {
       throw new AppError(`Failed to fetch orders: ${err.message}`, 502);
     }
   }
+
+  static async fetchOrdersList(params?: any) {
+    try {
+      const targetUrl = `https://production-manager-api.onrender.com/v1/orders`;
+      const response = await externalClient.get(targetUrl, { params });
+      return response.data || [];
+    } catch (err: any) {
+      throw new AppError(`Failed to fetch orders list: ${err.message}`, 502);
+    }
+  }
 }

@@ -63,32 +63,12 @@ export class CustomersRepository {
       const response = await apiClient.post(ENDPOINTS.CUSTOMERS.SYNC, {}, { timeout: 120000 });
       
       const res = response.data;
-      if (!res.success || !res.data) {
+      if (!res.success && !res.data) {
         return Result.fail('Falha na resposta do proxy ao sincronizar clientes');
       }
 
-      const pageData = res.data || [];
-      if (!Array.isArray(pageData) || pageData.length === 0) {
-        console.log('[CustomersRepository] Nenhum cliente retornado do Omie.');
-        return Result.success();
-      }
-
-      const validCustomers: Customer[] = pageData.map((c: any) => ({
-        id: c.omieClientCode || c.id || crypto.randomUUID(),
-        name: c.tradeName || c.legalName || c.name || 'Sem Nome',
-        document: c.document || undefined,
-        email: c.email || undefined,
-        phone: c.phone || undefined,
-        omieCode: c.omieClientCode || c.omieCode || undefined,
-        updatedAt: new Date().toISOString()
-      }));
-
-      console.log(`[CustomersRepository] Processando ${validCustomers.length} clientes...`);
-
-      // Salva no firebase sequencialmente em background em lotes
-      await (FirebaseCustomerRepository as any).saveMany(validCustomers);
-
-      console.log('[CustomersRepository] Sincronização Omie de clientes concluída.');
+      // Backend now saves to firebase automatically, no need to push here
+      console.log('[CustomersRepository] Sincronização Omie de clientes concluída no backend.');
       return Result.success();
     } catch (error) {
        console.error('[CustomersRepository] Erro no sync Omie:', error);

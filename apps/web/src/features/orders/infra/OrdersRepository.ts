@@ -6,9 +6,8 @@ export const OrdersRepository = {
   async syncWithOmie() {
     try {
       const { data } = await apiClient.post(ENDPOINTS.DASHBOARD.SYNC_STAGE20, {});
-      if (data && data.data && Array.isArray(data.data)) {
-        await FirebaseOrderRepository.saveMany(data.data.map((o: any) => ({ ...o, id: o.id || o.omieCode || o.codigo_pedido })));
-      }
+      // We don't need to manually push to Firebase here anymore because our backend API
+      // automatically saves to Firebase Admin on /sync! 
       return data;
     } catch (apiError) {
       console.warn('[OrdersRepository] Failed to sync orders:', apiError);
@@ -17,12 +16,13 @@ export const OrdersRepository = {
   },
 
   async getAll() {
-    // Try to get from Firebase first as per user request
+    // 100% reliant on Firebase as per architecture plan!
     const cachedResponse = await FirebaseOrderRepository.getAll();
-    if (cachedResponse.success && cachedResponse.data && cachedResponse.data.length > 0) {
+    if (cachedResponse.success && cachedResponse.data) {
       return { data: { data: cachedResponse.data } };
     }
 
+    // Fallback just in case Firebase is empty, though it shouldn't be since the background job hydrates it
     try {
       const response = await apiClient.get(ENDPOINTS.ORDERS.BASE);
       if (response.data) {
@@ -34,7 +34,7 @@ export const OrdersRepository = {
         } else if (response.data.orders && Array.isArray(response.data.orders)) {
           orders = response.data.orders;
         }
-
+        
         if (orders.length > 0) {
           FirebaseOrderRepository.saveMany(orders.map(o => ({ ...o, id: o.id || o.omieCode || o.codigo_pedido })))
             .catch(err => console.log('Warn: Failed to save orders to Firebase', err));

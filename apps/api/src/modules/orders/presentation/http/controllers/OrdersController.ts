@@ -8,7 +8,7 @@ export class OrdersController {
     console.log('[SYNC] Orders Sync triggered via Domain Controller');
     try {
       const page = Number(req.query.page) || 1;
-      const pageSize = Number(req.query.pageSize) || 500;
+      const pageSize = Number(req.query.pageSize) || 200;
       const result = await SyncOrdersUseCase.execute(page, pageSize);
       return HttpResponseBuilder.success(res, result.data, 200, result.count);
     } catch (err: any) {

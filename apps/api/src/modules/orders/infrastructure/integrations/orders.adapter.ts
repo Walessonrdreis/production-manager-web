@@ -2,14 +2,14 @@ import { externalClient } from '../../../../shared/integrations/external/externa
 import { AppError } from '../../../../shared/errors/AppError.js';
 
 export class OrdersAdapter {
-  static async fetchFromExternalAPI(page: number = 1, pageSize: number = 500) {
+  static async fetchFromExternalAPI(page: number = 1, pageSize: number = 200) {
     try {
-      const targetUrl = `https://production-manager-api.onrender.com/v1/orders`;
+      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/orders`;
       const response = await externalClient.get(targetUrl, { 
         params: { page, pageSize }
       });
       const responseData = response.data || {};
-      return responseData.orders || [];
+      return responseData.data?.orders || responseData.orders || [];
     } catch (err: any) {
       throw new AppError(`Failed to fetch orders: ${err.message}`, 502);
     }
@@ -17,9 +17,9 @@ export class OrdersAdapter {
 
   static async fetchOrdersList(params?: any) {
     try {
-      const targetUrl = `https://production-manager-api.onrender.com/v1/orders`;
+      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/orders`;
       const response = await externalClient.get(targetUrl, { params });
-      return response.data || [];
+      return response.data?.data?.orders || response.data?.orders || response.data || [];
     } catch (err: any) {
       throw new AppError(`Failed to fetch orders list: ${err.message}`, 502);
     }

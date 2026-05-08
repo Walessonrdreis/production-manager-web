@@ -21,7 +21,7 @@ describe('SyncOrdersUseCase', () => {
 
     const result = await SyncOrdersUseCase.execute();
 
-    expect(OrdersAdapter.fetchFromExternalAPI).toHaveBeenCalledWith(1, 500);
+    expect(OrdersAdapter.fetchFromExternalAPI).toHaveBeenCalledWith(1, 200);
     expect(result.count).toBe(1);
     expect(result.data[0].id).toBe('001');
     expect(result.data[0].customer_name).toBe('Client A');

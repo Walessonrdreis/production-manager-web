@@ -3,6 +3,7 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { configureApp } from './app.js';
+import { startBackgroundJobs } from './plugins/jobs.js';
 
 export async function startServer() {
   const app = express();
@@ -18,6 +19,9 @@ export async function startServer() {
 
   // Configuring core API functionalities, routes, etc.
   configureApp(app);
+
+  // Initialize background jobs (cron)
+  startBackgroundJobs();
 
   // Vite middleware for development (must be AFTER API routes)
   if (process.env.NODE_ENV !== 'production') {

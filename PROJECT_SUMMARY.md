@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.4.1 (Atualizado em 07/05/2026 - Correção de Rotas do Proxy API)
+**Versão:** v4.4.2 (Atualizado em 07/05/2026 - Estruturação Modular do Node Environment)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -8,9 +8,8 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
 
-### 0. Refatoração da API Backend (v4.4.0 e v4.4.1)
-- **Correção de Proxy Routing (v4.4.1):** Solucionado o bug 404 ao atualizar de `router.all('*')` para `router.use('/')` no módulo proxy para suportar flexibilidade em subrotas no padrão Express. 
-- **Estruturação Modular (Etapa 1 - v4.4.0):** Migração do código do proxy contido no `server.ts` para a nova arquitetura padrão dentro de `apps/api/`, organizando as funções antigas em controllers e rotas (`ProxyController`), sem perda de funcionalidade e em total conformidade ao guia de restruturação definido no `AGENTS.md`. No projeto, a refatoração preserva a conexão original.
+### 0. Refatoração da API Backend
+- **Estruturação Modular (Etapas 1 e 2 - v4.4.0 e v4.4.1):** Migração do código do proxy contido no `server.ts` para a nova arquitetura padrão dentro de `apps/api/`, organizando as funções antigas em controllers e rotas (`ProxyController`). A lógica de inicialização de variáveis de ambiente (`dotenv`) e as configurações globais de Node (`process.setMaxListeners`) agora encontram-se encapsuladas em `apps/api/src/config/env.ts` e as rotas são roteadas via `apps/api/src/bootstrap/routes.ts`. A funcionalidade original foi mantida de forma íntegra. Em (v4.4.1) foi corrigido o bug 404 ao atualizar de `router.all('*')` para `router.use('/')` no módulo proxy.
 
 ### 0.5. Refatoração de Sincronização (v4.3.0 - Atual)
 - **Persistência Exclusiva e Direta no Firebase:** As operações em "Meus Produtos" (`/my-products`) e "Controle de Produção" (`/production-control`) foram completamente migradas para utilizarem SOMENTE o Firebase API. Nenhuma requisição (`POST`, `PUT`, `DELETE`) de lógica de negócios ou cruds é enviada para a API do Render nas funcionalidades correspondentes, simplificando as mutações e aumentando a agilidade das transações off-line/local-first apoiadas pelo Firestore.

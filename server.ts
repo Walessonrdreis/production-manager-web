@@ -2,15 +2,11 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import * as dotenv from 'dotenv';
-import events from 'events';
-import { proxyRouter } from './apps/api/src/modules/proxy/presentation/http/routes.js';
+import { setupEnv } from './apps/api/src/config/env.js';
+import { buildApiRouter } from './apps/api/src/bootstrap/routes.js';
 
-// Carrega variáveis de ambiente do .env
-dotenv.config();
-
-// Aumenta o limite global de ouvintes para evitar "MaxListenersExceededWarning" no TLSSocket
-events.EventEmitter.defaultMaxListeners = 100;
+// Inicializa variáveis de ambiente e configurações globais
+setupEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,14 +15,11 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Aumenta o limite global de ouvintes
-  process.setMaxListeners(100);
-
   // Body parser
   app.use(express.json());
 
-  // Use the extracted proxy module
-  app.use('/api/proxy', proxyRouter);
+  // Use the extracted API modules
+  app.use('/api', buildApiRouter());
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {

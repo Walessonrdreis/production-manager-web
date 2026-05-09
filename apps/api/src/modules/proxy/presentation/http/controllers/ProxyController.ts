@@ -9,6 +9,9 @@ const httpsAgent = new https.Agent({
   timeout: 120000
 });
 httpsAgent.setMaxListeners(100);
+httpsAgent.on('socket', (socket) => {
+  socket.setMaxListeners(100);
+});
 
 // Proxy methods from server.ts
 export class ProxyController {

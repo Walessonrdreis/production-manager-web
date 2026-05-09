@@ -7,6 +7,9 @@ export const httpsAgent = new https.Agent({
   timeout: 120000
 });
 httpsAgent.setMaxListeners(100);
+httpsAgent.on('socket', (socket) => {
+  socket.setMaxListeners(100);
+});
 
 export const externalClient = axios.create({
   timeout: 120000,

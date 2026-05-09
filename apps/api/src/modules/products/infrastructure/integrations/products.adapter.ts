@@ -6,7 +6,8 @@ export class ProductsAdapter {
     try {
       const targetUrl = `https://production-manager-api.onrender.com/v1/products`;
       const firstResponse = await externalClient.get(targetUrl, { 
-        params: { page: 1 }
+        params: { page: 1, _t: new Date().getTime() },
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
       });
       const { data: firstPageData, meta } = firstResponse.data;
       
@@ -17,7 +18,10 @@ export class ProductsAdapter {
         for (let i = 2; i <= totalPages; i += 5) {
           const chunk = [];
           for (let j = i; j < i + 5 && j <= totalPages; j++) {
-            chunk.push(externalClient.get(targetUrl, { params: { page: j } }));
+            chunk.push(externalClient.get(targetUrl, { 
+              params: { page: j, _t: new Date().getTime() },
+              headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+            }));
           }
           const responses = await Promise.all(chunk);
           for (const res of responses) {
@@ -57,7 +61,10 @@ export class ProductsAdapter {
   static async fetchList() {
     try {
       const targetUrl = `https://production-manager-api.onrender.com/v1/products`;
-      const firstResponse = await externalClient.get(targetUrl, { params: { page: 1 } });
+      const firstResponse = await externalClient.get(targetUrl, { 
+        params: { page: 1, _t: new Date().getTime() },
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
       const { data: firstPageData, meta } = firstResponse.data;
       
       let allProducts = [...(firstPageData || [])];
@@ -67,7 +74,10 @@ export class ProductsAdapter {
         for (let i = 2; i <= totalPages; i += 5) {
           const chunk = [];
           for (let j = i; j < i + 5 && j <= totalPages; j++) {
-            chunk.push(externalClient.get(targetUrl, { params: { page: j } }));
+            chunk.push(externalClient.get(targetUrl, { 
+              params: { page: j, _t: new Date().getTime() },
+              headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+            }));
           }
           const responses = await Promise.all(chunk);
           for (const res of responses) {

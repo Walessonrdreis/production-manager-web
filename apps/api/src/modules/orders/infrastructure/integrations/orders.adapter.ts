@@ -4,7 +4,7 @@ import { AppError } from '../../../../shared/errors/AppError.js';
 export class OrdersAdapter {
   static async fetchFromExternalAPI(page: number = 1, pageSize: number = 200) {
     try {
-      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/orders`;
+      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/orders/stage20/enriched`;
       let allOrders: any[] = [];
       let currentPage = page;
       let hasMore = true;
@@ -23,7 +23,7 @@ export class OrdersAdapter {
           }
         });
         const responseData = response.data || {};
-        const orders = responseData.data?.orders || responseData.orders || [];
+        const orders = responseData.enrichedOrders || responseData.data?.orders || responseData.orders || responseData.data || [];
         
         if (orders.length > 0) {
           allOrders = [...allOrders, ...orders];
@@ -44,7 +44,7 @@ export class OrdersAdapter {
 
   static async fetchOrdersList(params?: any) {
     try {
-      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/orders`;
+      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/orders/stage20/enriched`;
       const response = await externalClient.get(targetUrl, { 
         params: {
           ...params,
@@ -55,7 +55,7 @@ export class OrdersAdapter {
           'Pragma': 'no-cache'
         }
       });
-      return response.data?.data?.orders || response.data?.orders || response.data || [];
+      return response.data?.enrichedOrders || response.data?.data?.orders || response.data?.orders || response.data?.data || response.data || [];
     } catch (err: any) {
       throw new AppError(`Failed to fetch orders list: ${err.message}`, 502);
     }

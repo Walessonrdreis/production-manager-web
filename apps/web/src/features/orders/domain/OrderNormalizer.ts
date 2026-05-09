@@ -58,7 +58,7 @@ export function normalizeOrder(raw: any): Order {
   return {
     id: String(raw.order?.omieCode || raw.omieCode || raw.id || raw.codigo_pedido || Math.random().toString()),
     orderNumber: raw.order?.orderNumber || raw.numeroPedido || raw.orderNumber || raw.order_number || raw.numero_pedido || 'N/A',
-    customerName: raw.client?.tradeName || raw.client?.legalName || raw.customerName || raw.customer_name || raw.cliente || raw.nome_cliente || 'Cliente Omie',
+    customerName: raw.tradeName || raw.client?.tradeName || raw.client?.legalName || raw.customer?.tradeName || raw.customer?.legalName || raw.customerName || raw.customer_name || raw.cliente || raw.nome_cliente || 'Cliente Omie',
     customerId: raw.client?.omieClientCode ? String(raw.client.omieClientCode) : (raw.customer_id ? String(raw.customer_id) : (raw.customerId ? String(raw.customerId) : (raw.cabecalho?.codigo_cliente ? String(raw.cabecalho.codigo_cliente) : undefined))),
     items,
     status: raw.order ? (raw.order.cancelled ? 'Cancelado' : raw.order.closed ? 'Encerrado' : 'Ativo') : (raw.status || (raw.cancelado === 'Y' ? 'Cancelado' : raw.encerrado === 'Y' ? 'Encerrado' : 'Ativo')),

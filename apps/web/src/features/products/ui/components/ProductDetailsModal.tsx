@@ -147,6 +147,19 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                     <div className="font-medium text-slate-900 uppercase">{product.family || 'Não informada'}</div>
                   </div>
                   <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold text-indigo-600 mb-1">Categoria</div>
+                     <select
+                      value={product.category || 'Nenhuma'}
+                      onChange={(e) => updateProduct(product.id, { category: e.target.value === 'Nenhuma' ? undefined : e.target.value })}
+                      className="block w-full max-w-[200px] pl-3 pr-8 py-1.5 text-sm border border-indigo-200 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-lg appearance-none bg-indigo-50 text-indigo-700 font-bold"
+                    >
+                      <option value="Nenhuma">Nenhuma</option>
+                      <option value="Vegano">Vegano</option>
+                      <option value="Ao leite">Ao leite</option>
+                      <option value="Ambos">Ambos</option>
+                    </select>
+                  </div>
+                  <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">Identificação Interna</div>
                     <div className="font-mono text-sm text-slate-900">{product.id}</div>
                   </div>

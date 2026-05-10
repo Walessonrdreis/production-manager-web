@@ -154,6 +154,11 @@ export function MyProductsTable({ products, demandMap = {}, onRemoveProduct, onV
                             Família: {p.family}
                           </span>
                         )}
+                        {p.category && (
+                          <span className="text-[10px] font-medium text-emerald-600 uppercase inline-block">
+                            Cat: {p.category}
+                          </span>
+                        )}
                         {(p.sectorIds || []).length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {(p.sectorIds || []).map(sId => {

@@ -7,9 +7,13 @@ export const CollaboratorsRepository = {
   async getAll(): Promise<Collaborator[]> {
     try {
       // Firebase fallback priority
-      const cachedResponse = await FirebaseCollaboratorsRepository.getAll();
-      if (cachedResponse.success && cachedResponse.data && cachedResponse.data.length > 0) {
-        return cachedResponse.data as unknown as Collaborator[];
+      try {
+        const cachedResponse = await FirebaseCollaboratorsRepository.getAll();
+        if (cachedResponse.success && cachedResponse.data && cachedResponse.data.length > 0) {
+          return cachedResponse.data as unknown as Collaborator[];
+        }
+      } catch (err) {
+        console.warn('[CollaboratorsRepository] Firebase cache falhou:', err);
       }
 
       // API

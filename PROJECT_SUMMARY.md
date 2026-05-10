@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.8.1 (Atualizado em 10/05/2026 - Evolução de Produtos e Setores)
+**Versão:** v4.8.4 (Atualizado em 10/05/2026 - Evolução de Categorias e Colaboradores)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -7,7 +7,10 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
-### 0.7. Renovação do Dashboard Estratégico (v4.8.1 - Atual)
+### 0.7. Renovação do Dashboard Estratégico (v4.8.4 - Atual)
+- **Categorização de Produtos em Foco:** Implementada no `ProductDetailsModal` a funcionalidade de "Classificação por Categoria", permitindo ao gestor atribuir individualmente tags especiais como "Vegano" ou "Ao leite" aos produtos selecionados em "Meus Produtos". Adicionado este indicativo visual na listagem (na `MyProductsTable`) utilizando badges na cor esmeralda para os destaques.
+- **Categorização e Metas por Colaborador:** Atualizado o modal e fluxo de criação/edição de Colaboradores (`CollaboratorsPage`), inserindo as propriedades obrigatórias para "Categoria de Produto" que aquele membro atende melhor e sua "Meta Diária".
+- **Visualização Dinâmica de Team Details:** Implantado um clique sensitivo (`cursor-pointer`) na grid da listagem de Time (`CollaboratorPage`). Ao efetuar o clique livre na linha do colaborador, é exibido o novo modal detalhado "Detalhes do Colaborador", compilando informações ricas de Metas Diárias, Categoria Vinculada, Status e Setor através de widgets coloridos para rápida inferência visual. O comportamento foi cuidadosamente separado dos botões de exclusão e edição através de `stopPropagation()`.
 - **Configuração de Estoque Mínimo e em Lote (Em Lote):** Adicionada funcionalidade de atribuir estoque mínimo a vários produtos simulaneamente em `MyProductsPage`, utilizando checkboxes e um modal flutuante com a funcionalidade de "Ações em Massa".
 - **Configuração de Estoque Mínimo:** Adicionado botão/input inline no painel de "Inventário & Demanda" do `ProductDetailsModal`, garantindo que os usuários possam ajustar rapidamente o estoque mínimo de cada produto e atualizar em tempo real a situação de "Déficit" ou "Atenção".
 - **Filtros Avançados em Meus Produtos (v4.8.1):** Adicionada funcionalidade de filtragem por "Família" e "Setor" na página de Meus Produtos, permitindo reduzir o campo de visão do usuário quando existem dezenas/centenas de produtos cadastrados.

@@ -124,6 +124,8 @@ export function initDb() {
       name TEXT NOT NULL,
       role TEXT,
       sectorId TEXT,
+      category TEXT,
+      dailyGoal INTEGER,
       status TEXT DEFAULT 'active',
       createdAt TEXT,
       updatedAt TEXT

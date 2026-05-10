@@ -15,6 +15,7 @@ export interface Product {
   description: string;
   unit: string;
   family: string;
+  category?: 'Vegano' | 'Ao leite' | 'Ambos' | string;
   familyDescription?: string;
   price: number;
   stock: number;
@@ -51,6 +52,8 @@ export interface Collaborator {
   name: string;
   role?: string;
   sectorId?: string;
+  category?: 'Vegano' | 'Ao leite' | 'Ambos' | string;
+  dailyGoal?: number;
   status?: 'active' | 'inactive' | string;
   createdAt?: string;
   updatedAt?: string;

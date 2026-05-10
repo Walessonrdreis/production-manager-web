@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.8.4 (Atualizado em 10/05/2026 - Evolução de Categorias e Colaboradores)
+**Versão:** v4.8.6 (Atualizado em 10/05/2026 - Ações em Lote Avançadas)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -7,7 +7,13 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
-### 0.7. Renovação do Dashboard Estratégico (v4.8.4 - Atual)
+### 0.7. Renovação do Dashboard Estratégico (v4.8.6 - Atual)
+- **Padrão de UI para Listagens (Tables):** Consolidado como padrão o visual limpo implementado nas listas de Metas (`GoalsManagementPage.tsx`). Consiste em usar padding folgado nas células, empilhamento de informações relacionadas na mesma coluna (como código e descrição em fontes de pesos diferentes) e revelação opcional de botões de ações ao passar o mouse (`group-hover`), reduzindo a poluição visual generalizada.
+- **Ações em Massa para Setores, Metas e Produção:** Ampliadas as funcionalidades do painel flutuante de seleção múltipla em "Meus Produtos". Inclusão de três novos botões de ação em massa:
+  - **Setores**: Substitui ou define os setores produtivos em lote para os itens selecionados.
+  - **Metas**: Abre um modal para definir Metas Diárias, Semanais ou Mensais agregadas para múltiplos produtos, salvando-os de forma encadeada no módulo de Metas do Firebase.
+  - **Planejar**: Adiciona com um único clique os produtos correspondentes ao "Plano de Produção (Rascunho)" compensando seus Dèficits pendentes.
+- **Ações em Massa para Categoria:** Ampliadas as funcionalidades do painel flutuante de seleção múltipla em "Meus Produtos". Inclusão do botão "Definir Categoria", que abre um novo Modal para aplicar categorizações (Vegano, Ao Leite, Ambos, Nenhuma) numa tacada só a vários itens selecionados da grade produtiva. O state respectivo (`updateBulkCategory`) foi atracado no `useMyProducts`.
 - **Categorização de Produtos em Foco:** Implementada no `ProductDetailsModal` a funcionalidade de "Classificação por Categoria", permitindo ao gestor atribuir individualmente tags especiais como "Vegano" ou "Ao leite" aos produtos selecionados em "Meus Produtos". Adicionado este indicativo visual na listagem (na `MyProductsTable`) utilizando badges na cor esmeralda para os destaques.
 - **Categorização e Metas por Colaborador:** Atualizado o modal e fluxo de criação/edição de Colaboradores (`CollaboratorsPage`), inserindo as propriedades obrigatórias para "Categoria de Produto" que aquele membro atende melhor e sua "Meta Diária".
 - **Visualização Dinâmica de Team Details:** Implantado um clique sensitivo (`cursor-pointer`) na grid da listagem de Time (`CollaboratorPage`). Ao efetuar o clique livre na linha do colaborador, é exibido o novo modal detalhado "Detalhes do Colaborador", compilando informações ricas de Metas Diárias, Categoria Vinculada, Status e Setor através de widgets coloridos para rápida inferência visual. O comportamento foi cuidadosamente separado dos botões de exclusão e edição através de `stopPropagation()`.

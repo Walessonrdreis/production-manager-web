@@ -21,6 +21,13 @@ Crescimento Orgânico: Se um arquivo ultrapassar a responsabilidade única, frag
 Sinal de Alerta: Se o teste de um arquivo exige muitos mocks complexos, o arquivo está grande demais.
 Toda nova funcionalidade será feita com TDD sem quebrar a aplicação verificando sempre os logs e corrigindo os erros.
 
+## 2.1. Padrão de UI para Listagens (Tables e Linhas)
+Listagens de dados devem adotar por padrão o visual limpo implementado na listagem de **Metas** (`GoalsManagementPage.tsx` e afins):
+- Linhas (tr): Utilizar `hover:bg-gray-50 transition-colors group` para feedback visual simples.
+- Células (td): Padding folgado com `px-6 py-4`. 
+- Empilhamento de dados: Para poupar colunas horizontais, empilhar informações primárias e secundárias na mesma célula, como `font-medium text-gray-900` e a descrição logo abaixo em `text-sm text-gray-500`.
+- Ações: Centralizar os botões de ação à direita na linha que são revelados apenas no hover (`opacity-0 group-hover:opacity-100 transition-opacity`).
+
 ## 3. Padrão de Resposta do Agente (Protocolo Obrigatório)
 Para toda e qualquer tarefa, o agente deve iniciar a resposta com:
 Citação da ADR/Guia: Indicar quais seções estão sendo respeitadas.

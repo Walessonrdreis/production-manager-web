@@ -12,12 +12,17 @@ import { MyProductsTable } from './components/MyProductsTable';
 import { ProductDetailsModal } from './components/ProductDetailsModal';
 import { Product } from '../../../types/api';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { useGoals } from '../../../hooks/goals/useGoals';
+import { GoalPeriod } from '../../goals/domain/Goal';
+import { useToast } from '../../../components/ui/Toast';
 
 export function MyProductsPage() {
-  const { savedProducts, removeProduct, clearAll, updateBulkMinStock } = useMyProducts();
+  const { savedProducts, removeProduct, clearAll, updateBulkMinStock, updateBulkCategory, updateBulkSectors } = useMyProducts();
   const { orders } = useOrders();
   const { addItem } = usePlanning();
   const { data: sectors = [] } = useSectors();
+  const { saveBulkGoals, goals } = useGoals();
+  const { success } = useToast();
   
   const [search, setSearch] = useState('');
   const [selectedFamily, setSelectedFamily] = useState<string>('all');
@@ -79,6 +84,44 @@ export function MyProductsPage() {
     
     await addItem(product, qtyToPlan, 'geral', 'Produção Geral');
     navigate('/planner');
+  };
+
+  const handleBulkPlanProducts = async (productIds: string[]) => {
+    const promises = productIds.map(async (id) => {
+      const product = savedProducts.find(p => p.id === id);
+      if (product) {
+        const productCode = String(product.code || product.id || product.description);
+        const demand = demandMap[productCode] || 0;
+        const stock = product.stock || 0;
+        let qtyToPlan = 1;
+        if (demand > stock) {
+          qtyToPlan = demand - stock;
+        }
+        await addItem(product, qtyToPlan, 'geral', 'Produção Geral');
+      }
+    });
+
+    await Promise.all(promises);
+    navigate('/planner');
+  };
+
+  const handleBulkGoals = async (productIds: string[], sectorId: string, quantity: number, goalPeriod: GoalPeriod) => {
+    const dataToSend = [];
+    for (const id of productIds) {
+      const product = savedProducts.find(p => p.id === id);
+      if (product) {
+         dataToSend.push({
+           productCode: String(product.code || product.id),
+           productDescription: product.description,
+           sectorId: sectorId,
+           targetQuantity: quantity,
+           period: goalPeriod,
+           isActive: true
+         });
+      }
+    }
+    await saveBulkGoals(dataToSend);
+    success('Metas definidas com sucesso.');
   };
 
   const handleConfirmDelete = () => {
@@ -173,6 +216,10 @@ export function MyProductsPage() {
         onViewDetails={handleViewDetails}
         onPlanProduct={handlePlanProduct}
         onUpdateBulkMinStock={updateBulkMinStock}
+        onUpdateBulkCategory={updateBulkCategory}
+        onUpdateBulkSectors={updateBulkSectors}
+        onUpdateBulkGoals={handleBulkGoals}
+        onBulkPlanProducts={handleBulkPlanProducts}
       />
 
       <ProductDetailsModal 

@@ -29,6 +29,23 @@ export function useGoals() {
     invalidate();
   };
 
+  const saveBulkGoals = async (goalsData: Omit<ProductionGoal, 'id' | 'synced' | 'lastModified' | 'version' | 'updatedAt'>[]) => {
+    const promises = goalsData.map(async goalData => {
+      const newGoal: ProductionGoal = {
+        ...goalData,
+        id: uuidv4(),
+        synced: true,
+        lastModified: Date.now(),
+        version: 1,
+        updatedAt: new Date().toISOString()
+      };
+      await GoalsRepository.save(newGoal);
+    });
+    
+    await Promise.all(promises);
+    invalidate();
+  };
+
   const updateGoal = async (id: string, updates: Partial<ProductionGoal>) => {
     await GoalsRepository.update(id, updates);
     invalidate();
@@ -43,6 +60,7 @@ export function useGoals() {
     goals,
     isLoading,
     saveGoal,
+    saveBulkGoals,
     updateGoal,
     deleteGoal
   };

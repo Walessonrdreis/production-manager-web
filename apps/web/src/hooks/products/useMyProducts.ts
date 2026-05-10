@@ -72,6 +72,34 @@ export function useMyProducts() {
     invalidate();
   };
 
+  const updateBulkCategory = async (productIds: string[], category: string) => {
+    const promises = productIds.map(id => updateProductUseCase(id, { category: category === '' ? undefined : category }));
+    const results = await Promise.all(promises);
+    const hasError = results.some(r => !r.success);
+    
+    if (hasError) {
+      toastError('Erro ao atualizar alguns produtos.');
+    } else {
+      success('Categoria atualizada com sucesso.');
+    }
+    
+    invalidate();
+  };
+
+  const updateBulkSectors = async (productIds: string[], sectorIds: string[]) => {
+    const promises = productIds.map(id => updateProductUseCase(id, { sectorIds }));
+    const results = await Promise.all(promises);
+    const hasError = results.some(r => !r.success);
+    
+    if (hasError) {
+      toastError('Erro ao atualizar alguns produtos.');
+    } else {
+      success('Setores atualizados com sucesso.');
+    }
+    
+    invalidate();
+  };
+
   const removeProduct = async (productId: string) => {
     const res = await unselectProductUseCase(productId);
     if (!res.success) {
@@ -104,6 +132,8 @@ export function useMyProducts() {
     assignSector,
     updateProduct,
     updateBulkMinStock,
+    updateBulkCategory,
+    updateBulkSectors,
     removeProduct,
     clearAll,
     isSaved,

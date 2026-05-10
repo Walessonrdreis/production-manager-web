@@ -1,22 +1,14 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
-
-Font.register({
-  family: 'Inter',
-  fonts: [
-    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2', fontWeight: 400 },
-    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fAZ9hiA.woff2', fontWeight: 700 },
-  ],
-});
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
-  page: { padding: 30, fontFamily: 'Inter', fontSize: 10, color: '#1E293B' },
+  page: { padding: 30, fontSize: 10, color: '#1E293B' },
   header: { marginBottom: 20, borderBottom: 1, borderBottomColor: '#E2E8F0', paddingBottom: 10 },
-  title: { fontSize: 18, fontWeight: 700, color: '#0F172A' },
+  title: { fontSize: 18, color: '#0F172A' },
   subtitle: { fontSize: 10, color: '#64748B', marginTop: 4 },
   table: { display: 'flex', width: 'auto', marginTop: 15 },
   tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#F1F5F9', minHeight: 25, alignItems: 'center' },
-  tableHeader: { backgroundColor: '#F8FAFC', fontWeight: 700, borderBottomColor: '#E2E8F0' },
+  tableHeader: { backgroundColor: '#F8FAFC', borderBottomColor: '#E2E8F0' },
   colCode: { width: '15%', padding: 4 },
   colDesc: { width: '40%', padding: 4 },
   colSector: { width: '15%', padding: 4 },
@@ -62,7 +54,7 @@ export const PlanningPDF = ({ items, period, scheduledAt }: PlanningPDFProps) =>
           <View style={styles.header}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text style={styles.title}>Ordem de Produção</Text>
-              <Text style={{ fontSize: 10, fontWeight: 700, backgroundColor: '#F1F5F9', padding: '4 8', borderRadius: 4 }}>
+              <Text style={{ fontSize: 10, backgroundColor: '#F1F5F9', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 4 }}>
                 SETOR: {groupedItems[sectorId].name.toUpperCase()}
               </Text>
             </View>

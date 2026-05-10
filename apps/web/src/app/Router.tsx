@@ -7,6 +7,7 @@ import { SectorsPage } from '../pages/sectors/SectorsPage';
 import { OrdersPage } from '../pages/orders/OrdersPage';
 import { PlanningPage } from '../pages/planner/PlanningPage';
 import { GoalsManagementPage } from '../features/goals/ui/GoalsManagementPage';
+import { CollaboratorsPage } from '../features/collaborators/ui/CollaboratorsPage';
 import { CustomersPage } from '../pages/customers/CustomersPage';
 import { MonitoringPage } from '../pages/production/MonitoringPage';
 import { AuthGuard } from './AuthGuard';
@@ -27,6 +28,7 @@ export function AppRouter() {
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/planning" element={<PlanningPage />} />
         <Route path="/goals" element={<GoalsManagementPage />} />
+        <Route path="/collaborators" element={<CollaboratorsPage />} />
         
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Route>

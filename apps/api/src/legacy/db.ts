@@ -117,6 +117,19 @@ export function initDb() {
     )
   `);
 
+  // Colaboradores
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS collaborators (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      role TEXT,
+      sectorId TEXT,
+      status TEXT DEFAULT 'active',
+      createdAt TEXT,
+      updatedAt TEXT
+    )
+  `);
+
   console.log('[DB] SQLite database initialized successfully.');
 }
 

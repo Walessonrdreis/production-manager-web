@@ -32,5 +32,8 @@ export const ENDPOINTS = {
   CUSTOMERS: {
     BASE: 'clients',
     SYNC: 'clients/sync',
+  },
+  COLLABORATORS: {
+    BASE: 'collaborators',
   }
 } as const;

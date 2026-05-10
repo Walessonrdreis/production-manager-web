@@ -9,6 +9,7 @@ import { planningRouter } from '../modules/planning/presentation/http/routes.js'
 import { goalsRouter } from '../modules/goals/presentation/http/routes.js';
 import { productionRouter } from '../modules/production/presentation/http/routes.js';
 import { authRouter } from '../modules/auth/presentation/http/routes.js';
+import { collaboratorsRouter } from '../modules/collaborators/presentation/http/routes.js';
 
 export function buildApiRouter(): Router {
   const router = Router();
@@ -23,6 +24,7 @@ export function buildApiRouter(): Router {
   router.use('/goals', goalsRouter);
   router.use('/production', productionRouter);
   router.use('/auth', authRouter);
+  router.use('/collaborators', collaboratorsRouter);
 
   // Rotas do módulo proxy
   router.use('/proxy', proxyRouter);

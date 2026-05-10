@@ -1,9 +1,10 @@
 import { useMyProducts } from '../../../hooks/products/useMyProducts';
 import { useOrders } from '../../../hooks/orders/useOrders';
 import { usePlanning } from '../../../hooks/planner/usePlanning';
+import { useSectors } from '../../../hooks/sectors/useSectors';
 import { Button } from '../../../components/ui/Button';
 import { EmptyState } from '../../../components/ui/EmptyState';
-import { BookmarkCheck, Trash2, Search } from 'lucide-react';
+import { BookmarkCheck, Trash2, Search, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import { MyProductsLogic } from '../domain/MyProductsLogic';
@@ -13,10 +14,15 @@ import { Product } from '../../../types/api';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 
 export function MyProductsPage() {
-  const { savedProducts, removeProduct, clearAll } = useMyProducts();
+  const { savedProducts, removeProduct, clearAll, updateBulkMinStock } = useMyProducts();
   const { orders } = useOrders();
   const { addItem } = usePlanning();
+  const { data: sectors = [] } = useSectors();
+  
   const [search, setSearch] = useState('');
+  const [selectedFamily, setSelectedFamily] = useState<string>('all');
+  const [selectedSector, setSelectedSector] = useState<string>('all');
+  
   const navigate = useNavigate();
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -25,9 +31,17 @@ export function MyProductsPage() {
   // Confirmação de Exclusão
   const [itemToDelete, setItemToDelete] = useState<string | 'ALL' | null>(null);
 
+  const families = useMemo(() => {
+    const fams = new Set<string>();
+    savedProducts.forEach(p => {
+      if (p.family) fams.add(p.family);
+    });
+    return Array.from(fams).sort();
+  }, [savedProducts]);
+
   const filteredProducts = useMemo(() => {
-    return MyProductsLogic.filterProducts(savedProducts, search);
-  }, [savedProducts, search]);
+    return MyProductsLogic.filterProducts(savedProducts, search, selectedFamily, selectedSector);
+  }, [savedProducts, search, selectedFamily, selectedSector]);
 
   const demandMap = useMemo(() => {
     const map: Record<string, number> = {};
@@ -101,17 +115,55 @@ export function MyProductsPage() {
         </Button>
       </header>
 
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-4 w-4 text-slate-400" />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-slate-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Buscar nos meus produtos..."
+            className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-        <input
-          type="text"
-          placeholder="Buscar nos meus produtos..."
-          className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        
+        {families.length > 0 && (
+          <div className="sm:w-48 relative">
+            <select
+              value={selectedFamily}
+              onChange={(e) => setSelectedFamily(e.target.value)}
+              className="block w-full pl-3 pr-10 py-2 text-base border border-slate-200 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-xl appearance-none bg-white font-medium text-slate-700"
+            >
+              <option value="all">Todas Famílias</option>
+              {families.map(f => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+              <Filter className="h-4 w-4" />
+            </div>
+          </div>
+        )}
+
+        {sectors.length > 0 && (
+          <div className="sm:w-48 relative">
+            <select
+              value={selectedSector}
+              onChange={(e) => setSelectedSector(e.target.value)}
+              className="block w-full pl-3 pr-10 py-2 text-base border border-slate-200 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-xl appearance-none bg-white font-medium text-slate-700"
+            >
+              <option value="all">Todos Setores</option>
+              {sectors.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+              <Filter className="h-4 w-4" />
+            </div>
+          </div>
+        )}
       </div>
 
       <MyProductsTable 
@@ -120,6 +172,7 @@ export function MyProductsPage() {
         onRemoveProduct={(id) => setItemToDelete(id)} 
         onViewDetails={handleViewDetails}
         onPlanProduct={handlePlanProduct}
+        onUpdateBulkMinStock={updateBulkMinStock}
       />
 
       <ProductDetailsModal 

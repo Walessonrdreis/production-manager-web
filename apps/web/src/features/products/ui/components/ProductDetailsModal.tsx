@@ -2,7 +2,7 @@ import { Product } from '../../../../types/api';
 import { X, Package, Tag, Archive, DollarSign, Target, FilePlus2, Edit2, Trash2, AlertTriangle, Layers } from 'lucide-react';
 import { Button } from '../../../../components/ui/Button';
 import { useGoals } from '../../../../hooks/goals/useGoals';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { GoalPeriod } from '../../../goals/domain/Goal';
 import { ConfirmDialog } from '../../../../components/ui/ConfirmDialog';
 import { useSectors } from '../../../../hooks/sectors/useSectors';
@@ -25,6 +25,16 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
   const [targetQty, setTargetQty] = useState<number>(0);
   const [period, setPeriod] = useState<GoalPeriod>('monthly');
   const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
+
+  const [editingMinStock, setEditingMinStock] = useState(false);
+  const [minStockValue, setMinStockValue] = useState<number>(0);
+
+  useEffect(() => {
+    if (product) {
+      setMinStockValue(product.minStock || 0);
+      setEditingMinStock(false);
+    }
+  }, [product]);
 
   const productGoals = useMemo(() => {
     if (!product) return [];
@@ -73,6 +83,12 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
     setEditingGoal(goal.id);
     setTargetQty(goal.targetQuantity);
     setPeriod(goal.period);
+  };
+
+  const handleSaveMinStock = async () => {
+    if (!product) return;
+    await updateProduct(product.id, { minStock: minStockValue });
+    setEditingMinStock(false);
   };
 
   const handleToggleSector = async (sectorId: string) => {
@@ -173,22 +189,43 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                   {isCritical || isWarning ? <AlertTriangle size={16} /> : <Archive size={16} />}
                   <span className="text-xs font-bold uppercase tracking-wider">Inventário & Demanda</span>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">Estoque Atual</div>
-                    <div className="flex items-baseline space-x-1">
+                    <div className="flex items-baseline space-x-1 mt-1">
                       <span className={`text-2xl font-bold ${stock === 0 ? 'text-slate-400' : isCritical ? 'text-red-700' : 'text-slate-900'}`}>{stock}</span>
                       <span className="text-xs font-bold text-slate-500 uppercase">{product.unit}</span>
                     </div>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">Demanda Pendente</div>
-                    <div className="flex items-baseline space-x-1">
-                      <span className={`text-lg font-bold ${demand > 0 ? (isCritical ? 'text-red-700' : 'text-amber-600') : 'text-slate-400'}`}>{demand}</span>
+                    <div className="flex items-baseline space-x-1 mt-1">
+                      <span className={`text-xl font-bold ${demand > 0 ? (isCritical ? 'text-red-700' : 'text-amber-600') : 'text-slate-400'}`}>{demand}</span>
                       <span className="text-xs font-bold text-slate-500 uppercase">{product.unit}</span>
                     </div>
                   </div>
-                  <div className="col-span-2 pt-2 border-t border-slate-200/50">
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold text-indigo-600 mb-1">Estoque Mín.</div>
+                    {editingMinStock ? (
+                      <div className="flex items-center space-x-1">
+                        <input
+                          type="number"
+                          className="w-16 px-1.5 py-0.5 text-sm font-bold border border-indigo-300 rounded text-indigo-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          value={minStockValue || ''}
+                          onChange={(e) => setMinStockValue(Number(e.target.value))}
+                          autoFocus
+                          onKeyDown={(e) => e.key === 'Enter' && handleSaveMinStock()}
+                          onBlur={handleSaveMinStock}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-1 mt-[2px] group cursor-pointer" onClick={() => setEditingMinStock(true)}>
+                        <span className="text-xl font-bold text-indigo-600">{minStock}</span>
+                        <Edit2 size={12} className="text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="col-span-3 pt-2 border-t border-slate-200/50">
                     <div className="text-[10px] text-slate-400 uppercase font-bold mb-1">Status / Déficit</div>
                     <div className={`text-sm font-bold ${isCritical ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-emerald-600'}`}>
                       {isCritical 

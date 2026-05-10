@@ -58,6 +58,20 @@ export function useMyProducts() {
     return res;
   };
 
+  const updateBulkMinStock = async (productIds: string[], minStock: number) => {
+    const promises = productIds.map(id => updateProductUseCase(id, { minStock }));
+    const results = await Promise.all(promises);
+    const hasError = results.some(r => !r.success);
+    
+    if (hasError) {
+      toastError('Erro ao atualizar alguns produtos.');
+    } else {
+      success('Estoque mínimo atualizado com sucesso.');
+    }
+    
+    invalidate();
+  };
+
   const removeProduct = async (productId: string) => {
     const res = await unselectProductUseCase(productId);
     if (!res.success) {
@@ -89,6 +103,7 @@ export function useMyProducts() {
     saveProduct,
     assignSector,
     updateProduct,
+    updateBulkMinStock,
     removeProduct,
     clearAll,
     isSaved,

@@ -45,3 +45,13 @@ export interface Order {
   items: any[];
   createdAt: string;
 }
+
+export interface Collaborator {
+  id: string;
+  name: string;
+  role?: string;
+  sectorId?: string;
+  status?: 'active' | 'inactive' | string;
+  createdAt?: string;
+  updatedAt?: string;
+}

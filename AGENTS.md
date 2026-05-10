@@ -14,11 +14,12 @@ Isso garante que o proprietário do projeto sempre tenha um guia atualizado para
 ##2. Nunna quebrar a aplicação no final da implementação. Os dados que são consumidos de https://production-manager-api.onrender.com/v1 não devem ser 
 removidos, qualquer endpoint, pode ser salvo no banco de dados mas nunca removidos da aplicação, sem confirmação
 
-## 2. Regra de Granularidade (SRP Global)
+## 2. Regra de Granularidade (SRP Global) e TDD
 1 Arquivo = 1 Intenção: Se um arquivo faz "Fetch e Normalização", deve ser dividido em dois.
 Nomes Explícitos: Use o padrão `Verbo + Objeto` (ex: `GetSectors.ts`, `NormalizeProduct.ts`).
 Crescimento Orgânico: Se um arquivo ultrapassar a responsabilidade única, fragmente-o imediatamente.
 Sinal de Alerta: Se o teste de um arquivo exige muitos mocks complexos, o arquivo está grande demais.
+Toda nova funcionalidade será feita com TDD sem quebrar a aplicação verificando sempre os logs e corrigindo os erros.
 
 ## 3. Padrão de Resposta do Agente (Protocolo Obrigatório)
 Para toda e qualquer tarefa, o agente deve iniciar a resposta com:

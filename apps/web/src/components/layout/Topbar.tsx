@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, Cloud, RefreshCw } from 'lucide-react';
 import { useSyncStatus } from '../../hooks/ui/useSyncStatus';
 import { PendingChangesModal } from '../modals/PendingChangesModal';
@@ -9,8 +9,20 @@ interface TopbarProps {
 }
 
 export function Topbar({ onToggleSidebar, title }: TopbarProps) {
-  const { pendingCount, isSynced } = useSyncStatus();
+  const { isSyncing, lastSync, triggerSync } = useSyncStatus();
   const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
+  const [timeAgo, setTimeAgo] = useState('agora');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const diffMs = Date.now() - lastSync.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins === 0) setTimeAgo('agora');
+      else if (diffMins === 1) setTimeAgo('há 1 min');
+      else setTimeAgo(`há ${diffMins} min`);
+    }, 10000); // 10s
+    return () => clearInterval(interval);
+  }, [lastSync]);
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-40 transition-all">
@@ -30,29 +42,21 @@ export function Topbar({ onToggleSidebar, title }: TopbarProps) {
       </div>
       
       <div className="flex items-center gap-4">
-        {/* Sync Status - Transformed into a clickable button */}
+        {/* Sync Status Button */}
         <button 
-          onClick={() => setIsPendingModalOpen(true)}
+          onClick={() => triggerSync()}
+          disabled={isSyncing}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all hover:shadow-sm active:scale-95 ${
-            isSynced 
-              ? 'bg-slate-50 border-slate-100 hover:bg-slate-100' 
-              : 'bg-amber-50 border-amber-100 hover:bg-amber-100'
+            isSyncing
+              ? 'bg-amber-50 border-amber-100 text-amber-600'
+              : 'bg-slate-50 border-slate-100 hover:bg-slate-100 text-slate-500'
           }`}
-          title={isSynced ? "Todos os dados estão sincronizados" : "Ver alterações pendentes"}
+          title="Forçar Sincronização e Atualização"
         >
-          {isSynced ? (
-            <>
-              <Cloud size={14} className="text-emerald-500" />
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Sincronizado</span>
-            </>
-          ) : (
-            <>
-              <RefreshCw size={14} className="text-amber-500 animate-spin-slow" />
-              <span className="text-[10px] font-bold text-amber-600 uppercase">
-                {pendingCount} Pendente{pendingCount > 1 ? 's' : ''}
-              </span>
-            </>
-          )}
+          <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
+          <span className="text-[10px] font-bold uppercase hidden sm:inline-block">
+            {isSyncing ? 'Sincronizando...' : `Sincronizado ${timeAgo}`}
+          </span>
         </button>
 
         <div className="flex flex-col items-end">

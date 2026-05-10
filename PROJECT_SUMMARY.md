@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.6.6 (Atualizado em 09/05/2026 - Desativação Temporária do Módulo de Clientes)
+**Versão:** v4.8.1 (Atualizado em 10/05/2026 - Evolução de Produtos e Setores)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -7,6 +7,20 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.7. Renovação do Dashboard Estratégico (v4.8.1 - Atual)
+- **Bloqueio de Exclusão de Setores (v4.8.1):** Firmada regra de negócio onde Setores não podem ser excluídos da plataforma, existindo apenas como entidades perenes (edição/criação), a fim de evitar corrupção e desassociação não rastreada no fluxo multiponto de produtos.
+- **Novos KPIs Diretos:** O `DashboardPage` foi renovado para exibir indicadores reais da produção utilizando os hooks já disponíveis (`useLocalProduced`, `useProductionSchedules`, `useDashboardTotals`), entregando acompanhamento em tempo real alinhado à estratégia. Agregadores de "Produzidos Hoje", "Programados para Hoje", "Atrasos" e "Pendente Geral (Omie)" fornecem clareza extrema sobre os gaps imediatos no chão de fábrica e dão o match direto para a tela de Acompanhamento.
+- **Unificação de Metas no Modal:** Implementada a funcionalidade de "Metas de Produção" diretamente no modal de detalhes do produto (`ProductDetailsModal`). Agora é possível visualizar, criar, editar e excluir objetivos diários, semanais e mensais do SKU direto do modal, agilizando o gerenciamento sem necessidade de mudar de tela.
+- **Conexão Multiponto Setor-Produto:** Produtos favoritados ("Meus Produtos") agora ganharam a capacidade de armazenar e designar *vários* Setores em sua matriz por meio do novo quadro "Roteiro de Produção" no `ProductDetailsModal`. Além disso, a tabela "Meus Produtos" agora renderiza os badges de cada setor com o que o item está vinculado.
+- **Confirmação de Exclusão Segura:** Todos os botões de delete no fluxo de Meus Produtos (excluir linha da tabela, botão "Limpar Tudo" e botão de excluir Metas no Modal) agora invocam um `ConfirmDialog` de segurança genérico, prevenindo exclusões acidentais com visual de alerta padrão.
+
+- **Visão de Demanda vs Estoque:** A tabela "Meus Produtos" e o Modal passam a exibir a "Demanda Pendente" (calculada em tempo real com base nos pedidos ativos), confrontando com o "Estoque Atual" e identificando em qual situação se encontra o SKU (Déficit, Atenção ou Seguro).
+- **Alertas Visuais Estratégicos:** Linhas da tabela com déficit de estoque agora são destacadas em cores (vermelho para déficit imediato, amarelo para atenção quando estoque atinge mínimo) e ícones de alerta para clareza visual imeditada.
+- **Ação "Adicionar ao Planejamento":** Botão "Planejar Produção" implementado direto nas linhas da tabela de "Meus Produtos" e no Modal de Detalhes, otimizando o fluxo de planejamento e criação rápida de lotes.
+- **Identificador e Trigger de Sincronização:** O Topbar agora processa dinamicamente a conexão e o status das atualizações com um feedback de `"Sincronizado há X min"`. Um botão de re-sincronização forçada chama ativamente os Repositórios de Produtos e Pedidos para manter o offline-first sempre fresco.
+
+### 0.6. Redesign de "Meus Produtos" (v4.7.0)
+- **Tabela de Visualização e Modal de Detalhes:** A visualização de "Meus Produtos" que funcionava em cards foi alterada para um layout em tabela (`MyProductsTable`). Isso possibilita escalar o planejamento e visualizar saldos atualizados de forma otimizada. Quando o item é selecionado, um modal contendo todos os detalhes do produto mapeados pela API Omie (`ProductDetailsModal`) é revelado.
 
 ### 0. Refatoração da API Backend
 - **Limpeza de Base Legada (v4.5.2):** Movidos os arquivos remanescentes e não mais utilizados de persistência locais (como o antigo `db.ts` SQLite localizado na pasta raiz `/server`) diretamente para dentro de `apps/api/src/legacy/`, consolidando e unificando arquivos na arquitetura corporativa da API backend e limpando o diretório raiz do projeto.

@@ -22,7 +22,7 @@ export function startBackgroundJobs() {
   };
 
   // Run immediately on start
-  runAllSyncs();
+  runAllSyncs().catch(err => console.error('[JOBS] Unhandled error in runAllSyncs on start:', err));
 
   // Schedule Orders sync to run more frequently (e.g., every 3 minutes)
   cron.schedule('*/3 * * * *', async () => {

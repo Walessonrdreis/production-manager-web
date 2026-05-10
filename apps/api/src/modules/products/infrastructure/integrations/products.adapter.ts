@@ -23,10 +23,12 @@ export class ProductsAdapter {
               headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
             }));
           }
-          const responses = await Promise.all(chunk);
+          const responses = await Promise.allSettled(chunk);
           for (const res of responses) {
-            if (res.data && res.data.data) {
-              allProducts = [...allProducts, ...res.data.data];
+            if (res.status === 'fulfilled' && res.value.data && res.value.data.data) {
+              allProducts = [...allProducts, ...res.value.data.data];
+            } else if (res.status === 'rejected') {
+              console.warn('[PRODUCTS API fetchFromExternalAPI] Partial fetch failure:', res.reason?.message);
             }
           }
         }
@@ -79,10 +81,12 @@ export class ProductsAdapter {
               headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
             }));
           }
-          const responses = await Promise.all(chunk);
+          const responses = await Promise.allSettled(chunk);
           for (const res of responses) {
-            if (res.data && res.data.data) {
-              allProducts = [...allProducts, ...res.data.data];
+            if (res.status === 'fulfilled' && res.value.data && res.value.data.data) {
+              allProducts = [...allProducts, ...res.value.data.data];
+            } else if (res.status === 'rejected') {
+              console.warn('[PRODUCTS API fetchList] Partial fetch failure:', res.reason?.message);
             }
           }
         }

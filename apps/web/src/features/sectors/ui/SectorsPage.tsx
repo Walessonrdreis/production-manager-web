@@ -1,7 +1,6 @@
 import { useSectors } from '../../../hooks/sectors/useSectors';
 import { useCreateSector } from '../../../hooks/sectors/useCreateSector';
 import { useUpdateSector } from '../../../hooks/sectors/useUpdateSector';
-import { useDeleteSector } from '../../../hooks/sectors/useDeleteSector';
 import { useMyProducts } from '../../../hooks/products/useMyProducts';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
@@ -18,16 +17,13 @@ export function SectorsPage() {
   const { data: sectors = [], isLoading: isLoadingSectors, isError, error } = useSectors();
   const createSector = useCreateSector();
   const updateSector = useUpdateSector();
-  const deleteSector = useDeleteSector();
   const { savedProducts, assignSector, updateProduct, isLoading: isLoadingProducts } = useMyProducts();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isMappingModalOpen, setIsMappingModalOpen] = useState(false);
   const [mappingTab, setMappingTab] = useState<'assigned' | 'all'>('assigned');
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [productFormData, setProductFormData] = useState({ description: '', code: '', family: '', stock: 0, minStock: 0 });
-  const [sectorToDelete, setSectorToDelete] = useState<{ id: string, name: string } | null>(null);
   const [mappingSector, setMappingSector] = useState<Sector | null>(null);
   const [editingSector, setEditingSector] = useState<Sector | null>(null);
   const [formData, setFormData] = useState({ name: '', description: '' });
@@ -89,25 +85,6 @@ export function SectorsPage() {
         message: err.message || 'Falha ao processar operação', 
         type: 'error' 
       });
-    }
-  };
-
-  const handleDeleteClick = (id: string, name: string) => {
-    setSectorToDelete({ id, name });
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!sectorToDelete) return;
-
-    try {
-      await deleteSector.mutateAsync(sectorToDelete.id);
-      // O sucesso e erro são tratados pelo hook useDeleteSector (onSuccess/onError)
-    } catch (err: any) {
-      // O mutateAsync pode lançar erro se a função interna falhar miseravelmente
-    } finally {
-      setIsDeleteModalOpen(false);
-      setSectorToDelete(null);
     }
   };
 
@@ -296,15 +273,6 @@ export function SectorsPage() {
                         >
                           <Edit2 size={14} />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-zinc-400 hover:text-red-500 hover:bg-red-50"
-                          onClick={() => handleDeleteClick(s.id, s.name)}
-                          title="Excluir Setor"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -360,46 +328,6 @@ export function SectorsPage() {
             </Button>
           </div>
         </form>
-      </Modal>
-
-      {/* Modal de Confirmação de Exclusão */}
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        title="Confirmar Exclusão"
-      >
-        <div className="p-6">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
-              <Trash2 size={24} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-zinc-900">Excluir Setor?</h3>
-              <p className="text-sm text-zinc-500 mt-1">
-                Você está prestes a excluir o setor <strong className="text-zinc-900">{sectorToDelete?.name}</strong>.<br />
-                Esta ação irá desativar o setor no sistema.
-              </p>
-            </div>
-            
-            <div className="flex gap-3 w-full pt-2">
-              <Button 
-                variant="outline" 
-                className="flex-1 h-11" 
-                onClick={() => setIsDeleteModalOpen(false)}
-                disabled={deleteSector.isPending}
-              >
-                Cancelar
-              </Button>
-              <Button 
-                className="flex-1 h-11 bg-red-600 hover:bg-red-700 text-white font-bold"
-                onClick={handleConfirmDelete}
-                isLoading={deleteSector.isPending}
-              >
-                Sim, Excluir
-              </Button>
-            </div>
-          </div>
-        </div>
       </Modal>
 
       {/* Modal de Vínculo de Produtos / CRUD de Produtos do Setor */}

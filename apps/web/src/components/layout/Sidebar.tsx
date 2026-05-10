@@ -20,7 +20,7 @@ const navItems = [
   { id: 'production-control', label: 'Controle de Produção', path: '/production-control', icon: Activity },
   { id: 'products', label: 'Produtos Omie', path: '/products', icon: Package },
   { id: 'my-products', label: 'Meus Produtos', path: '/my-products', icon: User },
-  { id: 'customers', label: 'Clientes', path: '/customers', icon: Users },
+  // { id: 'customers', label: 'Clientes', path: '/customers', icon: Users },
   { id: 'sectors', label: 'Setores', path: '/sectors', icon: Layers },
   { id: 'orders', label: 'Ordens Pendentes', path: '/orders', icon: ShoppingCart },
   { id: 'planning', label: 'Gerador de Plano', path: '/planning', icon: CalendarRange },

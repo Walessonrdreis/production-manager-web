@@ -16,7 +16,7 @@ export function buildApiRouter(): Router {
   // Rotas de domínios específicos
   router.use('/products', productsRouter);
   router.use('/orders', ordersRouter);
-  router.use('/clients', clientsRouter);
+  // router.use('/clients', clientsRouter);
   router.use('/dashboard', dashboardRouter);
   router.use('/sectors', sectorsRouter);
   router.use('/planning', planningRouter);

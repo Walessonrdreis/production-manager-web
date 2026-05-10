@@ -22,7 +22,7 @@ export function AppRouter() {
         <Route path="/production-control" element={<MonitoringPage />} />
         <Route path="/products" element={<CatalogPage />} />
         <Route path="/my-products" element={<MyProductsPage />} />
-        <Route path="/customers" element={<CustomersPage />} />
+        {/* <Route path="/customers" element={<CustomersPage />} /> */}
         <Route path="/sectors" element={<SectorsPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/planning" element={<PlanningPage />} />

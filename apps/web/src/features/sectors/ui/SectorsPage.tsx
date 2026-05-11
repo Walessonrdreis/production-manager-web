@@ -179,17 +179,17 @@ export function SectorsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:p-4">
+        <div className="flex flex-col gap-3 sm:p-4">
           {isLoadingSectors ? (
             [1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="animate-pulse bg-white border border-zinc-100 rounded-xl p-5">
-                 <div className="h-4 w-12 bg-zinc-100 rounded mb-4" />
-                 <div className="h-4 w-32 bg-zinc-100 rounded mb-2" />
-                 <div className="h-3 w-48 bg-zinc-100 rounded mt-4" />
+              <div key={i} className="animate-pulse bg-white border border-zinc-100 rounded-xl p-5 w-full flex items-center justify-between">
+                 <div className="h-4 w-12 bg-zinc-100 rounded" />
+                 <div className="h-4 w-32 bg-zinc-100 rounded" />
+                 <div className="h-3 w-48 bg-zinc-100 rounded" />
               </div>
             ))
           ) : isError ? (
-            <div className="col-span-full py-12 text-center bg-white rounded-xl border border-zinc-100">
+            <div className="py-12 text-center bg-white rounded-xl border border-zinc-100 w-full">
               <div className="text-red-500 font-medium">
                 {typeof error === 'string' ? error : (error as any)?.message || 'Erro ao carregar setores'}
               </div>
@@ -203,56 +203,31 @@ export function SectorsPage() {
               </Button>
             </div>
           ) : filteredSectors.length === 0 ? (
-            <div className="col-span-full py-12 text-center text-zinc-500 italic bg-white rounded-xl border border-dashed border-zinc-200">
+            <div className="py-12 text-center text-zinc-500 italic bg-white rounded-xl border border-dashed border-zinc-200 w-full">
               Nenhum setor encontrado.
             </div>
           ) : (
             filteredSectors.map((s) => (
-              <div key={s.id} className="bg-white rounded-xl p-5 shadow-sm border border-zinc-200/60 hover:shadow-md transition-shadow relative group flex flex-col items-start cursor-pointer group/card" onClick={() => handleOpenMapping(s)}>
-                <div className="flex justify-between items-start w-full mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-500 group-hover/card:scale-125 transition-transform" />
+              <div key={s.id} className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-zinc-200/60 hover:shadow-md transition-all relative group flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer group/card gap-4" onClick={() => handleOpenMapping(s)}>
+                <div className="flex items-center gap-3 w-full sm:w-auto min-w-[200px]">
+                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500 group-hover/card:scale-125 transition-transform" />
+                  <div>
                     <span className="font-bold text-zinc-900 text-lg group-hover/card:text-blue-600 transition-colors leading-tight">
                       {s.name}
                     </span>
-                  </div>
-                  <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg">
-                     <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-zinc-400 hover:text-blue-600 hover:bg-blue-50"
-                        onClick={(e) => { e.stopPropagation(); handleOpenMapping(s); }}
-                        title="Vincular Produtos"
-                        aria-label={`Vincular Produtos no setor ${s.name}`}
-                      >
-                        <LayoutPanelLeft size={14} />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-zinc-400 hover:text-blue-600 hover:bg-blue-50"
-                        onClick={(e) => { e.stopPropagation(); handleOpenModal(s); }}
-                        title="Editar Setor"
-                        aria-label={`Editar setor ${s.name}`}
-                      >
-                        <Edit2 size={14} />
-                      </Button>
+                    <div className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">
+                      ID: <span className="font-mono text-zinc-500 bg-zinc-100 px-1 py-0.5 rounded leading-none">{s.id.slice(-6).toUpperCase()}</span>
+                    </div>
                   </div>
                 </div>
 
-                 <p className="text-sm text-zinc-500 line-clamp-2 min-h-[40px] mb-4 pr-10">
+                 <p className="text-sm text-zinc-500 line-clamp-2 sm:line-clamp-1 flex-1 sm:max-w-md">
                    {s.description || 'Sem descrição'}
                  </p>
 
-                <div className="mt-auto w-full flex justify-between items-end pt-4 border-t border-zinc-50">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block mb-1">ID</span>
-                    <span className="text-[10px] font-mono font-bold text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">
-                      {s.id.slice(-6).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                     <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block mb-1">Produtos</span>
+                <div className="flex items-center justify-between w-full sm:w-auto gap-4 sm:gap-6 mt-2 sm:mt-0">
+                  <div className="text-left sm:text-right">
+                     <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block mb-0.5">Produtos</span>
                      <span className="px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-md text-sm font-bold shadow-none inline-flex justify-center min-w-[32px]">
                         {isLoadingProducts ? (
                           <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin my-[3px]" />
@@ -260,6 +235,29 @@ export function SectorsPage() {
                           sectorProductCounts[s.id] || 0
                         )}
                       </span>
+                  </div>
+                  
+                  <div className="flex gap-2 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                     <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-9 w-9 border-zinc-200 text-zinc-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 shadow-sm"
+                        onClick={(e) => { e.stopPropagation(); handleOpenMapping(s); }}
+                        title="Vincular Produtos"
+                        aria-label={`Vincular Produtos no setor ${s.name}`}
+                      >
+                        <LayoutPanelLeft size={16} />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-9 w-9 border-zinc-200 text-zinc-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 shadow-sm"
+                        onClick={(e) => { e.stopPropagation(); handleOpenModal(s); }}
+                        title="Editar Setor"
+                        aria-label={`Editar setor ${s.name}`}
+                      >
+                        <Edit2 size={16} />
+                      </Button>
                   </div>
                 </div>
               </div>

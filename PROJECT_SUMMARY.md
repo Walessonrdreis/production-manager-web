@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.12.0 (Atualizado em 11/05/2026 - Separação Produtos vs Estoques)
+**Versão:** v4.14.0 (Atualizado em 11/05/2026 - Menu Lateral Recolhível e Controles de Produção)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -7,6 +7,13 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.5. Layout e Experiência do Usuário (v4.14.0)
+- **Menu Lateral Recolhível (Collapsible Sidebar):** Refatoramos o `Sidebar` para recolher em telas de computadores, exibindo fundamentalmente os ícones e expandindo suavemente no hover (`group-hover`), preservando o comportamento natural da página sem ocupar espaço horizontal desnecessário. Aplicou-se nova estilização (`shadow-xl`, `whitespace-nowrap`, `opacity-100/0`), reestruturação de textos em div fluida com `overflow-hidden` fixado a 64 unidades que reage de modo coeso quando a barra retrai para `84px`, prevenindo qualquer layout shift ou falha em flexboxes.
+
+### 0.4. Evolução do Controle de Produção (v4.13.0)
+- **Rastreamento de Produção Específico por Pedido:** Corrigida severa inconsistência onde "Alternar Tudo" na tela de controle vinculava produtos marcados de forma genérica (bulk). Agora a atribuição e contabilização da quantidade produzida obriga explicitamente o ID do pedido original (Omie), impedindo que marcações passadas recaiam falsamente sobre novos pedidos importados.
+- **Histórico de Produção em Abas:** Introduzido um sub-pilar em `/production-control` ("Monitoramento" vs "Histórico"); a nova aba expõe todos os registros cronológicos confirmados de encerramento da Etapa 20 agrupados de forma polida e com referência ao Pedido, resolvendo as dores do rastreio e auditoria produtiva.
+
 ### 0.11. Separação de Nomenclatura entre Produtos (Catálogo Omie) e Estoque Local (v4.12.0)
 - **Desacoplamento de Domínio:** O módulo antigo `products` causava ambiguidade de nomenclatura entre produtos brutos vindos da Omie e saldos manipulados no estoque local.
 - **Divisão Backend e Frontend:** O módulo foi decomposto com sucesso em dois módulos independentes: `catalog` e `stocks`. Ambos implementados de ponta a ponta na API (`modules/catalog` e `modules/stocks`) contendo o Repository Pattern autônomo, rotas isoladas (`/api/catalog` e `/api/stocks`) e respectivo pareamento no Frontend (`features/catalog` e `features/stocks`).

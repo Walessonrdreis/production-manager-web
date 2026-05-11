@@ -145,9 +145,9 @@ export function CollaboratorGoalsTab() {
       </div>
 
       {/* Tabela de Metas -> Grid de Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex flex-col gap-3">
         {filteredGoals.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
+          <div className="py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
             Nenhuma meta cadastrada para os critérios atuais.
           </div>
         ) : (
@@ -155,49 +155,47 @@ export function CollaboratorGoalsTab() {
             <motion.div 
               layout
               key={goal.id} 
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all relative group flex flex-col cursor-pointer hover:border-indigo-100"
+              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all relative group flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer hover:border-indigo-200 gap-4"
               onClick={() => openEditModal(goal)}
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3 pr-4">
-                  <span 
-                    className={`w-3 h-3 rounded-full flex-shrink-0 shadow-inner ${goal.isActive ? 'bg-green-500' : 'bg-gray-300'}`} 
-                    title={goal.isActive ? 'Ativo' : 'Inativo'}
-                    aria-label={goal.isActive ? 'Status ativo' : 'Status inativo'}
-                  />
-                  <h3 className="font-semibold text-gray-900 leading-tight">
-                    {goal.collaboratorName || 'Desconhecido'}
-                  </h3>
+              <div className="flex items-center gap-4 flex-1">
+                 <span 
+                  className={`w-3 h-3 rounded-full flex-shrink-0 shadow-inner ${goal.isActive ? 'bg-green-500' : 'bg-gray-300'}`} 
+                  title={goal.isActive ? 'Ativo' : 'Inativo'}
+                  aria-label={goal.isActive ? 'Status ativo' : 'Status inativo'}
+                />
+                <h3 className="font-bold text-gray-900 leading-tight flex-1">
+                  {goal.collaboratorName || 'Desconhecido'}
+                </h3>
+              </div>
+              
+              <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 p-3 sm:p-0 border-gray-50 mt-2 sm:mt-0">
+                <div className="text-left sm:text-right">
+                  <p className="text-[10px] text-gray-400 font-bold mb-0.5 uppercase tracking-wider">Quantidade Alvo</p>
+                  <p className="text-2xl font-mono text-indigo-600 font-black leading-none">{goal.targetQuantity}</p>
                 </div>
-                <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg">
+                
+                <div>
+                  <span className="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-indigo-100">
+                    {goal.period === 'daily' ? 'Dia' : goal.period === 'weekly' ? 'Semana' : 'Mês'}
+                  </span>
+                </div>
+
+                <div className="flex gap-2 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pl-2 border-l border-gray-100">
                   <button 
                     onClick={(e) => { e.stopPropagation(); openEditModal(goal); }}
-                    className="text-gray-400 hover:text-indigo-600 p-1.5 rounded-md hover:bg-indigo-50 focus:bg-indigo-50 outline-none transition-colors"
+                    className="text-gray-400 hover:text-indigo-600 p-2 border border-gray-100 rounded-lg hover:border-indigo-200 hover:bg-indigo-50 focus:bg-indigo-50 outline-none transition-all shadow-sm"
                     title="Editar Meta"
-                    aria-label={`Editar meta do colaborador ${goal.collaboratorName}`}
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setDeletingId(goal.id); }}
-                    className="text-gray-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 focus:bg-red-50 outline-none transition-colors"
+                    className="text-gray-400 hover:text-red-600 p-2 border border-gray-100 rounded-lg hover:border-red-200 hover:bg-red-50 focus:bg-red-50 outline-none transition-all shadow-sm"
                     title="Excluir Meta"
-                    aria-label={`Excluir meta do colaborador ${goal.collaboratorName}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                </div>
-              </div>
-              
-              <div className="mt-auto flex justify-between items-end pt-4 border-t border-gray-50">
-                <div>
-                  <p className="text-xs text-gray-500 font-medium mb-1 uppercase tracking-wider">Quantidade Alvo</p>
-                  <p className="text-2xl font-mono text-indigo-600 font-bold leading-none">{goal.targetQuantity}</p>
-                </div>
-                <div>
-                  <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wide">
-                    {goal.period === 'daily' ? 'Dia' : goal.period === 'weekly' ? 'Semana' : 'Mês'}
-                  </span>
                 </div>
               </div>
             </motion.div>

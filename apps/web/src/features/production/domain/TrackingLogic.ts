@@ -63,9 +63,10 @@ export const TrackingLogic = {
   /**
    * Calcula a quantidade produzida para uma descrição específica.
    */
-  calculateProducedQuantity(records: ProducedRecord[], description: string): number {
+  calculateProducedQuantityByOrders(records: ProducedRecord[], description: string, currentOrders: Order[]): number {
+    const validOrderIds = new Set(currentOrders.map(o => String(o.id)));
     return records
-      .filter(r => r.description === description)
+      .filter(r => r.description === description && r.orderId && validOrderIds.has(String(r.orderId)))
       .reduce((acc, curr) => acc + (curr.quantity || 0), 0);
   },
 

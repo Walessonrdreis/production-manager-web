@@ -6,13 +6,13 @@ import { Result } from '../../../lib/Result';
  * UseCase: Alterna a seleção de todos os itens de uma descrição.
  * Recupera os registros atuais, aplica a lógica de domínio e persiste as alterações.
  */
-export async function toggleAllProduction(description: string, totalNeeded: number): Promise<Result<any>> {
+export async function toggleAllProduction(ordersContainingProduct: any[], description: string): Promise<Result<any>> {
   try {
     const existing = await ProducedRepository.getByDescription(description);
     
-    const { idsToDelete, recordToAdd } = ProductionLogic.calculateToggleAllAction(
+    const { idsToDelete, recordsToAdd } = ProductionLogic.calculateToggleAllByOrdersAction(
       description,
-      totalNeeded,
+      ordersContainingProduct,
       existing
     );
 
@@ -20,8 +20,8 @@ export async function toggleAllProduction(description: string, totalNeeded: numb
       await ProducedRepository.bulkDelete(idsToDelete);
     }
 
-    if (recordToAdd) {
-      const saved = await ProducedRepository.save(recordToAdd);
+    if (recordsToAdd && recordsToAdd.length > 0) {
+      const saved = await ProducedRepository.bulkSave(recordsToAdd);
       return Result.ok(saved);
     }
 

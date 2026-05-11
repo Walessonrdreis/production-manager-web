@@ -12,6 +12,7 @@ import { MonitoringStats } from './components/MonitoringStats';
 import { MonitoringTable } from './components/MonitoringTable';
 import { MonitoringDetailsModal } from './components/MonitoringDetailsModal';
 import { ScheduleEditModal } from './components/ScheduleEditModal';
+import { ProductionHistoryList } from './components/ProductionHistoryList';
 import { TrackingLogic } from '../domain/TrackingLogic';
 import { cn } from '../../../utils/cn';
 
@@ -29,11 +30,12 @@ export function MonitoringPage() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   const [filter, setFilter] = useState<'all' | 'today' | 'tomorrow' | 'week' | 'overdue'>('all');
+  const [activeTab, setActiveTab] = useState<'monitoring' | 'history'>('monitoring');
 
   const isLoading = isApiLoading || isLocalLoading || isOrdersLoading;
 
   const getProducedQuantity = (description: string) => {
-    return TrackingLogic.calculateProducedQuantity(producedRecords, description);
+    return TrackingLogic.calculateProducedQuantityByOrders(producedRecords, description, orders || []);
   };
 
   const filteredData = useMemo(() => {
@@ -86,7 +88,8 @@ export function MonitoringPage() {
   }, [editingScheduleDesc, schedules]);
 
   const handleToggleProduct = (description: string, totalNeeded: number) => {
-    toggleAll(description, totalNeeded);
+    const ordersWithProduct = TrackingLogic.filterOrdersByProduct(orders || [], description);
+    toggleAll(ordersWithProduct, description);
   };
 
   const handleToggleOrder = (orderId: string, description: string, quantity: number, orderNumber: string) => {
@@ -104,7 +107,9 @@ export function MonitoringPage() {
     return producedRecords.find(r => r.id === id);
   };
 
-  const totalProducedItemsCount = TrackingLogic.calculateTotalProduced(producedRecords);
+  const validOrderIds = new Set((orders || []).map(o => String(o.id)));
+  const validProducedRecords = producedRecords.filter(r => r.orderId && validOrderIds.has(String(r.orderId)));
+  const totalProducedItemsCount = TrackingLogic.calculateTotalProduced(validProducedRecords);
   const adjustedTotal = Math.max(0, (totals?.totalItems || 0) - totalProducedItemsCount);
 
   if (isError) {
@@ -134,62 +139,89 @@ export function MonitoringPage() {
         subtitle="Monitoramento em tempo real (Etapa 20)"
       />
 
-      <MonitoringStats 
-        totalItems={adjustedTotal}
-        uniqueSkus={totals?.data.length || 0}
-        lastUpdate={totals?.lastUpdate}
-        isLoading={isLoading}
-      />
-
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-zinc-100">
-        <div className="flex items-center gap-3">
-          <Filter size={18} className="text-zinc-400" />
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: 'all', label: 'Todos' },
-              { id: 'today', label: 'Para Hoje' },
-              { id: 'tomorrow', label: 'Amanhã' },
-              { id: 'week', label: 'Esta Semana' },
-              { id: 'overdue', label: 'Atrasados', color: 'text-red-600 font-bold' }
-            ].map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setFilter(f.id as any)}
-                className={cn(
-                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-                  filter === f.id 
-                    ? "bg-zinc-900 text-white shadow-sm" 
-                    : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100",
-                  f.color && filter !== f.id ? f.color : ""
-                )}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
-          <CalendarIcon size={14} />
-          {filteredData.length} itens mostrados
-        </div>
+      <div className="flex bg-zinc-100 p-1 rounded-xl w-max">
+        <button
+          onClick={() => setActiveTab('monitoring')}
+          className={cn(
+            "px-4 py-2 rounded-lg text-sm font-bold transition-colors",
+            activeTab === 'monitoring' ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"
+          )}
+        >
+          Monitoramento
+        </button>
+        <button
+          onClick={() => setActiveTab('history')}
+          className={cn(
+            "px-4 py-2 rounded-lg text-sm font-bold transition-colors",
+            activeTab === 'history' ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"
+          )}
+        >
+          Histórico
+        </button>
       </div>
 
-      <MonitoringTable 
-        isLoading={isLoading}
-        data={filteredData}
-        getProducedQuantity={getProducedQuantity}
-        onToggleProduct={handleToggleProduct}
-        onSelectProduct={(desc) => {
-          setSelectedProduct(desc);
-          setShowDetailsModal(true);
-        }}
-        schedules={schedules}
-        onOpenSchedule={(desc) => {
-          setEditingScheduleDesc(desc);
-          setShowScheduleModal(true);
-        }}
-      />
+      {activeTab === 'monitoring' ? (
+        <>
+          <MonitoringStats 
+            totalItems={adjustedTotal}
+            uniqueSkus={totals?.data.length || 0}
+            lastUpdate={totals?.lastUpdate}
+            isLoading={isLoading}
+          />
+
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-zinc-100">
+            <div className="flex items-center gap-3">
+              <Filter size={18} className="text-zinc-400" />
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'all', label: 'Todos' },
+                  { id: 'today', label: 'Para Hoje' },
+                  { id: 'tomorrow', label: 'Amanhã' },
+                  { id: 'week', label: 'Esta Semana' },
+                  { id: 'overdue', label: 'Atrasados', color: 'text-red-600 font-bold' }
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFilter(f.id as any)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                      filter === f.id 
+                        ? "bg-zinc-900 text-white shadow-sm" 
+                        : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100",
+                      f.color && filter !== f.id ? f.color : ""
+                    )}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
+              <CalendarIcon size={14} />
+              {filteredData.length} itens mostrados
+            </div>
+          </div>
+
+          <MonitoringTable 
+            isLoading={isLoading}
+            data={filteredData}
+            getProducedQuantity={getProducedQuantity}
+            onToggleProduct={handleToggleProduct}
+            onSelectProduct={(desc) => {
+              setSelectedProduct(desc);
+              setShowDetailsModal(true);
+            }}
+            schedules={schedules}
+            onOpenSchedule={(desc) => {
+              setEditingScheduleDesc(desc);
+              setShowScheduleModal(true);
+            }}
+          />
+        </>
+      ) : (
+        <ProductionHistoryList records={producedRecords} isLoading={isLocalLoading} />
+      )}
 
       <MonitoringDetailsModal 
         isOpen={showDetailsModal}
@@ -197,7 +229,7 @@ export function MonitoringPage() {
         selectedProduct={selectedProduct}
         currentProductData={currentProductData}
         producedQuantity={selectedProduct ? getProducedQuantity(selectedProduct) : 0}
-        ordersWithProduct={selectedProduct ? TrackingLogic.filterOrdersByProduct(orders, selectedProduct) : []}
+        ordersWithProduct={selectedProduct ? TrackingLogic.filterOrdersByProduct(orders || [], selectedProduct) : []}
         isOrderProduced={isOrderProduced}
         getOrderProducedRecord={getOrderProducedRecord}
         onToggleProduct={handleToggleProduct}

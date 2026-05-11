@@ -38,33 +38,37 @@ export function useLocalProduced() {
     return res;
   };
 
-  const toggleAll = async (description: string, totalNeeded: number) => {
+  const toggleAll = async (ordersContainingProduct: any[], description: string) => {
     // Optimistic update
     queryClient.setQueryData(['producedRecords'], (old: any) => {
       if (!old) return [];
       const now = new Date().toISOString();
-      const existing = old.filter((r: any) => r.description === description);
-      const isPartiallyProduced = existing.length > 0;
+      const expectedIds = ordersContainingProduct.map(o => `order-${o.id}-${description}`);
+      const existingIds = expectedIds.filter(id => old.some((r: any) => r.id === id));
       
-      const newOld = old.filter((r: any) => r.description !== description);
+      const isAllProduced = existingIds.length === expectedIds.length && expectedIds.length > 0;
       
-      if (!isPartiallyProduced) {
-        // Toggle on
-        const newRecord = {
-          id: `bulk-${description}-${Date.now()}`,
-          description,
-          quantity: totalNeeded,
-          synced: false,
-          updatedAt: now
-        };
-        return [...newOld, newRecord];
+      if (isAllProduced) {
+        // Toggle off: remove them
+        return old.filter((r: any) => !existingIds.includes(r.id));
       } else {
-        // Toggle off
-        return newOld;
+        // Toggle on: add missing records mapped to specific orders
+        const newRecords = ordersContainingProduct
+          .filter(o => !old.some((r: any) => r.id === `order-${o.id}-${description}`))
+          .map(o => ({
+             id: `order-${o.id}-${description}`,
+             description,
+             quantity: o.items?.find((i: any) => i.description === description)?.quantity || o.itemQuantity || 0,
+             orderId: String(o.id),
+             orderNumber: String(o.numero_pedido || o.orderNumber || o.id),
+             synced: false,
+             updatedAt: now
+          }));
+        return [...old, ...newRecords];
       }
     });
 
-    const res = await toggleAllProduction(description, totalNeeded);
+    const res = await toggleAllProduction(ordersContainingProduct, description);
     if (!res.success) {
       error(res.error);
       queryClient.invalidateQueries({ queryKey: ['producedRecords'] });

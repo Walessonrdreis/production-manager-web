@@ -4,7 +4,7 @@ Este projeto utiliza um arquivo de documentação viva chamado `PROJECT_SUMMARY.
 #AÇÂO OBRIGATORIA NUNCA ESQUEÇA:# Toda pergunta que eu fizer que terminar com ok? não é permitido codar é para responder via chat somente
 #AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda pergunta que eu fizer que terminar com verifique! Busque o problema na plicação faz um relatorio crie ou edite um documento em em docs/BUGS com nome objetivo do problema e enel deve conter  a descrição do problema ,  toda atualização comcluida e testada será marcado como PRONTA! no final de cada passo  e apresente no chat sem codar, e agurde minha decisão.
 #AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda tod acorreção realizada de um bug ou error deve ser registrada em docs/correcoes/historic_bugs criando um arquivo .md descrever como foi realizado a correção e como evitar.
-#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda toda acorreção implementação deve ser registrada em docs/impprementacoes/historic_imprementations criando um arquivo .md que tenha a descrição de como foi feito e melhorias.
+#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda toda implementação deve ser registrada em docs/impprementacoes/historic_imprementations criando um arquivo .md que tenha a descrição de como foi feito e melhorias.
 
 ## 1. Regra de Auto-Atualização
 Sempre que houver uma alteração na estrutura de arquivos, na arquitetura técnica ou na lógica de negócio (ex: novos endpoints no proxy, novas regras de dedução, novos hooks de persistência), você DEVE:

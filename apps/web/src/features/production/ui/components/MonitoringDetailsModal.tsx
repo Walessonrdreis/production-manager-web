@@ -1,4 +1,4 @@
-import { CheckSquare, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { CheckSquare, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react';
 import { Button } from '../../../../components/ui/Button';
 import { Modal } from '../../../../components/ui/Modal';
 import { cn } from '../../../../utils/cn';
@@ -15,6 +15,7 @@ interface MonitoringDetailsModalProps {
   getOrderProducedRecord?: (orderId: string, description: string) => any;
   onToggleProduct: (desc: string, qty: number) => void;
   onToggleOrder: (orderId: string, description: string, quantity: number, orderNumber: string) => void;
+  onOpenSchedule?: () => void;
 }
 
 export function MonitoringDetailsModal({
@@ -27,7 +28,8 @@ export function MonitoringDetailsModal({
   isOrderProduced,
   getOrderProducedRecord,
   onToggleProduct,
-  onToggleOrder
+  onToggleOrder,
+  onOpenSchedule
 }: MonitoringDetailsModalProps) {
   const [orderToConfirm, setOrderToConfirm] = useState<{ id: string, desc: string, qty: number, orderNumber: string } | null>(null);
 
@@ -72,17 +74,30 @@ export function MonitoringDetailsModal({
           <div>
              <div className="flex justify-between items-center mb-3">
                <h3 className="text-sm font-bold text-zinc-900">Pedidos contendo este item</h3>
-               <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-xs h-8 text-blue-600 hover:bg-blue-50"
-                onClick={() => {
-                  if (currentProductData) onToggleProduct(currentProductData.description, currentProductData.totalQuantity);
-                }}
-               >
-                 <CheckSquare size={14} className="mr-1" />
-                 Alternar Tudo
-               </Button>
+               <div className="flex gap-2">
+                 {onOpenSchedule && (
+                   <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-xs h-8 text-amber-600 hover:bg-amber-50"
+                    onClick={onOpenSchedule}
+                   >
+                     <Calendar size={14} className="mr-1" />
+                     Programar
+                   </Button>
+                 )}
+                 <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs h-8 text-blue-600 hover:bg-blue-50"
+                  onClick={() => {
+                    if (currentProductData) onToggleProduct(currentProductData.description, currentProductData.totalQuantity);
+                  }}
+                 >
+                   <CheckSquare size={14} className="mr-1" />
+                   Alternar Tudo
+                 </Button>
+               </div>
              </div>
              
              {ordersWithProduct.length === 0 ? (

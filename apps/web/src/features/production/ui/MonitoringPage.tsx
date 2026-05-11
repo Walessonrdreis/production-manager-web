@@ -202,6 +202,13 @@ export function MonitoringPage() {
         getOrderProducedRecord={getOrderProducedRecord}
         onToggleProduct={handleToggleProduct}
         onToggleOrder={handleToggleOrder}
+        onOpenSchedule={() => {
+          if (selectedProduct) {
+            setShowDetailsModal(false); // maybe close details or not, let's just leave it open or close it
+            setEditingScheduleDesc(selectedProduct);
+            setShowScheduleModal(true);
+          }
+        }}
       />
 
       <ScheduleEditModal 

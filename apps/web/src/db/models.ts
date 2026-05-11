@@ -1,4 +1,4 @@
-import { type Product } from '../types/api';
+import { type Product, type StockType } from '../types/api';
 
 export interface ProducedRecord {
   id: string; // SKU or combined unique ID
@@ -61,11 +61,15 @@ export type SavedProduct = Product & Syncable & {
   savedAt: string;
   category?: string;
   sectorIds: string[]; // Relacionamento com setores
+  stockType?: StockType; // Categoria do produto no estoque
 };
 
 export interface ProductionSchedule extends Syncable {
   productCode: string; // SKU como link universal
   description: string;
+  quantity?: number;
+  sectorId?: string;
+  sectorName?: string;
   scheduledAt: string;
   notes?: string;
   updatedAt: string;

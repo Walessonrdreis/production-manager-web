@@ -7,6 +7,15 @@ export const ENDPOINTS = {
     SYNC_STAGE20: 'orders/sync',
     PRODUCED: 'dashboard/produced'
   },
+  CATALOG: {
+    LIST: 'catalog',
+    SYNC: 'catalog/sync',
+    SYNC_STOCK: 'catalog/stock/refresh',
+    ADMIN: 'catalog/admin',
+  },
+  STOCKS: {
+    BASE: 'stocks',
+  },
   PRODUCTS: {
     LIST: 'products',
     SYNC: 'products/sync',

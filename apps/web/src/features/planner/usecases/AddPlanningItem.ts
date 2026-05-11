@@ -34,10 +34,6 @@ export async function addPlanningItem(
       await PlanningRepository.update(toUpdate[0].id, { quantity: toUpdate[0].quantity });
     }
 
-    if (scheduledAt) {
-      await setProductionSchedule(product.description, scheduledAt, `Planejado via setor: ${sectorName}`);
-    }
-
     return Result.ok(undefined);
   } catch (err) {
     return Result.fail(err instanceof Error ? err.message : 'Erro desconhecido ao adicionar item.');

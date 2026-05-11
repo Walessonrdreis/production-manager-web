@@ -1,95 +1,43 @@
-import { useMemo, useState } from 'react';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { useOrders, Order } from '../../../hooks/orders/useOrders';
-import { Card } from '../../../components/ui/Card';
-import { Button } from '../../../components/ui/Button';
-import { useToast } from '../../../components/ui/Toast';
-import { AlertCircle, Search } from 'lucide-react';
-import { OrderLogic } from '../domain/OrderLogic';
-import { OrdersRepository } from '../infra/OrdersRepository';
+import { useState } from 'react';
+import { ShoppingBag, Settings2 } from 'lucide-react';
+import { SalesOrdersTab } from './components/SalesOrdersTab';
+import { ProductionOrdersTab } from './components/ProductionOrdersTab';
 
-import { OrdersHeader } from './components/OrdersHeader';
-import { OrdersTable } from './components/OrdersTable';
-import { OrderDetailsModal } from './components/OrderDetailsModal';
+type MainTab = 'vendas' | 'producao';
 
 export function OrdersPage() {
-  const { orders, isLoading, isError, error, refetchOrders } = useOrders();
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [search, setSearch] = useState('');
-
-  const queryClient = useQueryClient();
-  const { success: toastSuccess, error: toastError } = useToast();
-
-  const syncMutation = useMutation({
-    mutationFn: () => OrdersRepository.syncWithOmie(),
-    onSuccess: () => {
-      toastSuccess('Sincronização Finalizada', 'Pedidos atualizados.');
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-    },
-    onError: () => toastError('Erro ao Sincronizar', 'Não foi possível buscar pedidos na V1.')
-  });
-
-  const filteredOrders = useMemo(() => {
-    return OrderLogic.filterOrders(orders || [], search);
-  }, [orders, search]);
-
-  const handleOpenDetails = (order: Order) => {
-    setSelectedOrder(order);
-    setIsModalOpen(true);
-  };
-
-  if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-center">
-        <div className="bg-red-50 p-6 rounded-2xl border border-red-100 max-w-sm">
-          <AlertCircle size={32} className="text-red-500 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-red-900 mb-1">Erro ao Carregar Ordens</h2>
-          <p className="text-red-700 text-sm mb-6">
-            {(error as any)?.message || 'Não foi possível carregar os dados das ordens de venda.'}
-          </p>
-          <Button onClick={() => refetchOrders()} variant="outline" size="sm" className="w-full">
-            Tentar Novamente
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const [mainTab, setMainTab] = useState<MainTab>('vendas');
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <OrdersHeader 
-        ordersCount={orders?.length || 0}
-        isLoading={isLoading || syncMutation.isPending}
-        onRefresh={() => syncMutation.mutate()}
-      />
+    <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <header className="mb-6">
+        <h1 className="text-3xl flex items-center font-bold text-gray-900 gap-3">
+          <ShoppingBag className="w-8 h-8 text-blue-600" />
+          Gestão de Ordens
+        </h1>
+        <p className="text-gray-500 mt-2">Gerencie pedidos de venda do Omie e as Ordens de Produção (OPs) locais com seus respectivos lotes.</p>
+      </header>
 
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-4 w-4 text-slate-400" />
-        </div>
-        <input
-          type="text"
-          placeholder="Buscar pedidos ou clientes..."
-          className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {/* Main Tabs */}
+      <div className="flex space-x-1 p-1 bg-gray-100 rounded-xl mb-6 shadow-inner">
+        <button
+          onClick={() => setMainTab('vendas')}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${mainTab === 'vendas' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'}`}
+        >
+          <ShoppingBag className="w-4 h-4" />
+          Pedidos de Venda
+        </button>
+        <button
+          onClick={() => setMainTab('producao')}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${mainTab === 'producao' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'}`}
+        >
+          <Settings2 className="w-4 h-4" />
+          Ordens de Produção
+        </button>
       </div>
 
-      <Card>
-        <OrdersTable 
-          orders={filteredOrders}
-          isLoading={isLoading}
-          onOpenDetails={handleOpenDetails}
-        />
-      </Card>
-
-      <OrderDetailsModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        selectedOrder={selectedOrder}
-      />
+      {mainTab === 'vendas' && <SalesOrdersTab />}
+      {mainTab === 'producao' && <ProductionOrdersTab />}
     </div>
   );
 }

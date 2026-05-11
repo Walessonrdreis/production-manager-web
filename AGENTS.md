@@ -2,7 +2,9 @@
 Siga rigorosamente se precisar fazer algo que seja imcompativel pergunte
 Este projeto utiliza um arquivo de documentação viva chamado `PROJECT_SUMMARY.md`.
 #AÇÂO OBRIGATORIA NUNCA ESQUEÇA:# Toda pergunta que eu fizer que terminar com ok? não é permitido codar é para responder via chat somente
-#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda pergunta que eu fizer que terminar com verifique! Busque o problema na plicação faz um relatorio crie um documentoem em docs/BUGS com nome objetivo do problema e enel deve conter  a descrição do problema e apresente no chat sem codar, e agurde minha decisão.
+#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda pergunta que eu fizer que terminar com verifique! Busque o problema na plicação faz um relatorio crie ou edite um documento em em docs/BUGS com nome objetivo do problema e enel deve conter  a descrição do problema ,  toda atualização comcluida e testada será marcado como PRONTA! no final de cada passo  e apresente no chat sem codar, e agurde minha decisão.
+#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda tod acorreção realizada de um bug ou error deve ser registrada em docs/correcoes/historic_bugs criando um arquivo .md descrever como foi realizado a correção e como evitar.
+#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda toda acorreção implementação deve ser registrada em docs/impprementacoes/historic_imprementations criando um arquivo .md que tenha a descrição de como foi feito e melhorias.
 
 ## 1. Regra de Auto-Atualização
 Sempre que houver uma alteração na estrutura de arquivos, na arquitetura técnica ou na lógica de negócio (ex: novos endpoints no proxy, novas regras de dedução, novos hooks de persistência), você DEVE:
@@ -49,7 +51,7 @@ Estratégia de Mapeamento (Mappers/Normalizers): Utilize mappers explícitos par
 Test-Driven Development (TDD): 100% dos arquivos em `domain/` e `usecases/` devem ter testes acompanhando, cobrindo casos de sucesso, erro e limites.
 Documentação Viva e Rastreabilidade: O `PROJECT_SUMMARY.md` é a fonte da verdade técnica. Nenhuma funcionalidade é "Done" sem que sua lógica e contratos estejam documentados proativamente.
 
-## 5. Backend estrutura futura
+## 5. Backend estrutura 
 apps/api/
 ├─ dist/
 ├─ docs/
@@ -141,22 +143,12 @@ apps/api/
 │
 └─ server.ts
 
-## 6. Plano de Refatoração da API Backend
-A fim de manter o controle arquitetural e o avanço gradual da refatoração abordada no repositório, estão definidas as seguintes etapas a serem perseguidas:
-
-**Etapa 4: Setup do Bootstrap Server e App Base**
-Extração do Express: Atualmente nosso construtor `app = express()` principal e lógicas de vite estão no `server.ts` da raiz. A ideia nesta etapa é isolar essa montagem da API no `apps/api/src/bootstrap/app.ts` e chamar os plugins definidos em `error-handler.ts`, isolando 100% a camada de API.
-ATUALIZAÇÃO ENTREGUE
-
-**Etapa 5: Outros Módulos**
-Com a base pronta e o Proxy roteado, podemos estruturar outros endpoints legados ou futuras criações dentro de seus próprios domínios em `apps/api/src/modules/nome_do_modulo/`.
-ATUALIZAÇÃO ENTREGUE
-
-**Etapa 6: Criação dos diretórios para novas features (Dashboard, Sectors, Planning, Goals e Production)**
-Migração Autônoma Completa criando Adapters, UseCases, e Controllers e removendo `/proxy` dos chamados de endpoints do Front-end.
-ATUALIZAÇÃO ENTREGUE
-
+## 6. Plano de Refatoração 
+A fim de manter o controle arquitetural e presevar tudo funcioando.
+- Toda e qualquer refatoração deve ser implementada sem quebrar a aplicação, cria o que é necessario seguindo nossos padroes, mantendo o sistema funcionando depois só muda as importações
+- Não deve ser longa, para evitar erros no processo, trabalhe focando em partes por parte
 Toda etapa relizazada no final dela coloque ATUALIZAÇÂO ENTREGUE em AGENTS.md 6. Plano de Refatoração da API backend, no final de cada Etapa.
+ATUALIZAÇÃO ENTREGUE
 
 ## 7. Planejamento e Passos para a Migração do Frontend para apps/web
 Passo 1: Criação e Espelhamento Progressivo (Shadowing)

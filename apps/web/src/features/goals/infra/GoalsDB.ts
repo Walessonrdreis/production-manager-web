@@ -9,6 +9,9 @@ export class GoalsDB extends Dexie {
     this.version(1).stores({
       goals: 'id, productCode, period, sectorId, synced, lastModified'
     });
+    this.version(2).stores({
+      goals: 'id, productCode, period, sectorId, synced, lastModified, type, collaboratorId'
+    });
   }
 }
 

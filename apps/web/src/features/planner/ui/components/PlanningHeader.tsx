@@ -9,6 +9,7 @@ interface PlanningHeaderProps {
   scheduledAt: string;
   onScheduledAtChange: (val: string) => void;
   onClear: () => void;
+  onGenerateOrder: () => void;
   items: any[];
   sectors: any[];
   activeSectorId: string;
@@ -17,7 +18,7 @@ interface PlanningHeaderProps {
 
 export function PlanningHeader({ 
   period, onPeriodChange, scheduledAt, onScheduledAtChange,
-  onClear, items, sectors, activeSectorId, onActiveSectorChange 
+  onClear, onGenerateOrder, items, sectors, activeSectorId, onActiveSectorChange 
 }: PlanningHeaderProps) {
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -65,12 +66,21 @@ export function PlanningHeader({
            className="w-full sm:w-auto"
          >
            {({ loading }: { loading: boolean }) => (
-              <Button disabled={items.length === 0 || loading} size="sm" className="w-full sm:w-auto text-xs h-10 px-6 font-bold">
+              <Button disabled={items.length === 0 || loading} variant="outline" size="sm" className="w-full sm:w-auto text-xs h-10 px-4 font-bold">
                 <Download size={14} className="mr-2" />
-                {loading ? 'Gerando...' : 'Gerar PDF'}
+                PDF
               </Button>
             )}
          </PDFDownloadLink>
+
+         <Button 
+            disabled={items.length === 0} 
+            size="sm" 
+            className="w-full sm:w-auto text-xs h-10 px-6 font-bold bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={onGenerateOrder}
+          >
+            Gerar Ordens
+         </Button>
       </div>
     </header>
   );

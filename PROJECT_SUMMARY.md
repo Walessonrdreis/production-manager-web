@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.8.6 (Atualizado em 10/05/2026 - Ações em Lote Avançadas)
+**Versão:** v4.12.0 (Atualizado em 11/05/2026 - Separação Produtos vs Estoques)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -7,7 +7,30 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
-### 0.7. Renovação do Dashboard Estratégico (v4.8.6 - Atual)
+### 0.11. Separação de Nomenclatura entre Produtos (Catálogo Omie) e Estoque Local (v4.12.0)
+- **Desacoplamento de Domínio:** O módulo antigo `products` causava ambiguidade de nomenclatura entre produtos brutos vindos da Omie e saldos manipulados no estoque local.
+- **Divisão Backend e Frontend:** O módulo foi decomposto com sucesso em dois módulos independentes: `catalog` e `stocks`. Ambos implementados de ponta a ponta na API (`modules/catalog` e `modules/stocks`) contendo o Repository Pattern autônomo, rotas isoladas (`/api/catalog` e `/api/stocks`) e respectivo pareamento no Frontend (`features/catalog` e `features/stocks`).
+- **Limpeza do Sistema:** A versão legada e ambígua `products` foi completamente removida da API e da Web, firmando os princípios de granularidade.
+
+### 0.10. Gestão de Estoques e Categorização de Produtos (v4.11.0 - Atual)
+- **Painel de Estoques Embutido:** A rota `/my-products` (agora rotulada como "Estoques" na UI e Sidebar) evoluiu para suportar abas de múltiplos estoques departamentais (Barras, Confeitaria, Chocolate Refinado, Insumos, Limpeza, Maquinários).
+- **Tipagem Dinâmica e Retrocompatibilidade:** A identificação do estoque foi abstraída na propriedade union type `stockType` anexada à entidade `SavedProduct` (`db/models.ts` e `types/api.ts`). Produtos salvos previamente assumem a categoria legada/padrão "Barras".
+- **Fluxo de Alimentação Modular (Catálogo):** Implementada a seleção contextual do destino. Ao salvar um ou múltiplos itens no Catálogo Omie, um novo modal `SaveToStockModal` exige a atribuição obrigatória a qual categoria de estoque aquele produto fará parte, direcionando a separação das "classes" de produtos, separando o negócio para a interface com segurança.
+- **Visualização em Abas:** Na tela de Estoques a visualização agora usa Tab bar contendo os filtros dinâmicos de renderização. A ação "Limpar Todos" agora é granular e contextual ("Limpar Categoria Atual").
+
+### 0.9. Gestão de Ordens de Produção (v4.10.0)
+- **Painel Central de Ordens:** A rota `/orders` foi expandida. Agora a página `OrdersPage` funciona como um painel central separado por abas: `Pedidos de Venda` (importados do Omie) e as novas `Ordens de Produção` (locais).
+- **Módulo Backend Independente (API):** Concluindo o requisito arquitetural de divisão, foi criado o repositório back-end `production-orders` contendo toda a pipeline (`Controllers`, `Routes`, `UseCases`, `DTOs` e `FirebaseAdminProductionOrderRepository`). 
+- **Refatoração do Front-end para a API:** O frontend não faz mais comunicação direta do cliente Web com o Google Firestore via `FirebaseProductionOrderRepository`. Tudo foi substituído pelo consumo tradicional no padrão de `Repository Pattern` usando `apiClient` e as rotas `/api/production-orders` - deixando a aplicação 100% pronta e modular para infraestrutura.
+- **Relacionamento Local:** As OPs criadas continuam consultado o banco IndexedDB local de Produtos (Catálogo) e Setores, permitindo um select dinâmico sem sobrecarregar a API principal.
+
+### 0.8. Evolução de Metas Multi-entidade (v4.9.0 - Atual)
+- **Sub-divisão em Abas (Single Page):** A configuração de metas (`GoalsManagementPage.tsx`) evoluiu para não ficar restrita apenas aos produtos. Mantendo a essência SPA, a página agora conta com abas superiores principais: "Por Produto", "Por Colaborador" e "Por Setor".
+- **Gestão Isolada em Componentes:** Para respeitar o Princípio de Responsabilidade Única (Global SRP), a interface original foi desacoplada em três novos componentes (tabs): `ProductGoalsTab`, `CollaboratorGoalsTab` e `SectorGoalsTab`.
+- **Evolução do Schema e Banco:** O schema de persistência IndexedDB de metas (`GoalsDB`) foi atualizado (v2) adicionando novos índices (`type` e `collaboratorId`). Adicionalmente o domínio `ProductionGoal` passou a aceitar dinamicamente os targets através da prop union `type: 'product' | 'collaborator' | 'sector'`, com retrocompatibilidade garantida.
+- **Integração Plena (React Query):** As abas novas consomen os hooks maduros `useCollaborators()` e `useSectors()` mantendo o cache aquecido sem poluir a renderização, proporcionando uma experiência instantânea ao construir metas para o time ou maquinário.
+
+### 0.7. Renovação do Dashboard Estratégico (v4.8.6)
 - **Padrão de UI para Listagens (Tables):** Consolidado como padrão o visual limpo implementado nas listas de Metas (`GoalsManagementPage.tsx`). Consiste em usar padding folgado nas células, empilhamento de informações relacionadas na mesma coluna (como código e descrição em fontes de pesos diferentes) e revelação opcional de botões de ações ao passar o mouse (`group-hover`), reduzindo a poluição visual generalizada.
 - **Ações em Massa para Setores, Metas e Produção:** Ampliadas as funcionalidades do painel flutuante de seleção múltipla em "Meus Produtos". Inclusão de três novos botões de ação em massa:
   - **Setores**: Substitui ou define os setores produtivos em lote para os itens selecionados.

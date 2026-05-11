@@ -54,71 +54,102 @@ export function MonitoringTable({
       ) : data.length === 0 ? (
         <div className="text-center py-12 text-zinc-500 italic">Nenhum item pendente para produção no momento.</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr className="border-b border-zinc-200 bg-zinc-50/50">
-                <th className="pb-3 px-4 pt-3 font-semibold text-zinc-900 w-12 text-center">Status</th>
-                <th className="pb-3 px-4 pt-3 font-semibold text-zinc-900">Descrição do Produto</th>
-                <th className="pb-3 px-4 pt-3 font-semibold text-zinc-900">Programação</th>
-                <th className="pb-3 px-4 pt-3 font-semibold text-zinc-900 text-right">Total Pendente</th>
-                <th className="pb-3 px-4 pt-3 font-semibold text-zinc-900 text-right w-32">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {data.map((p, index) => {
-                const producedQty = getProducedQuantity(p.description);
-                const isFullyProduced = producedQty >= p.totalQuantity;
-                const remainingQty = Math.max(0, p.totalQuantity - producedQty);
-                const schedule = getSchedule(p.description);
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-4 px-1">
+          {data.map((p, index) => {
+            const producedQty = getProducedQuantity(p.description);
+            const isFullyProduced = producedQty >= p.totalQuantity;
+            const remainingQty = Math.max(0, p.totalQuantity - producedQty);
+            const schedule = getSchedule(p.description);
 
-                return (
-                  <tr 
-                    key={index} 
-                    className={cn(
-                      "group hover:bg-zinc-50 transition-colors",
-                      isFullyProduced && "bg-emerald-50/30 grayscale-[0.5]"
-                    )}
-                  >
-                    <td className="py-4 px-4 text-center">
-                      <div 
+            return (
+              <div 
+                key={index} 
+                className={cn(
+                  "group bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-all flex flex-col cursor-pointer relative",
+                  isFullyProduced ? "border-emerald-100 bg-emerald-50/10 grayscale-[0.3]" : "border-zinc-200 hover:border-blue-100"
+                )}
+                onClick={() => onSelectProduct(p.description)}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex gap-3 items-start pr-8">
+                     <div 
                         className={cn(
-                          "w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer",
+                          "w-5 h-5 mt-0.5 rounded border flex shrink-0 items-center justify-center transition-all cursor-pointer",
                           isFullyProduced 
                             ? "bg-emerald-500 border-emerald-500 text-white" 
                             : "border-zinc-300 bg-white group-hover:border-blue-400"
                         )}
-                        onClick={() => onSelectProduct(p.description)}
+                        onClick={(e) => { e.stopPropagation(); onSelectProduct(p.description); }}
+                        aria-label={`Status da produção para ${p.description}`}
                       >
                         {isFullyProduced && <CheckCircle2 size={14} strokeWidth={3} />}
                       </div>
-                    </td>
-                    <td 
-                      className={cn(
-                        "py-4 px-4 font-medium transition-all cursor-pointer text-zinc-900",
-                        isFullyProduced && "text-zinc-400 line-through"
-                      )} 
-                      onClick={() => onSelectProduct(p.description)}
-                    >
-                      <div className="flex flex-col">
-                        <span>{p.description}</span>
-                        {schedule?.notes && (
-                          <div className="flex items-center gap-1 mt-1 text-[10px] text-amber-600 font-medium italic">
-                            <MessageSquare size={10} />
-                            {schedule.notes}
-                          </div>
-                        )}
-                        {isFullyProduced && <span className="mt-1 w-fit text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded uppercase">Concluído</span>}
+                      <div>
+                        <h3 className={cn(
+                            "font-bold text-sm leading-tight transition-all uppercase line-clamp-2",
+                            isFullyProduced ? "text-zinc-400 line-through" : "text-zinc-900 group-hover:text-blue-600"
+                          )} 
+                          title={p.description}
+                        >
+                          {p.description}
+                        </h3>
+                        {isFullyProduced && <span className="mt-1 w-fit text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded uppercase block">Concluído</span>}
                       </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      {schedule ? (
+                  </div>
+                  
+                  <div className="absolute top-3 right-3 flex flex-col gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity bg-white/80 backdrop-blur rounded p-0.5">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50"
+                        title="Marcar tudo como pronto"
+                        aria-label={`Marcar tudo como pronto para ${p.description}`}
+                        onClick={(e) => { e.stopPropagation(); onToggleProduct(p.description, p.totalQuantity); }}
+                      >
+                        <CheckSquare size={16} />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-zinc-400 hover:text-blue-600 hover:bg-blue-50"
+                        title="Gerenciar Programação"
+                        aria-label={`Gerenciar Programação para ${p.description}`}
+                        onClick={(e) => { e.stopPropagation(); onOpenSchedule(p.description); }}
+                      >
+                        <Calendar size={16} />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50"
+                        title="Ver detalhes"
+                        aria-label={`Ver detalhes de ${p.description}`}
+                        onClick={(e) => { e.stopPropagation(); onSelectProduct(p.description); }}
+                      >
+                        <ListFilter size={16} />
+                      </Button>
+                  </div>
+                </div>
+
+                <div className="mb-4 pl-8">
+                  {schedule?.notes && (
+                    <div className="flex items-center gap-1 mt-1 text-[10px] text-amber-600 font-medium italic bg-amber-50 rounded px-2 py-1 line-clamp-2" title={schedule.notes}>
+                      <MessageSquare size={10} className="shrink-0" />
+                      {schedule.notes}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-auto grid grid-cols-2 gap-3 pt-3 border-t border-zinc-50 pl-8 items-end">
+                   <div>
+                       <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block mb-1">Programação</span>
+                       {schedule ? (
                         <div 
                           className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                          onClick={() => onOpenSchedule(p.description)}
+                          onClick={(e) => { e.stopPropagation(); onOpenSchedule(p.description); }}
                         >
                           <span className={cn(
-                            "px-2 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1.5",
+                            "px-2 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1.5 w-fit",
                             getBadgeColor(schedule.scheduledAt)
                           )}>
                             <Calendar size={10} />
@@ -128,58 +159,33 @@ export function MonitoringTable({
                       ) : (
                         <div 
                           className="text-[10px] text-zinc-400 font-medium italic hover:text-blue-500 transition-colors cursor-pointer flex items-center gap-1.5"
-                          onClick={() => onOpenSchedule(p.description)}
+                          onClick={(e) => { e.stopPropagation(); onOpenSchedule(p.description); }}
                         >
                           <Calendar size={12} strokeWidth={2.5} />
                           Programar...
                         </div>
                       )}
-                    </td>
-                    <td 
-                      className={cn(
-                        "py-4 px-4 text-right font-bold transition-all",
-                        isFullyProduced ? "text-zinc-300" : "text-blue-600"
-                      )}
-                    >
-                      {remainingQty} <span className="text-[10px] text-zinc-400 font-normal uppercase ml-1">un</span>
+                   </div>
+                   <div className="text-right">
+                       <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block mb-0.5">Pendente</span>
+                       <div 
+                        className={cn(
+                          "font-bold text-lg leading-none transition-all",
+                          isFullyProduced ? "text-zinc-300" : "text-blue-600"
+                        )}
+                      >
+                        {remainingQty} <span className="text-[10px] text-zinc-400 font-normal uppercase ml-0.5">un</span>
+                      </div>
                       {producedQty > 0 && producedQty < p.totalQuantity && (
-                        <div className="text-[10px] text-emerald-500 font-normal">(-{producedQty} marcados)</div>
+                        <div className="text-[10px] text-emerald-500 font-normal mt-0.5" title={`${producedQty} marcados como produzidos`}>
+                           (-{producedQty} marcados)
+                        </div>
                       )}
-                    </td>
-                    <td className="py-4 px-4 text-right space-x-2 whitespace-nowrap">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-zinc-400 hover:text-emerald-600"
-                        title="Marcar tudo como pronto"
-                        onClick={() => onToggleProduct(p.description, p.totalQuantity)}
-                      >
-                        <CheckSquare size={16} />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-zinc-400 hover:text-blue-600"
-                        title="Gerenciar Programação"
-                        onClick={() => onOpenSchedule(p.description)}
-                      >
-                        <Calendar size={16} />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-zinc-400 hover:text-zinc-600"
-                        title="Ver detalhes"
-                        onClick={() => onSelectProduct(p.description)}
-                      >
-                        <ListFilter size={16} />
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                   </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </Card>

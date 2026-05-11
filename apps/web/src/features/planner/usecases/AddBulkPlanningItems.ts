@@ -33,13 +33,6 @@ export async function addBulkPlanningItems(
       await PlanningRepository.bulkUpdate(toUpdate);
     }
 
-    if (scheduledAt) {
-      // Sincroniza cada produto com a agenda de produção
-      await Promise.all(products.map(p => 
-        setProductionSchedule(p.description, scheduledAt, `Planejado via setor (lote): ${sectorName}`)
-      ));
-    }
-
     return Result.ok(undefined);
   } catch (err) {
     return Result.fail(err instanceof Error ? err.message : 'Erro ao adicionar produtos em lote.');

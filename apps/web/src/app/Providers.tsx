@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
+import { QueryClient, QueryCache, MutationCache, QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { BrowserRouter } from 'react-router-dom';
@@ -43,10 +43,24 @@ export const queryClient = new QueryClient({
   },
 });
 
-const persister = createSyncStoragePersister({
-  storage: window.localStorage,
+const getSafeStorage = (): Storage | undefined => {
+  try {
+    const testKey = '__test_storage__';
+    window.localStorage.setItem(testKey, '1');
+    window.localStorage.removeItem(testKey);
+    return window.localStorage;
+  } catch (e) {
+    console.warn('LocalStorage is not available (likely iframe restrictions). Persistance disabled.');
+    return undefined;
+  }
+};
+
+const storage = getSafeStorage();
+
+const persister = storage ? createSyncStoragePersister({
+  storage,
   key: 'PROD_MANAGER_QUERY_CACHE',
-});
+}) : undefined;
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -55,18 +69,28 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <ErrorBoundary>
-      <PersistQueryClientProvider 
-        client={queryClient} 
-        persistOptions={{ 
-          persister,
-          maxAge: 1000 * 60 * 60 * 24,
-        }}
-      >
-        <BrowserRouter>
-          {children}
-        </BrowserRouter>
-        <Toaster position="top-right" richColors closeButton />
-      </PersistQueryClientProvider>
+      {persister ? (
+        <PersistQueryClientProvider 
+          client={queryClient} 
+          persistOptions={{ 
+            persister,
+            maxAge: 1000 * 60 * 60 * 24,
+          }}
+        >
+          <BrowserRouter>
+            {children}
+          </BrowserRouter>
+          <Toaster position="top-right" richColors closeButton />
+        </PersistQueryClientProvider>
+      ) : (
+        // Fallback when persistence is unavailable
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            {children}
+          </BrowserRouter>
+          <Toaster position="top-right" richColors closeButton />
+        </QueryClientProvider>
+      )}
     </ErrorBoundary>
   );
 }

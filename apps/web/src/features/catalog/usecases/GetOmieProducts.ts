@@ -2,7 +2,7 @@ import { Product } from '../../../types/api';
 import { CatalogRepository } from '../infra/CatalogRepository';
 import { findMetaTotal, findArray, normalizeProduct } from '../domain/CatalogNormalizer';
 import { Result } from '../../../lib/Result';
-import { validateOmieProducts } from '../../products/infra/ProductSchemas';
+import { validateOmieProducts } from '../../stocks/infra/ProductSchemas';
 
 /**
  * UseCase: Busca produtos no catálogo do Omie.

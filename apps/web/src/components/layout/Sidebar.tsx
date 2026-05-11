@@ -19,7 +19,7 @@ const navItems = [
   { id: 'dashboard', label: 'Estatísticas', path: '/dashboard', icon: LayoutDashboard },
   { id: 'production-control', label: 'Controle de Produção', path: '/production-control', icon: Activity },
   { id: 'products', label: 'Produtos Omie', path: '/products', icon: Package },
-  { id: 'my-products', label: 'Meus Produtos', path: '/my-products', icon: User },
+  { id: 'stocks', label: 'Estoques', path: '/stocks', icon: Package },
   { id: 'collaborators', label: 'Colaboradores', path: '/collaborators', icon: Users },
   { id: 'sectors', label: 'Setores', path: '/sectors', icon: Layers },
   { id: 'orders', label: 'Ordens Pendentes', path: '/orders', icon: ShoppingCart },

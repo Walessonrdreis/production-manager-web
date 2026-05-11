@@ -11,6 +11,7 @@ import {
 import { Product } from '../../types/api';
 import { useToast } from '../../components/ui/Toast';
 import { PlanningRepository } from '../../features/planner/infra/PlanningRepository';
+import { Result } from '../../lib/Result';
 
 export function usePlanning() {
   const { success, error: toastError } = useToast();
@@ -101,12 +102,33 @@ export function usePlanning() {
     scheduledAt,
     setScheduledAt: async (date: string) => {
       setScheduledAt(date);
-      // Sincroniza todos os itens atuais com a nova data
-      if (items.length > 0) {
-        const { setProductionSchedule } = await import('../../features/production');
-        await Promise.all(items.map(item => 
-          setProductionSchedule(item.description, date, `Re-programado via planejamento (${period})`)
-        ));
+    },
+    generateOrders: async () => {
+      if (items.length === 0) return Result.fail('Nenhum item para gerar ordens.');
+      
+      const { setProductionSchedule } = await import('../../features/production');
+      
+      let hasError = false;
+      for (const item of items) {
+        const result = await setProductionSchedule(
+          item.description,
+          scheduledAt,
+          `Ordem de Produção - ${period}`,
+          item.productCode,
+          item.quantity,
+          item.sectorId,
+          item.sectorName
+        );
+        if (!result.success) hasError = true;
+      }
+      
+      if (hasError) {
+        toastError('Algumas ordens de produção falharam ao ser geradas.');
+        return Result.fail('Falha parcial');
+      } else {
+        success('Ordens de Produção geradas com sucesso!');
+        await clear(); // Limpa o planejamento atual para iniciar um novo
+        return Result.ok(undefined);
       }
     }
   };

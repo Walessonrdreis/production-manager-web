@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ProducedRepository } from '../../features/production/infra/ProducedRepository';
 import { PlanningRepository } from '../../features/planner/infra/PlanningRepository';
 import { GoalsRepository } from '../../features/goals/infra/GoalsRepository';
-import { MyProductsRepository } from '../../features/products/infra/MyProductsRepository';
+import { MyProductsRepository } from '../../features/stocks/infra/MyProductsRepository';
 
 export interface ActivityLogItem {
   id: string;

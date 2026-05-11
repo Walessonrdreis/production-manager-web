@@ -4,7 +4,7 @@ import { ENDPOINTS } from '../../../services/api/endpoints';
 export const CatalogRepository = {
   async getProductsPage(page: number, registros_por_pagina: number = 100) {
     try {
-      const response = await apiClient.get(ENDPOINTS.PRODUCTS.LIST, {
+      const response = await apiClient.get(ENDPOINTS.CATALOG.LIST, {
         params: { 
           pagina: page, 
           registros_por_pagina,
@@ -24,11 +24,11 @@ export const CatalogRepository = {
   },
 
   async syncWithOmie() {
-    const response = await apiClient.post(ENDPOINTS.PRODUCTS.SYNC, {});
+    const response = await apiClient.post(ENDPOINTS.CATALOG.SYNC, {});
     return response;
   },
 
   async syncStockWithOmie() {
-    return apiClient.post(ENDPOINTS.PRODUCTS.SYNC_STOCK, {}, { timeout: 120000 });
+    return apiClient.post(ENDPOINTS.CATALOG.SYNC_STOCK, {}, { timeout: 120000 });
   }
 };

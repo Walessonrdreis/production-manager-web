@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/dashboard/HomePage';
 import { CatalogPage } from '../pages/catalog/CatalogPage';
-import { MyProductsPage } from '../pages/products/MyProductsPage';
+import { StocksPage } from '../pages/stocks/StocksPage';
 import { SectorsPage } from '../pages/sectors/SectorsPage';
 import { OrdersPage } from '../pages/orders/OrdersPage';
 import { PlanningPage } from '../pages/planner/PlanningPage';
@@ -22,7 +22,7 @@ export function AppRouter() {
         <Route path="/dashboard" element={<HomePage />} />
         <Route path="/production-control" element={<MonitoringPage />} />
         <Route path="/products" element={<CatalogPage />} />
-        <Route path="/my-products" element={<MyProductsPage />} />
+        <Route path="/stocks" element={<StocksPage />} />
         {/* <Route path="/customers" element={<CustomersPage />} /> */}
         <Route path="/sectors" element={<SectorsPage />} />
         <Route path="/orders" element={<OrdersPage />} />

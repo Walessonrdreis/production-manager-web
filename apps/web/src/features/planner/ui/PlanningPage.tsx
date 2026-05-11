@@ -1,4 +1,5 @@
-import { useMyProducts } from '../../../hooks/products/useMyProducts';
+import { useStocks } from '../../../hooks/stocks/useStocks';
+import { useOmieProducts } from '../../../hooks/catalog/useOmieProducts';
 import { usePlanning } from '../../../hooks/planner/usePlanning';
 import { useSectors } from '../../../hooks/sectors/useSectors';
 import { useMemo, useState, useEffect } from 'react';
@@ -13,11 +14,13 @@ export function PlanningPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeSectorId, setActiveSectorId] = useState<string>('');
   
-  const { savedProducts } = useMyProducts();
+  const { savedProducts } = useStocks();
+  const { data: allOmieProducts } = useOmieProducts();
+  
   const { 
     items, addItem, addBulkItems, removeItem, 
     period, setPeriod, clearPlanning, updateQuantity,
-    scheduledAt, setScheduledAt 
+    scheduledAt, setScheduledAt, generateOrders 
   } = usePlanning();
   const { data: sectors = [] } = useSectors();
   
@@ -33,8 +36,9 @@ export function PlanningPage() {
   , [sectors, activeSectorId]);
 
   const filteredProducts = useMemo(() => {
-    return PlanningLogic.filterProducts(savedProducts, search);
-  }, [savedProducts, search]);
+    const dataSource = search.length > 0 ? (allOmieProducts.length > 0 ? allOmieProducts : savedProducts) : savedProducts;
+    return PlanningLogic.filterProducts(dataSource, search);
+  }, [savedProducts, allOmieProducts, search]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -57,7 +61,8 @@ export function PlanningPage() {
 
   const handleBulkAdd = async () => {
     if (!activeSector) return;
-    const productsToAdd = savedProducts.filter(p => selectedIds.includes(p.id));
+    const dataSource = search.length > 0 ? (allOmieProducts.length > 0 ? allOmieProducts : savedProducts) : savedProducts;
+    const productsToAdd = dataSource.filter(p => selectedIds.includes(p.id));
     await addBulkItems(productsToAdd, activeSector.id, activeSector.name);
     setSelectedIds([]);
   };
@@ -70,6 +75,7 @@ export function PlanningPage() {
         scheduledAt={scheduledAt}
         onScheduledAtChange={setScheduledAt}
         onClear={clearPlanning}
+        onGenerateOrder={generateOrders}
         items={items}
         sectors={sectors}
         activeSectorId={activeSectorId}

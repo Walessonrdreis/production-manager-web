@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import { SyncOrdersUseCase } from '../../modules/orders/application/use-cases/SyncOrdersUseCase.js';
-import { SyncProductsUseCase } from '../../modules/products/application/use-cases/SyncProductsUseCase.js';
+import { SyncCatalogUseCase } from '../../modules/catalog/application/use-cases/SyncCatalogUseCase.js';
 // import { SyncClientsUseCase } from '../../modules/clients/application/use-cases/SyncClientsUseCase.js';
 
 export function startBackgroundJobs() {
@@ -12,7 +12,7 @@ export function startBackgroundJobs() {
       console.log('[JOBS] Syncing data from Render API to Firebase...');
       await Promise.all([
         SyncOrdersUseCase.execute(1, 200).catch(err => console.error('[JOBS] Error syncing orders:', err.message)),
-        SyncProductsUseCase.execute().catch(err => console.error('[JOBS] Error syncing products:', err.message)),
+        SyncCatalogUseCase.execute().catch(err => console.error('[JOBS] Error syncing catalog:', err.message)),
         // SyncClientsUseCase.execute().catch(err => console.error('[JOBS] Error syncing clients:', err.message))
       ]);
       console.log('[JOBS] Synchronization cycle complete.');
@@ -35,14 +35,14 @@ export function startBackgroundJobs() {
     }
   });
 
-  // Schedule Products sync to run less frequently (e.g., every 15 minutes)
+  // Schedule Catalog sync to run less frequently (e.g., every 15 minutes)
   cron.schedule('*/15 * * * *', async () => {
     try {
-      console.log('[JOBS] Syncing products from Render API to Firebase...');
-      await SyncProductsUseCase.execute();
-      console.log('[JOBS] Products synchronization cycle complete.');
+      console.log('[JOBS] Syncing catalog from Render API to Firebase...');
+      await SyncCatalogUseCase.execute();
+      console.log('[JOBS] Catalog synchronization cycle complete.');
     } catch (err: any) {
-      console.error('[JOBS] Error syncing products:', err.message);
+      console.error('[JOBS] Error syncing catalog:', err.message);
     }
   });
 }

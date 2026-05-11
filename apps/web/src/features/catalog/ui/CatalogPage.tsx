@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useOmieProducts } from '../../../hooks/catalog/useOmieProducts';
 import { useSyncCatalog, useSyncStock } from '../../../hooks/catalog/useSyncCatalog';
 import { useSectors } from '../../../hooks/sectors/useSectors';
-import { useMyProducts } from '../../../hooks/products/useMyProducts';
+import { useStocks } from '../../../hooks/stocks/useStocks';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { useToast } from '../../../components/ui/Toast';
@@ -14,6 +14,9 @@ import { CatalogTable } from './components/CatalogTable';
 import { CatalogPagination } from './components/CatalogPagination';
 import { SelectionBar } from './components/SelectionBar';
 import { CatalogLogic } from '../domain/CatalogLogic';
+import { SaveToStockModal } from './components/SaveToStockModal';
+import { StockType } from '../../../types/api';
+import { Product } from '../../../types/api';
 
 export function CatalogPage() {
   const { addToast } = useToast();
@@ -21,7 +24,7 @@ export function CatalogPage() {
   const syncWithOmie = useSyncCatalog();
   const syncStock = useSyncStock();
   const { data: sectors = [] } = useSectors();
-  const { saveProduct, isSaved, removeProduct } = useMyProducts();
+  const { saveProduct, isSaved, removeProduct } = useStocks();
   
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -31,6 +34,9 @@ export function CatalogPage() {
   const [stockLevel, setStockLevel] = useState<'all' | 'low' | 'normal'>('all');
   const [familyFilter, setFamilyFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  
+  const [isStockModalOpen, setIsStockModalOpen] = useState(false);
+  const [pendingProductsToSave, setPendingProductsToSave] = useState<Product[]>([]);
 
   const filteredProducts = useMemo(() => {
     return CatalogLogic.filterProducts(products, {
@@ -67,15 +73,28 @@ export function CatalogPage() {
     setSelectedIds(newSelected);
   };
 
-  const handleSaveSelected = () => {
+  const requestSaveSingle = (product: Product) => {
+    setPendingProductsToSave([product]);
+    setIsStockModalOpen(true);
+  };
+
+  const requestSaveMultiple = () => {
     const selectedItems = filteredProducts.filter(p => selectedIds.has(p.id));
-    selectedItems.forEach(p => saveProduct(p));
+    setPendingProductsToSave(selectedItems);
+    setIsStockModalOpen(true);
+  };
+
+  const handleConfirmSave = (stockType: StockType) => {
+    pendingProductsToSave.forEach(p => {
+       saveProduct({ ...p, stockType });
+    });
     addToast({
       title: 'Produtos Salvos',
-      message: `${selectedIds.size} produtos adicionados à sua lista pessoal.`,
+      message: `${pendingProductsToSave.length} produtos adicionados ao estoque de ${stockType}.`,
       type: 'success'
     });
     setSelectedIds(new Set());
+    setPendingProductsToSave([]);
   };
 
   if (isError) {
@@ -126,7 +145,7 @@ export function CatalogPage() {
 
         <SelectionBar 
           selectedCount={selectedIds.size}
-          onSave={handleSaveSelected}
+          onSave={requestSaveMultiple}
         />
 
         {isLoading ? (
@@ -141,7 +160,7 @@ export function CatalogPage() {
               onToggleSelect={toggleSelect}
               onToggleSelectAll={toggleSelectAll}
               isSaved={isSaved}
-              onSaveProduct={saveProduct}
+              onSaveProduct={requestSaveSingle}
               onRemoveProduct={removeProduct}
               isLoading={isLoading}
             />
@@ -155,6 +174,14 @@ export function CatalogPage() {
           </>
         )}
       </Card>
+      {isStockModalOpen && (
+        <SaveToStockModal 
+          isOpen={isStockModalOpen}
+          onClose={() => setIsStockModalOpen(false)}
+          onConfirm={handleConfirmSave}
+          count={pendingProductsToSave.length}
+        />
+      )}
     </div>
   );
 }

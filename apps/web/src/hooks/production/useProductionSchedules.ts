@@ -16,8 +16,8 @@ export function useProductionSchedules() {
   });
 
   const mutation = useMutation({
-    mutationFn: ({ description, date, notes }: { description: string; date: string; notes?: string }) => 
-      setProductionSchedule(description, date, notes),
+    mutationFn: ({ description, date, notes, productCode, quantity, sectorId, sectorName }: { description: string; date: string; notes?: string; productCode?: string; quantity?: number; sectorId?: string; sectorName?: string }) => 
+      setProductionSchedule(description, date, notes, productCode, quantity, sectorId, sectorName),
     onSuccess: (res) => {
       if (res.success) {
         queryClient.invalidateQueries({ queryKey: ['production-schedules'] });

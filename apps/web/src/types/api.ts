@@ -9,6 +9,8 @@ export interface DashboardTotalsResponse {
   lastUpdate?: string;
 }
 
+export type StockType = 'Barras' | 'Confeitaria' | 'Chocolate Refinado' | 'Insumos' | 'Limpeza' | 'Maquinários';
+
 export interface Product {
   id: string;
   code: string;
@@ -21,6 +23,7 @@ export interface Product {
   stock: number;
   minStock?: number;
   sectorIds?: string[];
+  stockType?: StockType;
 }
 
 export interface Sector {

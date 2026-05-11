@@ -6,7 +6,10 @@ export async function setProductionSchedule(
   description: string, 
   scheduledAt: string, 
   notes?: string,
-  productCode?: string
+  productCode?: string,
+  quantity?: number,
+  sectorId?: string,
+  sectorName?: string
 ): Promise<Result<void>> {
   try {
     await ScheduleRepository.save({
@@ -14,6 +17,9 @@ export async function setProductionSchedule(
       productCode: productCode || '',
       description,
       scheduledAt,
+      quantity,
+      sectorId,
+      sectorName,
       notes,
       synced: false,
       lastModified: Date.now(),

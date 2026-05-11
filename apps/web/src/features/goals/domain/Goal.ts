@@ -1,13 +1,25 @@
 import { Syncable } from '../../../db/models';
 
 export type GoalPeriod = 'daily' | 'weekly' | 'monthly';
+export type GoalType = 'product' | 'collaborator' | 'sector';
 
 export interface ProductionGoal extends Syncable {
-  productCode: string;         // SKU (Identificador mestre)
-  productDescription: string;  // Denormalizado para performance
+  type?: GoalType; // Tornou opcional por retrocompatibilidade, se não tiver é 'product'
+  
+  // Produto
+  productCode?: string;         
+  productDescription?: string;  
+  
+  // Colaborador
+  collaboratorId?: string;
+  collaboratorName?: string;
+  
+  // Setor
+  sectorId?: string;
+  sectorName?: string;
+
   targetQuantity: number;
   period: GoalPeriod;
-  sectorId?: string;           // Meta específica para um setor (opcional)
   isActive: boolean;
-  updatedAt: string;           // ISO Timestamp
+  updatedAt: string;           
 }

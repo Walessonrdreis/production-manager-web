@@ -25,20 +25,29 @@ export function useGoals() {
       version: 1,
       updatedAt: new Date().toISOString()
     };
+    
+    await queryClient.cancelQueries({ queryKey: ['goals'] });
+    // Optimistic update
+    queryClient.setQueryData(['goals'], (old: any) => [...(old || []), newGoal]);
+
     await GoalsRepository.save(newGoal);
     invalidate();
   };
 
   const saveBulkGoals = async (goalsData: Omit<ProductionGoal, 'id' | 'synced' | 'lastModified' | 'version' | 'updatedAt'>[]) => {
-    const promises = goalsData.map(async goalData => {
-      const newGoal: ProductionGoal = {
-        ...goalData,
-        id: uuidv4(),
-        synced: true,
-        lastModified: Date.now(),
-        version: 1,
-        updatedAt: new Date().toISOString()
-      };
+    const newGoals = goalsData.map(goalData => ({
+      ...goalData,
+      id: uuidv4(),
+      synced: true,
+      lastModified: Date.now(),
+      version: 1,
+      updatedAt: new Date().toISOString()
+    }));
+
+    await queryClient.cancelQueries({ queryKey: ['goals'] });
+    queryClient.setQueryData(['goals'], (old: any) => [...(old || []), ...newGoals]);
+
+    const promises = newGoals.map(async newGoal => {
       await GoalsRepository.save(newGoal);
     });
     
@@ -47,11 +56,23 @@ export function useGoals() {
   };
 
   const updateGoal = async (id: string, updates: Partial<ProductionGoal>) => {
+    await queryClient.cancelQueries({ queryKey: ['goals'] });
+    queryClient.setQueryData(['goals'], (old: any) => {
+      if (!old) return [];
+      return old.map((g: any) => g.id === id ? { ...g, ...updates } : g);
+    });
+
     await GoalsRepository.update(id, updates);
     invalidate();
   };
 
   const deleteGoal = async (id: string) => {
+    await queryClient.cancelQueries({ queryKey: ['goals'] });
+    queryClient.setQueryData(['goals'], (old: any) => {
+      if (!old) return [];
+      return old.filter((g: any) => g.id !== id);
+    });
+
     await GoalsRepository.delete(id);
     invalidate();
   };

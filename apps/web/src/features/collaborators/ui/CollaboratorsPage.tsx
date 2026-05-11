@@ -7,6 +7,7 @@ import { Modal } from '../../../components/ui/Modal';
 import { Input } from '../../../components/ui/Input';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Collaborator } from '../../../types/api';
+import { cn } from '../../../utils/cn';
 
 export function CollaboratorsPage() {
   const { collaborators, isLoading, create, update, remove } = useCollaborators();
@@ -100,84 +101,87 @@ export function CollaboratorsPage() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-500">
-              <tr>
-                <th className="px-6 py-4 font-medium">Nome</th>
-                <th className="px-6 py-4 font-medium">Função/Cargo</th>
-                <th className="px-6 py-4 font-medium">Setor</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {collaborators.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                    Nenhum colaborador cadastrado.
-                  </td>
-                </tr>
-              ) : (
-                collaborators.map((collab) => {
-                  const sector = sectors.find(s => s.id === collab.sectorId);
-                  return (
-                    <tr 
-                      key={collab.id} 
-                      className="hover:bg-gray-50/50 transition-colors cursor-pointer" 
-                      onClick={() => setViewingCollaborator(collab)}
-                    >
-                      <td className="px-6 py-4 font-medium text-gray-900">{collab.name}</td>
-                      <td className="px-6 py-4 text-gray-600">{collab.role || '-'}</td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {sector ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                            {sector.name}
-                          </span>
-                        ) : (
-                          '-'
-                        )}
-                        {collab.category && collab.category !== 'Nenhuma' && (
-                           <span className="inline-flex items-center px-2 py-1 ml-2 rounded text-xs font-medium bg-emerald-50 text-emerald-700">
-                             {collab.category}
-                           </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                          collab.status === 'active' 
-                            ? 'bg-green-50 text-green-700' 
-                            : 'bg-gray-100 text-gray-700'
-                        }`}>
-                          {collab.status === 'active' ? 'Ativo' : 'Inativo'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleOpenModal(collab); }}
-                            className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setDeletingId(collab.id); }}
-                            className="p-1 text-gray-400 hover:text-rose-600 transition-colors"
-                            title="Remover"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-4 px-1">
+        {collaborators.length === 0 ? (
+          <div className="col-span-full text-center py-12 text-zinc-500 italic bg-white rounded-xl border border-dashed border-zinc-200">
+            Nenhum colaborador cadastrado.
+          </div>
+        ) : (
+          collaborators.map((collab) => {
+            const sector = sectors.find(s => s.id === collab.sectorId);
+            return (
+              <div 
+                key={collab.id} 
+                className="group bg-white rounded-xl p-4 shadow-sm border border-zinc-200 hover:shadow-md hover:border-blue-100 transition-all cursor-pointer relative flex flex-col" 
+                onClick={() => setViewingCollaborator(collab)}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex gap-3 items-start pr-8">
+                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                       <span className="text-blue-700 font-bold text-lg">{collab.name.charAt(0).toUpperCase()}</span>
+                     </div>
+                     <div>
+                       <h3 className="font-bold text-zinc-900 group-hover:text-blue-600 transition-colors line-clamp-1" title={collab.name}>
+                         {collab.name}
+                       </h3>
+                       <p className="text-sm text-zinc-500 line-clamp-1">{collab.role || 'Sem cargo definido'}</p>
+                     </div>
+                  </div>
+                  
+                  <div className="absolute top-3 right-3 flex flex-col gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity bg-white/80 backdrop-blur rounded p-0.5">
+                     <button
+                        onClick={(e) => { e.stopPropagation(); handleOpenModal(collab); }}
+                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        title="Editar"
+                        aria-label={`Editar colaborador ${collab.name}`}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeletingId(collab.id); }}
+                        className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Remover"
+                        aria-label={`Remover colaborador ${collab.name}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 mb-4 pl-[3.25rem]">
+                  {sector && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase">
+                      {sector.name}
+                    </span>
+                  )}
+                  {collab.category && collab.category !== 'Nenhuma' && (
+                     <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase">
+                       {collab.category}
+                     </span>
+                  )}
+                </div>
+
+                <div className="mt-auto grid grid-cols-2 gap-3 pt-3 border-t border-zinc-50 pl-[3.25rem] items-end">
+                   <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider mb-1">Status</span>
+                      <span className={cn(
+                        "inline-flex items-center px-2 py-0.5 rounded text-xs font-bold w-fit",
+                        collab.status === 'active' 
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                          : 'bg-zinc-100 text-zinc-600 border border-zinc-200'
+                      )}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5", collab.status === 'active' ? 'bg-emerald-500' : 'bg-zinc-400')} />
+                        {collab.status === 'active' ? 'Ativo' : 'Inativo'}
+                      </span>
+                   </div>
+                   <div className="text-right">
+                       {/* Space for future metrics like 'production efficiency' maybe */}
+                   </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       <Modal

@@ -1,7 +1,7 @@
 import { useSectors } from '../../../hooks/sectors/useSectors';
 import { useCreateSector } from '../../../hooks/sectors/useCreateSector';
 import { useUpdateSector } from '../../../hooks/sectors/useUpdateSector';
-import { useMyProducts } from '../../../hooks/products/useMyProducts';
+import { useStocks } from '../../../hooks/stocks/useStocks';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
@@ -17,7 +17,7 @@ export function SectorsPage() {
   const { data: sectors = [], isLoading: isLoadingSectors, isError, error } = useSectors();
   const createSector = useCreateSector();
   const updateSector = useUpdateSector();
-  const { savedProducts, assignSector, updateProduct, isLoading: isLoadingProducts } = useMyProducts();
+  const { savedProducts, assignSector, updateProduct, isLoading: isLoadingProducts } = useStocks();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMappingModalOpen, setIsMappingModalOpen] = useState(false);
@@ -163,15 +163,15 @@ export function SectorsPage() {
         </div>
       </header>
 
-      <Card className="overflow-hidden border-zinc-200/60 shadow-sm">
-        <div className="p-4 border-b border-zinc-100 bg-zinc-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <Card className="overflow-hidden border-zinc-200/60 shadow-sm p-4 bg-transparent border-0 shadow-none sm:bg-white sm:border sm:border-zinc-200/60 sm:shadow-sm">
+        <div className="sm:border-b sm:border-zinc-100 sm:bg-zinc-50/50 mb-4 sm:mb-0 sm:p-4 sm:-mx-4 sm:-mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
             <Input
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Buscar setores..."
-              className="pl-10 h-10 text-sm"
+              className="pl-10 h-10 text-sm bg-white"
             />
           </div>
           <div className="text-xs font-medium text-zinc-500 bg-white px-3 py-1.5 rounded-full border border-zinc-200 shadow-sm">
@@ -179,107 +179,92 @@ export function SectorsPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-zinc-50 border-b border-zinc-100">
-                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Nome</th>
-                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Descrição</th>
-                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-center">Produtos</th>
-                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-50">
-              {isLoadingSectors ? (
-                [1, 2, 3, 4, 5].map(i => (
-                  <tr key={i} className="animate-pulse">
-                    <td className="px-6 py-4"><div className="h-4 w-12 bg-zinc-100 rounded" /></td>
-                    <td className="px-6 py-4"><div className="h-4 w-32 bg-zinc-100 rounded" /></td>
-                    <td className="px-6 py-4"><div className="h-4 w-48 bg-zinc-100 rounded" /></td>
-                    <td className="px-6 py-4 text-center"><div className="h-4 w-8 bg-zinc-100 rounded mx-auto" /></td>
-                    <td className="px-6 py-4 text-right"><div className="h-8 w-16 bg-zinc-100 rounded ml-auto" /></td>
-                  </tr>
-                ))
-              ) : isError ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center">
-                    <div className="text-red-500 font-medium">
-                      {typeof error === 'string' ? error : (error as any)?.message || 'Erro ao carregar setores'}
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="mt-2 text-blue-600 hover:text-blue-700"
-                      onClick={() => window.location.reload()}
-                    >
-                      Tentar atualizar a página
-                    </Button>
-                  </td>
-                </tr>
-              ) : filteredSectors.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-zinc-500 italic">
-                    Nenhum setor encontrado.
-                  </td>
-                </tr>
-              ) : (
-                filteredSectors.map((s) => (
-                  <tr key={s.id} className="hover:bg-zinc-50/50 transition-colors group">
-                    <td className="px-6 py-4">
-                      <span className="text-[10px] font-mono font-bold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded">
-                        {s.id.slice(-6).toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 cursor-pointer group/name" onClick={() => handleOpenMapping(s)}>
-                        <div className="w-2 h-2 rounded-full bg-blue-500 group-hover/name:scale-125 transition-transform" />
-                        <span className="font-bold text-zinc-900 group-hover/name:text-blue-600 transition-colors">
-                          {s.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-zinc-500 line-clamp-1 max-w-xs">
-                        {s.description || '-'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="px-2.5 py-1 bg-zinc-100 text-zinc-700 rounded-lg text-xs font-bold border border-zinc-200 shadow-sm min-w-[32px] inline-flex justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:p-4">
+          {isLoadingSectors ? (
+            [1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="animate-pulse bg-white border border-zinc-100 rounded-xl p-5">
+                 <div className="h-4 w-12 bg-zinc-100 rounded mb-4" />
+                 <div className="h-4 w-32 bg-zinc-100 rounded mb-2" />
+                 <div className="h-3 w-48 bg-zinc-100 rounded mt-4" />
+              </div>
+            ))
+          ) : isError ? (
+            <div className="col-span-full py-12 text-center bg-white rounded-xl border border-zinc-100">
+              <div className="text-red-500 font-medium">
+                {typeof error === 'string' ? error : (error as any)?.message || 'Erro ao carregar setores'}
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="mt-2 text-blue-600 hover:text-blue-700"
+                onClick={() => window.location.reload()}
+              >
+                Tentar atualizar a página
+              </Button>
+            </div>
+          ) : filteredSectors.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-zinc-500 italic bg-white rounded-xl border border-dashed border-zinc-200">
+              Nenhum setor encontrado.
+            </div>
+          ) : (
+            filteredSectors.map((s) => (
+              <div key={s.id} className="bg-white rounded-xl p-5 shadow-sm border border-zinc-200/60 hover:shadow-md transition-shadow relative group flex flex-col items-start cursor-pointer group/card" onClick={() => handleOpenMapping(s)}>
+                <div className="flex justify-between items-start w-full mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 group-hover/card:scale-125 transition-transform" />
+                    <span className="font-bold text-zinc-900 text-lg group-hover/card:text-blue-600 transition-colors leading-tight">
+                      {s.name}
+                    </span>
+                  </div>
+                  <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg">
+                     <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-zinc-400 hover:text-blue-600 hover:bg-blue-50"
+                        onClick={(e) => { e.stopPropagation(); handleOpenMapping(s); }}
+                        title="Vincular Produtos"
+                        aria-label={`Vincular Produtos no setor ${s.name}`}
+                      >
+                        <LayoutPanelLeft size={14} />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-zinc-400 hover:text-blue-600 hover:bg-blue-50"
+                        onClick={(e) => { e.stopPropagation(); handleOpenModal(s); }}
+                        title="Editar Setor"
+                        aria-label={`Editar setor ${s.name}`}
+                      >
+                        <Edit2 size={14} />
+                      </Button>
+                  </div>
+                </div>
+
+                 <p className="text-sm text-zinc-500 line-clamp-2 min-h-[40px] mb-4 pr-10">
+                   {s.description || 'Sem descrição'}
+                 </p>
+
+                <div className="mt-auto w-full flex justify-between items-end pt-4 border-t border-zinc-50">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block mb-1">ID</span>
+                    <span className="text-[10px] font-mono font-bold text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">
+                      {s.id.slice(-6).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                     <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block mb-1">Produtos</span>
+                     <span className="px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-md text-sm font-bold shadow-none inline-flex justify-center min-w-[32px]">
                         {isLoadingProducts ? (
-                          <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                          <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin my-[3px]" />
                         ) : (
                           sectorProductCounts[s.id] || 0
                         )}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-zinc-400 hover:text-blue-600 hover:bg-blue-50"
-                          onClick={() => handleOpenMapping(s)}
-                          title="Vincular Produtos"
-                        >
-                          <LayoutPanelLeft size={14} />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-zinc-400 hover:text-blue-600 hover:bg-blue-50"
-                          onClick={() => handleOpenModal(s)}
-                          title="Editar Setor"
-                        >
-                          <Edit2 size={14} />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </Card>
 

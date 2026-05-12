@@ -30,15 +30,16 @@ export function parseTrelloCardName(cardName: string): ParsedTrelloCard | null {
     return null;
   }
 
-  // A última parte deve ser a quantidade, terminando em 'un'
+  // A última parte deve ser a quantidade, podendo terminar em 'un', 'um', 'b', 'g' ou 'kg'
   const quantityPart = parts[parts.length - 1];
-  const quantityMatch = quantityPart.match(/^(\d+)\s*un$/i);
+  const quantityMatch = quantityPart.match(/^(\d+(?:[.,]\d+)?)\s*(un|um|b|g|kg)$/i);
   
   if (!quantityMatch) {
     return null;
   }
 
-  const quantity = parseInt(quantityMatch[1], 10);
+  // Se houver vírgula, trocamos por ponto
+  const quantity = parseFloat(quantityMatch[1].replace(',', '.'));
   if (isNaN(quantity)) {
     return null;
   }

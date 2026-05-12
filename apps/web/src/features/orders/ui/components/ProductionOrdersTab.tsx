@@ -65,10 +65,12 @@ export function ProductionOrdersTab() {
     const sector = sectors.find(s => s.id === selectedSectorId);
     const collaborator = collaborators.find(c => c.id === selectedCollaboratorId);
     
-    if (!product || quantity <= 0 || !lote) return;
+    // Allow editing existing order even if a known product is not currently selected
+    if ((!product && !editingOrder) || quantity <= 0 || !lote) return;
 
     try {
       if (!editingOrder) {
+        if (!product) return; // For new ones, a product is mandatory
         await createProductionOrder({
           lote,
           productId: product.id,
@@ -86,9 +88,9 @@ export function ProductionOrdersTab() {
           id: editingOrder.id,
           data: {
             lote,
-            productId: product.id,
-            productCode: product.code as string,
-            productDescription: product.description,
+            productId: product?.id || editingOrder.productId,
+            productCode: product?.code as string || editingOrder.productCode,
+            productDescription: product?.description || editingOrder.productDescription,
             quantity,
             sectorId: sector?.id,
             sectorName: sector?.name,
@@ -181,7 +183,7 @@ export function ProductionOrdersTab() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
                     <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md">
-                      LOTE: {order.lote}
+                      Lote: {order.lote || '-'}
                     </span>
                     <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${statusColors[order.status]}`}>
                       {statusLabels[order.status]}
@@ -190,7 +192,11 @@ export function ProductionOrdersTab() {
                   <h3 className="font-bold text-gray-900 leading-tight">
                     {order.productDescription}
                   </h3>
-                  <p className="text-xs text-gray-400 mt-1 font-mono">[{order.productCode}]</p>
+                  {order.productCode && (
+                    <p className="text-xs text-gray-400 mt-1 font-mono">
+                      Código: {order.productCode}
+                    </p>
+                  )}
                 </div>
               </div>
               
@@ -262,7 +268,11 @@ export function ProductionOrdersTab() {
                   onChange={(e) => setSelectedProductId(e.target.value)}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 >
-                  <option value="">Selecione um produto...</option>
+                  <option value="">
+                    {(!selectedProductId && editingOrder) 
+                      ? `${editingOrder.productCode || 'S/C'} - ${editingOrder.productDescription}`
+                      : 'Selecione um produto...'}
+                  </option>
                   {savedProducts.map(p => (
                     <option key={p.id} value={p.id}>{p.code} - {p.description}</option>
                   ))}
@@ -332,7 +342,7 @@ export function ProductionOrdersTab() {
               </button>
               <button 
                 onClick={handleSaveOrder}
-                disabled={!selectedProductId || quantity <= 0 || !lote}
+                disabled={(!editingOrder && !selectedProductId) || quantity <= 0 || !lote}
                 className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <Save className="w-4 h-4" />

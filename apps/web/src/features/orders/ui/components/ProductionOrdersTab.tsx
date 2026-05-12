@@ -270,11 +270,11 @@ export function ProductionOrdersTab() {
                 >
                   <option value="">
                     {(!selectedProductId && editingOrder) 
-                      ? `${editingOrder.productCode || 'S/C'} - ${editingOrder.productDescription}`
+                      ? editingOrder.productDescription
                       : 'Selecione um produto...'}
                   </option>
                   {savedProducts.map(p => (
-                    <option key={p.id} value={p.id}>{p.code} - {p.description}</option>
+                    <option key={p.id} value={p.id}>{p.description}</option>
                   ))}
                 </select>
               </div>

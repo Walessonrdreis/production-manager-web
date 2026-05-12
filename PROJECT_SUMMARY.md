@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.14.0 (Atualizado em 11/05/2026 - Menu Lateral Recolhível e Controles de Produção)
+**Versão:** v4.15.0 (Atualizado em 12/05/2026 - Trello Webhook MVP)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -7,6 +7,11 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.6. Integração Trello (MVP Webhook v4.15.0)
+- **Integração Backend-Driven (Trello Webhook):** Desenvolvido o MVP da integração do Trello com a aplicação, com processamento via webhook da nossa API do Firebase e criação automática de Ordem de Produção (OP).
+- **Idempotência e Cautela (SRP e ADR-007):** Criado fluxo paralelo na API que converte a requisição do Trello mapeando a string título do card para os dados requeridos e injeta chamando com re-uso total do `CreateProductionOrderUseCase` sem modificar o fluxo de OP Manual já existente.
+- **Testes Positivos:** O MVP (Versão 2 será apenas o merge completo pós aprovação e validação deste MVP) foi construído e verificado localmente usando os endpoints e fluxos do Cloud Firebase atual e já reflete em ambiente real sem comprometer estabilidade.
+
 ### 0.5. Layout e Experiência do Usuário (v4.14.0)
 - **Menu Lateral Recolhível (Collapsible Sidebar):** Refatoramos o `Sidebar` para recolher em telas de computadores, exibindo fundamentalmente os ícones e expandindo suavemente no hover (`group-hover`), preservando o comportamento natural da página sem ocupar espaço horizontal desnecessário. Aplicou-se nova estilização (`shadow-xl`, `whitespace-nowrap`, `opacity-100/0`), reestruturação de textos em div fluida com `overflow-hidden` fixado a 64 unidades que reage de modo coeso quando a barra retrai para `84px`, prevenindo qualquer layout shift ou falha em flexboxes.
 

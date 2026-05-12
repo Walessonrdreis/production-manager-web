@@ -12,6 +12,7 @@ import { productionRouter } from '../modules/production/presentation/http/routes
 import { authRouter } from '../modules/auth/presentation/http/routes.js';
 import { collaboratorsRouter } from '../modules/collaborators/presentation/http/routes.js';
 import { productionOrdersRouter } from '../modules/production-orders/presentation/http/routes.js';
+import { trelloRoutes } from '../modules/trello/presentation/http/routes.js';
 
 export function buildApiRouter(): Router {
   const router = Router();
@@ -29,6 +30,7 @@ export function buildApiRouter(): Router {
   router.use('/auth', authRouter);
   router.use('/collaborators', collaboratorsRouter);
   router.use('/production-orders', productionOrdersRouter);
+  router.use('/trello', trelloRoutes);
 
   // Rotas do módulo proxy
   router.use('/proxy', proxyRouter);

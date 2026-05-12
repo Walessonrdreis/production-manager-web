@@ -186,13 +186,44 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                 <div className="flex items-center space-x-2 text-slate-500 mb-2">
                   <Tag size={16} />
-                  <span className="text-xs font-bold uppercase tracking-wider">Classificação</span>
+                  <span className="text-xs font-bold uppercase tracking-wider">Detalhes do Produto</span>
                 </div>
-                <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-bold">Família</div>
-                    <div className="font-medium text-slate-900 uppercase">{product.family || 'Não informada'}</div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">omieCode</div>
+                    <div className="font-mono text-sm text-slate-900">{product.code || 'Não informado'}</div>
                   </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">sku</div>
+                    <div className="font-mono text-sm text-slate-900">null</div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">description</div>
+                    <div className="font-medium text-sm text-slate-900">{product.description || 'Não informada'}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">family</div>
+                    <div className="font-medium text-sm text-slate-900 uppercase">{product.family || 'null'}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">active</div>
+                    <div className="font-medium text-sm text-slate-900">true</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">stockQuantity</div>
+                    <div className="font-medium text-sm text-slate-900">{product.stock || 0}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">minimumStock</div>
+                    <div className="font-medium text-sm text-slate-900">{product.minStock || 0}</div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">product-structure</div>
+                    <div className="font-mono text-sm text-slate-500 italic">null</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3 pt-3 border-t border-slate-200">
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold text-indigo-600 mb-1">Categoria</div>
                      <select
@@ -208,7 +239,7 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">Identificação Interna</div>
-                    <div className="font-mono text-sm text-slate-900">{product.id}</div>
+                    <div className="font-mono text-xs text-slate-900">{product.id}</div>
                   </div>
                 </div>
               </div>

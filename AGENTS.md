@@ -145,10 +145,10 @@ apps/api/
 
 ## 6. Plano de Refatoração 
 A fim de manter o controle arquitetural e presevar tudo funcioando.
-- Toda e qualquer refatoração deve ser implementada sem quebrar a aplicação, cria o que é necessario seguindo nossos padroes, mantendo o sistema funcionando depois só muda as importações
+- Toda e qualquer refatoração sej frontend ou backend deve ser implementada sem quebrar a aplicação, cria o que é necessario seguindo nossos padroes, mantendo o sistema funcionando depois só muda as importações
 - Não deve ser longa, para evitar erros no processo, trabalhe focando em partes por parte
-Toda etapa relizazada no final dela coloque ATUALIZAÇÂO ENTREGUE em AGENTS.md 6. Plano de Refatoração da API backend, no final de cada Etapa.
-ATUALIZAÇÃO ENTREGUE
+
+ATUALIZAÇÃO ENTREGUE: Refatoração de MyProducts finalizada (Storage migrado de Offline IndexDB para Nuvem via ApiMyProductsRepository respeitando o padrão Backend).
 
 ## 7. Planejamento e Passos para a Migração do Frontend para apps/web
 Passo 1: Criação e Espelhamento Progressivo (Shadowing)

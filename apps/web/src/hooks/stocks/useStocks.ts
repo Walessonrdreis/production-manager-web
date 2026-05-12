@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import { MyProductsRepository } from '../../features/stocks/infra/MyProductsRepository';
+import { ApiMyProductsRepository } from '../../features/stocks/infra/ApiMyProductsRepository';
 import { 
   selectProduct as selectProductUseCase, 
   unselectProduct as unselectProductUseCase,
@@ -18,7 +18,7 @@ export function useStocks() {
   
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['myProducts'],
-    queryFn: () => MyProductsRepository.getAll()
+    queryFn: () => ApiMyProductsRepository.getAll()
   });
 
   const invalidate = useCallback(() => {

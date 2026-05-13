@@ -1,6 +1,7 @@
 import { CreateProductionOrderUseCase } from '../../../production-orders/application/use-cases/CreateProductionOrderUseCase.js';
 import { CreateProductionOrderDTO } from '../../../production-orders/application/dtos/ProductionOrderDTO.js';
 import { parseTrelloCardName } from '../utils/parseTrelloCardName.js';
+import { ProductsAdapter } from '../../../catalog/infrastructure/integrations/catalog.adapter.js';
 
 export interface ProcessTrelloWebhookResult {
   shouldCreateProductionOrder: boolean;
@@ -16,21 +17,68 @@ export class ProcessTrelloWebhookUseCase {
     const decision = this.evaluatePayload(payload);
 
     if (decision.shouldCreateProductionOrder && decision.cardId) {
-      const cardName = payload?.action?.data?.card?.name;
-      const parsedData = parseTrelloCardName(cardName || '');
+      const cardName = payload?.action?.data?.card?.name || '';
+      const cardDesc = payload?.action?.data?.card?.desc || '';
+      
+      let parsedData = parseTrelloCardName(cardName);
+
+      // 1. Resolver Lote se estiver vazio ou '1'
+      if (parsedData && (!parsedData.lot || parsedData.lot === '1' || parsedData.lot === '')) {
+        const descMatch = cardDesc.match(/Lote:\s*(\S+)/i);
+        if (descMatch) {
+          parsedData.lot = descMatch[1];
+        }
+      }
+
+      // Se não parseou nada, tenta ver se pelo menos tem o lote na descrição para criar algo básico
+      if (!parsedData) {
+        const descMatch = cardDesc.match(/Lote:\s*(\S+)/i);
+        if (descMatch) {
+          parsedData = {
+            name: cardName,
+            lot: descMatch[1],
+            quantity: 1
+          };
+        }
+      }
 
       if (parsedData) {
         try {
+          let finalProductDescription = parsedData.name || 'Produto não identificado';
+          let finalProductCode = parsedData.code || '';
+
+          // Se tiver 4 partes, parsedData.code é o código.
+          // Se tiver 3 partes, parsedData.name PODE ser o código ou o nome.
+          // Tentamos resolver pelo que vier em parsedData.code primeiro, depois pelo name como fallback de código.
+          const codeToLookup = parsedData.code || parsedData.name;
+
+          if (codeToLookup) {
+            try {
+              // Busca no catálogo oficial (API Omie via Render)
+              const allProducts = await ProductsAdapter.fetchFromExternalAPI();
+              const foundProduct = allProducts.find((p: any) => 
+                p.code === codeToLookup || p.description?.toLowerCase() === codeToLookup?.toLowerCase()
+              );
+
+              if (foundProduct) {
+                finalProductDescription = foundProduct.description;
+                finalProductCode = foundProduct.code;
+              } else if (parsedData.code) {
+                // Se o código foi explicitamente passado mas não achou no catálogo
+                finalProductDescription = parsedData.name || 'Produto (Código não encontrado)';
+              }
+            } catch (catalogErr) {
+              console.warn('[ProcessTrelloWebhookUseCase] Failed to fetch catalog:', catalogErr);
+            }
+          }
+
           const dto: CreateProductionOrderDTO = {
-            lote: parsedData.lot,
+            lote: parsedData.lot || 'S/L',
             quantity: parsedData.quantity,
-            productCode: parsedData.code || '',
-            productDescription: parsedData.name || 'Produto não identificado pelo Trello',
-            // O sistema base suporta pending, in_progress, completed, cancelled. 
-            // O requisito pede DRAFT / NEEDS_REVIEW. Usando pending para compatibilidade e adicionando nas notas.
+            productCode: finalProductCode,
+            productDescription: finalProductDescription,
             status: 'pending',
-            notes: 'Origem: Trello. ' + (parsedData.code ? '' : 'NEEDS_REVIEW: Produto precisa ser revisado.'),
-            // Ignorando source nativamente pois DTO não possui suporte, mas forçando cast se necessário
+            notes: `Origem: Trello. ${cardDesc ? '\nDescrição: ' + cardDesc : ''}`,
             ...({ source: 'TRELLO', trelloCardId: decision.cardId } as any)
           };
 
@@ -41,7 +89,7 @@ export class ProcessTrelloWebhookUseCase {
           decision.reason += ` | Error creating OP: ${error.message}`;
         }
       } else {
-        decision.reason += ' | Card name could not be parsed, OP not created';
+        decision.reason += ' | Card name/description could not be parsed, OP not created';
       }
     }
 

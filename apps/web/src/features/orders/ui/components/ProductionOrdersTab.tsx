@@ -251,19 +251,21 @@ export function ProductionOrdersTab() {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Lote</label>
+                <label htmlFor="modal-lote" className="block text-sm font-medium text-gray-700 mb-1">Lote</label>
                 <input 
-                  type="text" 
+                  id="modal-lote"
+                  type="number" 
                   value={lote}
                   onChange={(e) => setLote(e.target.value)}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                  placeholder="EX: LOTE-2026"
+                  placeholder="EX: 2026"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Produto</label>
+                <label htmlFor="modal-product" className="block text-sm font-medium text-gray-700 mb-1">Produto</label>
                 <select 
+                  id="modal-product"
                   value={selectedProductId}
                   onChange={(e) => setSelectedProductId(e.target.value)}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -281,8 +283,9 @@ export function ProductionOrdersTab() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                  <label htmlFor="modal-quantity" className="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
                   <input 
+                    id="modal-quantity"
                     type="number" 
                     value={quantity || ''}
                     onChange={(e) => setQuantity(Number(e.target.value))}
@@ -290,8 +293,9 @@ export function ProductionOrdersTab() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label htmlFor="modal-status" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                   <select 
+                    id="modal-status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value as ProductionOrderStatus)}
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -305,8 +309,9 @@ export function ProductionOrdersTab() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Setor Alvo (Opcional)</label>
+                <label htmlFor="modal-sector" className="block text-sm font-medium text-gray-700 mb-1">Setor Alvo (Opcional)</label>
                 <select 
+                  id="modal-sector"
                   value={selectedSectorId}
                   onChange={(e) => setSelectedSectorId(e.target.value)}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -319,8 +324,9 @@ export function ProductionOrdersTab() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Responsável (Opcional)</label>
+                <label htmlFor="modal-collaborator" className="block text-sm font-medium text-gray-700 mb-1">Responsável (Opcional)</label>
                 <select 
+                  id="modal-collaborator"
                   value={selectedCollaboratorId}
                   onChange={(e) => setSelectedCollaboratorId(e.target.value)}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"

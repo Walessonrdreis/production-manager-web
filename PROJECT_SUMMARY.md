@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.15.1 (Atualizado em 12/05/2026 - Trello Webhook Refinement)
+**Versão:** v4.15.2 (Atualizado em 13/05/2026 - Trello Precision Parsing)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -7,11 +7,10 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
-### 0.6. Integração Trello (Refinamento v4.15.1)
-- **Resolução Dinâmica de Produtos:** O webhook do Trello agora tenta resolver o produto do catálogo (`ProductsAdapter`) utilizando o código ou nome extraído do card. Se encontrado, a OP é criada com a descrição oficial do sistema.
-- **Extração de Lote Robusta:** Implementada captura de lote tanto via padrão de nomenclatura no card (`Nome - Lote - Qtd`) quanto via campo `Lote:` na descrição (body) do card.
-- **Acessibilidade e UX no Frontend:** Os inputs de criação de OP manual foram atualizados para incluir labels acessíveis (`id` + `htmlFor`) e o campo de Lote foi alterado para `type="number"`, alinhando a experiência UI com a integridade dos dados.
-- **Idempotência Preservada:** Mantida a chave única `trelloCardId` para evitar duplicidade de ordens.
+### 0.6. Integração Trello (Refinamento v4.15.2)
+- **Consolidação de Lote Numérico:** Campo de Lote agora é estritamente numérico no frontend e tratado como string limpa no backend (sem fallbacks arbitrários como '1').
+- **Resolução de Produto via Catálogo:** Webhook agora realiza consulta ativa ao `ProductsAdapter` (API Omie/Render) para traduzir códigos ou nomes extraídos do Trello em descrições oficiais do sistema.
+- **Acessibilidade Full-Modal:** Implementação de `id` e `htmlFor` em todos os inputs do modal de OP para conformidade com regras de acessibilidade.
 
 ### 0.6. Integração Trello (MVP Webhook v4.15.0)
 - **Integração Backend-Driven (Trello Webhook):** Desenvolvido o MVP da integração do Trello com a aplicação, com processamento via webhook da nossa API do Firebase e criação automática de Ordem de Produção (OP).

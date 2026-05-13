@@ -149,6 +149,7 @@ A fim de manter o controle arquitetural e presevar tudo funcioando.
 - Não deve ser longa, para evitar erros no processo, trabalhe focando em partes por parte
 
 ATUALIZAÇÃO ENTREGUE: Refatoração de MyProducts finalizada (Storage migrado de Offline IndexDB para Nuvem via ApiMyProductsRepository respeitando o padrão Backend).
+ATUALIZAÇÃO ENTREGUE: Integração Trello Webhook v4.15.2 com parsing de lote numérico e resolução via catálogo de produtos.
 
 ## 7. Planejamento e Passos para a Migração do Frontend para apps/web
 Passo 1: Criação e Espelhamento Progressivo (Shadowing)

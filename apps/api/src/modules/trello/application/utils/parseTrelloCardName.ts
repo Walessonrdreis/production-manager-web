@@ -57,7 +57,6 @@ export function parseTrelloCardName(cardName: string): ParsedTrelloCard | null {
     }
 
     // Formato: Nome - Lote - Qtd (3 partes)
-    // Se o usuário usa apenas Código - Lote - Qtd, o 'name' aqui será o código
     return {
       name: parts[0],
       lot: parts[1],

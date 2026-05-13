@@ -44,36 +44,46 @@ export class ProcessTrelloWebhookUseCase {
 
       if (parsedData) {
         try {
+          // 2. Tentar resolver o produto pelo catálogo oficial
           let finalProductDescription = parsedData.name || 'Produto não identificado';
           let finalProductCode = parsedData.code || '';
 
           // Se tiver 4 partes, parsedData.code é o código.
-          // Se tiver 3 partes, parsedData.name PODE ser o código ou o nome.
-          // Tentamos resolver pelo que vier em parsedData.code primeiro, depois pelo name como fallback de código.
+          // Se tiver 3 partes, parsedData.name pode ser o código ou o nome.
           const codeToLookup = parsedData.code || parsedData.name;
 
           if (codeToLookup) {
             try {
               // Busca no catálogo oficial (API Omie via Render)
               const allProducts = await ProductsAdapter.fetchFromExternalAPI();
-              const foundProduct = allProducts.find((p: any) => 
-                p.code === codeToLookup || p.description?.toLowerCase() === codeToLookup?.toLowerCase()
-              );
-
-              if (foundProduct) {
-                finalProductDescription = foundProduct.description;
-                finalProductCode = foundProduct.code;
-              } else if (parsedData.code) {
-                // Se o código foi explicitamente passado mas não achou no catálogo
-                finalProductDescription = parsedData.name || 'Produto (Código não encontrado)';
+              
+              // Tenta primeiro encontrar pelo código exato
+              const foundByCode = allProducts.find((p: any) => p.code === codeToLookup);
+              
+              if (foundByCode) {
+                finalProductDescription = foundByCode.description;
+                finalProductCode = foundByCode.code;
+              } else {
+                // Se não achou pelo código, tenta pelo nome exato (case-insensitive)
+                const foundByName = allProducts.find((p: any) => 
+                  p.description?.toLowerCase() === codeToLookup?.toLowerCase()
+                );
+                
+                if (foundByName) {
+                  finalProductDescription = foundByName.description;
+                  finalProductCode = foundByName.code;
+                } else if (parsedData.code) {
+                  // Se o código foi explicitamente passado (4 partes) mas não achou no catálogo
+                  finalProductDescription = parsedData.name || 'Produto (Código não catalogado)';
+                }
               }
             } catch (catalogErr) {
-              console.warn('[ProcessTrelloWebhookUseCase] Failed to fetch catalog:', catalogErr);
+              console.warn('[ProcessTrelloWebhookUseCase] Failed to fetch catalog resolution:', catalogErr);
             }
           }
 
           const dto: CreateProductionOrderDTO = {
-            lote: parsedData.lot || 'S/L',
+            lote: parsedData.lot || '',
             quantity: parsedData.quantity,
             productCode: finalProductCode,
             productDescription: finalProductDescription,

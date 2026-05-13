@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "start": "node dist/server.cjs",
-    "build": "vite build --config apps/web/vite.config.ts && esbuild server.ts --bundle --platform=node --target=node22 --packages=external --outfile=dist/server.cjs",
+    "build": "npx prisma generate --schema=apps/api/prisma/schema.prisma && vite build --config apps/web/vite.config.ts && esbuild server.ts --bundle --platform=node --target=node22 --packages=external --outfile=dist/server.cjs",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "tsc --noEmit",

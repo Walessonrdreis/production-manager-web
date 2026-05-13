@@ -1,25 +1,26 @@
-import { StocksRepository } from '../../infrastructure/db/StocksRepository.js';
+import { PrismaStocksRepository } from '../../infrastructure/db/PrismaStocksRepository.js';
 
 export class GetStocksUseCase {
   static async execute() {
-    return await StocksRepository.getAll();
+    return await PrismaStocksRepository.getAll();
   }
 }
 
 export class GetStockByIdUseCase {
   static async execute(id: string) {
-    return await StocksRepository.getById(id);
+    return await PrismaStocksRepository.getById(id);
   }
 }
 
 export class SaveStockUseCase {
   static async execute(id: string, data: any) {
-    return await StocksRepository.save(id, data);
+    return await PrismaStocksRepository.save(id, data);
   }
 }
 
 export class DeleteStockUseCase {
   static async execute(id: string) {
-    return await StocksRepository.delete(id);
+    return await PrismaStocksRepository.delete(id);
   }
 }
+

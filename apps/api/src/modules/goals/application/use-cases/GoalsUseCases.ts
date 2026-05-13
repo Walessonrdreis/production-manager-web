@@ -1,23 +1,23 @@
-import { FirebaseAdminGoalsRepository } from '../../infrastructure/db/FirebaseAdminGoalsRepository.js';
+import { PrismaAdminGoalsRepository } from '../../infrastructure/db/PrismaAdminGoalsRepository.js';
 
 export class GoalsUseCases {
   static async getAll() {
-    return await FirebaseAdminGoalsRepository.getAll();
+    return await PrismaAdminGoalsRepository.getAll();
   }
 
   static async getById(id: string) {
-    return await FirebaseAdminGoalsRepository.getById(id);
+    return await PrismaAdminGoalsRepository.getById(id);
   }
 
   static async create(data: any) {
-    return await FirebaseAdminGoalsRepository.save(data);
+    return await PrismaAdminGoalsRepository.save(data);
   }
 
   static async update(id: string, data: any) {
-    return await FirebaseAdminGoalsRepository.update(id, data);
+    return await PrismaAdminGoalsRepository.update(id, data);
   }
 
   static async delete(id: string) {
-    return await FirebaseAdminGoalsRepository.delete(id);
+    return await PrismaAdminGoalsRepository.delete(id);
   }
 }

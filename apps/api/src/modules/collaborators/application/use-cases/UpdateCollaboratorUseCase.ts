@@ -1,8 +1,8 @@
-import { FirebaseAdminCollaboratorsRepository } from '../../infrastructure/db/FirebaseAdminCollaboratorsRepository.js';
+import { PrismaAdminCollaboratorsRepository } from '../../infrastructure/db/PrismaAdminCollaboratorsRepository.js';
 
 export class UpdateCollaboratorUseCase {
   static async execute(id: string, data: any) {
-    const updated = await FirebaseAdminCollaboratorsRepository.update(id, data);
+    const updated = await PrismaAdminCollaboratorsRepository.update(id, data);
     return { data: updated };
   }
 }

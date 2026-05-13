@@ -26,48 +26,45 @@ export function parseTrelloCardName(cardName: string): ParsedTrelloCard | null {
   // Separa e limpa os espaços
   const parts = cardName.split('-').map(p => p.trim()).filter(Boolean);
 
-  if (parts.length < 2) {
+  if (parts.length < 3) {
     return null;
   }
 
   // A última parte deve ser a quantidade, podendo terminar em 'un', 'um', 'b', 'g' ou 'kg'
-  const lastPart = parts[parts.length - 1];
-  const quantityMatch = lastPart.match(/^(\d+(?:[.,]\d+)?)\s*(un|um|b|g|kg)$/i);
+  const quantityPart = parts[parts.length - 1];
+  const quantityMatch = quantityPart.match(/^(\d+(?:[.,]\d+)?)\s*(un|um|b|g|kg)$/i);
   
   if (!quantityMatch) {
-    // Se a última parte não for quantidade, talvez o formato esteja incompleto
     return null;
   }
 
+  // Se houver vírgula, trocamos por ponto
   const quantity = parseFloat(quantityMatch[1].replace(',', '.'));
-  if (isNaN(quantity)) return null;
+  if (isNaN(quantity)) {
+    return null;
+  }
 
-  // Se temos pelo menos 3 partes: Nome - Lote - Qtd ou Nome - Código - Lote - Qtd
-  if (parts.length >= 3) {
-    const lastIdx = parts.length - 1;
-    
-    // Formato: Nome - Código - Lote - Qtd (4 partes)
-    if (parts.length === 4) {
-      return {
-        name: parts[0],
-        code: parts[1],
-        lot: parts[2],
-        quantity
-      };
-    }
+  const lot = parts[parts.length - 2];
 
-    // Formato: Nome - Lote - Qtd (3 partes)
+  if (parts.length === 3) {
+    // Pode ser 'nome' ou 'codigo'. Colocamos em 'name' para uso genérico (MVP)
     return {
       name: parts[0],
-      lot: parts[1],
+      lot,
       quantity
     };
   }
 
-  // Se temos apenas 2 partes: Nome - Qtd
+  // Para 4 partes, assumimos que as últimas duas são qty e lot, 
+  // a antepenúltima é o codigo, e o primeiro é o nome.
+  // Se houver mais partes (ex: nome com hífen vazado), juntamos no nome.
+  const code = parts[parts.length - 3];
+  const name = parts.slice(0, parts.length - 3).join(' - ');
+
   return {
-    name: parts[0],
-    lot: '', 
+    name,
+    code,
+    lot,
     quantity
   };
 }

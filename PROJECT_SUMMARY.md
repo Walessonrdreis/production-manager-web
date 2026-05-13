@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.15.2 (Atualizado em 13/05/2026 - Trello Precision Parsing)
+**Versão:** v4.16.0 (Atualizado em 13/05/2026 - Transição Prisma 1-4)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
@@ -7,15 +7,15 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
-### 0.6. Integração Trello (Refinamento v4.15.2)
-- **Consolidação de Lote Numérico:** Campo de Lote agora é estritamente numérico no frontend e tratado como string limpa no backend (sem fallbacks arbitrários como '1').
-- **Resolução de Produto via Catálogo:** Webhook agora realiza consulta ativa ao `ProductsAdapter` (API Omie/Render) para traduzir códigos ou nomes extraídos do Trello em descrições oficiais do sistema.
-- **Acessibilidade Full-Modal:** Implementação de `id` e `htmlFor` em todos os inputs do modal de OP para conformidade com regras de acessibilidade.
-
 ### 0.6. Integração Trello (MVP Webhook v4.15.0)
 - **Integração Backend-Driven (Trello Webhook):** Desenvolvido o MVP da integração do Trello com a aplicação, com processamento via webhook da nossa API do Firebase e criação automática de Ordem de Produção (OP).
 - **Idempotência e Cautela (SRP e ADR-007):** Criado fluxo paralelo na API que converte a requisição do Trello mapeando a string título do card para os dados requeridos e injeta chamando com re-uso total do `CreateProductionOrderUseCase` sem modificar o fluxo de OP Manual já existente.
 - **Testes Positivos:** O MVP (Versão 2 será apenas o merge completo pós aprovação e validação deste MVP) foi construído e verificado localmente usando os endpoints e fluxos do Cloud Firebase atual e já reflete em ambiente real sem comprometer estabilidade.
+
+### 0.4. Transição Firebase para Prisma (v4.16.0 - Em andamento)
+- **Motivação:** Escapar das limitações de cota gratuita (RESOURCE_EXHAUSTED) e amarrações de Vendor Lock-in geradas pelo Firebase.
+- **Implementação (Etapas 1-4):** Integrado o Prisma ORM (`@prisma/client`) à API, configurando um banco local estruturado (em transição para PostgreSQL). Todos os repositórios Firebase Admin (`ProductionOrders`, `Goals`, `Collaborators`, `Stocks`) foram substituídos por implementações `Prisma*` (via Dependency Inversion - DIP), acompanhados por um refinamento rigoroso no `schema.prisma`.
+- **Sincronização Bidirecional Refatorada:** Os UseCases pesados de sincronização (Ordens, Clientes, Catálogo) também foram comutados de `Firebase` para os novos repositórios Prisma, sem impactar as interfaces Typescript existentes. A Etapa 5 (Migração final dos dados restantes) será executada em sequência.
 
 ### 0.5. Layout e Experiência do Usuário (v4.14.0)
 - **Menu Lateral Recolhível (Collapsible Sidebar):** Refatoramos o `Sidebar` para recolher em telas de computadores, exibindo fundamentalmente os ícones e expandindo suavemente no hover (`group-hover`), preservando o comportamento natural da página sem ocupar espaço horizontal desnecessário. Aplicou-se nova estilização (`shadow-xl`, `whitespace-nowrap`, `opacity-100/0`), reestruturação de textos em div fluida com `overflow-hidden` fixado a 64 unidades que reage de modo coeso quando a barra retrai para `84px`, prevenindo qualquer layout shift ou falha em flexboxes.

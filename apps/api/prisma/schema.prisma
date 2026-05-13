@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id
+  name        String
+  code        String?
+  price       Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProductionOrder {
+  id                String   @id
+  lote              String
+  productId         String?
+  productCode       String
+  productDescription String
+  quantity          Int
+  sectorId          String?
+  sectorName        String?
+  collaboratorId    String?
+  collaboratorName  String?
+  status            String
+  startDate         DateTime?
+  endDate           DateTime?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Goal {
+  id            String   @id
+  title         String
+  description   String?
+  targetDate    DateTime
+  status        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Collaborator {
+  id        String   @id
+  name      String
+  role      String?
+  metrics   String?  // Store JSON as string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id        String   @id
+  data      String
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id        String   @id
+  data      String
+  updatedAt DateTime @updatedAt
+}
+
+model Catalog {
+  id        String   @id
+  data      String
+  updatedAt DateTime @updatedAt
+}
+
+model Stock {
+  id        String   @id
+  data      String
+  updatedAt DateTime @updatedAt
+}

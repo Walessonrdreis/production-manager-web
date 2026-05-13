@@ -1,9 +1,9 @@
-import { FirebaseAdminProductionOrderRepository } from '../../infrastructure/db/FirebaseAdminProductionOrderRepository.js';
+import { PrismaProductionOrderRepository } from '../../infrastructure/db/PrismaProductionOrderRepository.js';
 import { UpdateProductionOrderDTO } from '../dtos/ProductionOrderDTO.js';
 
 export class UpdateProductionOrderUseCase {
   static async execute(id: string, data: UpdateProductionOrderDTO) {
-    const repo = new FirebaseAdminProductionOrderRepository();
+    const repo = new PrismaProductionOrderRepository();
     const updatedData = {
       ...data,
       updatedAt: new Date().toISOString(),

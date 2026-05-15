@@ -6,15 +6,23 @@ import { SyncCatalogUseCase } from '../../modules/catalog/application/use-cases/
 export function startBackgroundJobs() {
   console.log('[JOBS] Initializing background jobs...');
 
-  // Sync everything to Firebase
+  // Sync everything sequentially to avoid Rate Limits (429) & cascade 500 errors
   const runAllSyncs = async () => {
     try {
-      console.log('[JOBS] Syncing data from Render API to Firebase...');
-      await Promise.all([
-        SyncOrdersUseCase.execute(1, 200).catch(err => console.error('[JOBS] Error syncing orders:', err.message)),
-        SyncCatalogUseCase.execute().catch(err => console.error('[JOBS] Error syncing catalog:', err.message)),
-        // SyncClientsUseCase.execute().catch(err => console.error('[JOBS] Error syncing clients:', err.message))
-      ]);
+      console.log('[JOBS] Syncing data from Render API to Firebase sequentially...');
+      
+      try {
+        await SyncOrdersUseCase.execute(1, 200);
+      } catch (err: any) {
+        console.error('[JOBS] Error syncing orders:', err.message);
+      }
+      
+      try {
+        await SyncCatalogUseCase.execute();
+      } catch (err: any) {
+        console.error('[JOBS] Error syncing catalog:', err.message);
+      }
+
       console.log('[JOBS] Synchronization cycle complete.');
     } catch (err: any) {
       console.error('[JOBS] Error in synchronization cycle:', err.message);

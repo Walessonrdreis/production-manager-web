@@ -32,6 +32,7 @@ Sempre que houver mudança em:
 
 O agente **DEVE**:
 1. Ler `PROJECT_SUMMARY.md`
+2. Criar o arquivo em Docs/Atualizacoes
 2. Atualizar as seções impactadas
 3. Incrementar versão:
    - `v1.x.x` → ajustes menores

@@ -15,21 +15,18 @@ export class ProductsAdapter {
       
       if (meta && meta.pageSize > 0 && meta.total > meta.pageSize) {
         const totalPages = Math.ceil(meta.total / meta.pageSize);
-        for (let i = 2; i <= totalPages; i += 5) {
-          const chunk = [];
-          for (let j = i; j < i + 5 && j <= totalPages; j++) {
-            chunk.push(externalClient.get(targetUrl, { 
-              params: { page: j, _t: new Date().getTime() },
+        for (let i = 2; i <= totalPages; i++) {
+          try {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Respect rate limits
+            const res = await externalClient.get(targetUrl, { 
+              params: { page: i, _t: new Date().getTime() },
               headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-            }));
-          }
-          const responses = await Promise.allSettled(chunk);
-          for (const res of responses) {
-            if (res.status === 'fulfilled' && res.value.data && res.value.data.data) {
-              allProducts = [...allProducts, ...res.value.data.data];
-            } else if (res.status === 'rejected') {
-              console.warn('[CATALOG API fetchFromExternalAPI] Partial fetch failure:', res.reason?.message);
+            });
+            if (res.data && res.data.data) {
+              allProducts = [...allProducts, ...res.data.data];
             }
+          } catch (err: any) {
+             console.warn('[CATALOG API fetchFromExternalAPI] Partial fetch failure on page', i, ':', err.message);
           }
         }
       }
@@ -73,21 +70,18 @@ export class ProductsAdapter {
       
       if (meta && meta.pageSize > 0 && meta.total > meta.pageSize) {
         const totalPages = Math.ceil(meta.total / meta.pageSize);
-        for (let i = 2; i <= totalPages; i += 5) {
-          const chunk = [];
-          for (let j = i; j < i + 5 && j <= totalPages; j++) {
-            chunk.push(externalClient.get(targetUrl, { 
-              params: { page: j, _t: new Date().getTime() },
+        for (let i = 2; i <= totalPages; i++) {
+          try {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Respect rate limits
+            const res = await externalClient.get(targetUrl, { 
+              params: { page: i, _t: new Date().getTime() },
               headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-            }));
-          }
-          const responses = await Promise.allSettled(chunk);
-          for (const res of responses) {
-            if (res.status === 'fulfilled' && res.value.data && res.value.data.data) {
-              allProducts = [...allProducts, ...res.value.data.data];
-            } else if (res.status === 'rejected') {
-              console.warn('[CATALOG API fetchList] Partial fetch failure:', res.reason?.message);
+            });
+            if (res.data && res.data.data) {
+              allProducts = [...allProducts, ...res.data.data];
             }
+          } catch (err: any) {
+             console.warn('[CATALOG API fetchList] Partial fetch failure on page', i, ':', err.message);
           }
         }
       }

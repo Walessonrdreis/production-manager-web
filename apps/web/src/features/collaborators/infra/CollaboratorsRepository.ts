@@ -1,104 +1,60 @@
 import { Collaborator } from '../../../types/api';
-import { FirebaseCollaboratorsRepository } from './FirebaseCollaboratorsRepository';
 import { apiClient } from '../../../services/api/client';
 import { ENDPOINTS } from '../../../services/api/endpoints';
 
 export const CollaboratorsRepository = {
   async getAll(): Promise<Collaborator[]> {
     try {
-      // Firebase fallback priority
-      try {
-        const cachedResponse = await FirebaseCollaboratorsRepository.getAll();
-        if (cachedResponse.success && cachedResponse.data && cachedResponse.data.length > 0) {
-          return cachedResponse.data as unknown as Collaborator[];
-        }
-      } catch (err) {
-        console.warn('[CollaboratorsRepository] Firebase cache falhou:', err);
+      const response = await apiClient.get(ENDPOINTS.COLLABORATORS.BASE);
+      
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else if (response.data?.data && Array.isArray(response.data.data)) {
+        return response.data.data;
       }
-
-      // API
-      try {
-        const remoteResponse = await apiClient.get(ENDPOINTS.COLLABORATORS.BASE);
-        let apiCollaborators = null;
-        
-        if (Array.isArray(remoteResponse.data)) {
-          apiCollaborators = remoteResponse.data;
-        } else if (remoteResponse.data?.data && Array.isArray(remoteResponse.data.data)) {
-          apiCollaborators = remoteResponse.data.data;
-        }
-
-        if (apiCollaborators) {
-          if (apiCollaborators.length > 0) {
-            FirebaseCollaboratorsRepository.saveMany(apiCollaborators).catch((err: any) => console.log('Warn: Failed to save to firebase', err));
-          }
-          return apiCollaborators;
-        }
-      } catch (err) {
-        console.warn('[CollaboratorsRepository] Falha ao buscar da API', err);
-      }
-
+      
       return [];
     } catch (error) {
-      console.error('[CollaboratorsRepository] Erro ao buscar colaboradores:', error);
+      console.error('[CollaboratorsRepository] Erro ao buscar colaboradores da API:', error);
       throw error;
     }
   },
 
-  async create(collaborator: Omit<Collaborator, 'id'>) {
-    const newId = crypto.randomUUID();
-    const newCollaborator = {
-      ...collaborator,
-      id: newId
-    };
-
+  async create(collaborator: Omit<Collaborator, 'id'>): Promise<Collaborator> {
     try {
-      const remoteResponse = await apiClient.post(ENDPOINTS.COLLABORATORS.BASE, newCollaborator);
-      let created = null;
-      if (remoteResponse.data?.data) {
-        created = remoteResponse.data.data;
-      } else if (remoteResponse.data?.id) {
-        created = remoteResponse.data;
+      const response = await apiClient.post(ENDPOINTS.COLLABORATORS.BASE, collaborator);
+      if (response.data?.data) {
+        return response.data.data;
+      } else if (response.data?.id) {
+        return response.data;
       }
-      
-      if (created) {
-        await FirebaseCollaboratorsRepository.save(created as any);
-        return created;
-      }
-    } catch (error) {
-      console.warn('[CollaboratorsRepository] Falha ao criar na API, salvando localmente:', error);
-    }
-
-    try {
-      await FirebaseCollaboratorsRepository.save(newCollaborator as any);
-      return newCollaborator;
+      throw new Error('Falha ao criar colaborador');
     } catch (error) {
       console.error('[CollaboratorsRepository] Erro ao criar colaborador:', error);
-      return newCollaborator;
+      throw error;
     }
   },
 
-  async update(id: string, collaborator: Partial<Collaborator>) {
+  async update(id: string, collaborator: Partial<Collaborator>): Promise<Partial<Collaborator>> {
     try {
-      await apiClient.put(`${ENDPOINTS.COLLABORATORS.BASE}/${id}`, collaborator).catch(err => {
-        console.warn('[CollaboratorsRepository] Falha ao atualizar na API:', err);
-      });
-      await FirebaseCollaboratorsRepository.update(id, collaborator as any);
+      const response = await apiClient.put(`${ENDPOINTS.COLLABORATORS.BASE}/${id}`, collaborator);
+      if (response.data?.data) {
+        return response.data.data;
+      }
       return { id, ...collaborator };
     } catch (error) {
       console.error('[CollaboratorsRepository] Erro ao atualizar colaborador:', error);
-      return { id, ...collaborator };
+      throw error;
     }
   },
 
-  async delete(id: string) {
+  async delete(id: string): Promise<{ success: boolean }> {
     try {
-      await apiClient.delete(`${ENDPOINTS.COLLABORATORS.BASE}/${id}`).catch(err => {
-        console.warn('[CollaboratorsRepository] Falha ao excluir na API:', err);
-      });
-      await FirebaseCollaboratorsRepository.delete(id);
+      await apiClient.delete(`${ENDPOINTS.COLLABORATORS.BASE}/${id}`);
+      return { success: true };
     } catch (error) {
       console.error('[CollaboratorsRepository] Erro crítico ao excluir colaborador:', error);
+      throw error;
     }
-    return { success: true };
   }
 };

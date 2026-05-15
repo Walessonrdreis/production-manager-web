@@ -3,27 +3,28 @@ import { Result } from '../../../lib/Result';
 import { CustomerSchema, type CustomerInput } from './CustomerSchemas';
 import { apiClient } from '../../../services/api/client';
 import { ENDPOINTS } from '../../../services/api/endpoints';
-import { FirebaseCustomerRepository } from './FirebaseCustomerRepository';
 
 export class CustomersRepository {
   static async getAll(params?: { pageSize?: number; page?: number }): Promise<Result<Customer[]>> {
     try {
-      const response = await FirebaseCustomerRepository.getAll();
-      if (response.success && response.data) {
-         return Result.ok(response.data);
+      const response = await apiClient.get(ENDPOINTS.CUSTOMERS.BASE, { params });
+      let data = response.data?.data || response.data;
+      if (Array.isArray(data)) {
+        return Result.ok(data);
       }
       return Result.ok([]);
     } catch (error) {
-      console.error('[CustomersRepository] Erro ao buscar da API, faling back para local:', error);
+      console.error('[CustomersRepository] Erro ao buscar da API:', error);
       return Result.fail('Erro ao carregar clientes do banco local');
     }
   }
 
   static async getById(id: string): Promise<Result<Customer | undefined>> {
     try {
-      const response = await FirebaseCustomerRepository.getById(id);
-      if (response.success && response.data) {
-        return Result.ok(response.data);
+      const response = await apiClient.get(`${ENDPOINTS.CUSTOMERS.BASE}/${id}`);
+      let data = response.data?.data || response.data;
+      if (data) {
+        return Result.ok(data);
       }
       return Result.ok(undefined);
     } catch (error) {
@@ -34,14 +35,20 @@ export class CustomersRepository {
   static async save(input: CustomerInput): Promise<Result<Customer>> {
     try {
       const validated = CustomerSchema.parse(input);
-      const customer: Customer = {
+      const isEditing = !!validated.id;
+      const url = isEditing ? `${ENDPOINTS.CUSTOMERS.BASE}/${validated.id}` : ENDPOINTS.CUSTOMERS.BASE;
+      const method = isEditing ? 'put' : 'post';
+      
+      const payload = {
         ...validated,
         id: validated.id || crypto.randomUUID(),
         updatedAt: new Date().toISOString()
       };
+      
+      const response = await apiClient[method](url, payload);
+      const data = response.data?.data || response.data || payload;
 
-      await FirebaseCustomerRepository.save(customer);
-      return Result.ok(customer);
+      return Result.ok(data);
     } catch (error) {
       if (error instanceof Error) return Result.fail(error.message);
       return Result.fail('Erro ao salvar cliente');
@@ -50,7 +57,7 @@ export class CustomersRepository {
 
   static async delete(id: string): Promise<Result<void>> {
     try {
-      await FirebaseCustomerRepository.delete(id);
+      await apiClient.delete(`${ENDPOINTS.CUSTOMERS.BASE}/${id}`);
       return Result.success();
     } catch (error) {
       return Result.fail('Erro ao excluir cliente');
@@ -67,7 +74,6 @@ export class CustomersRepository {
         return Result.fail('Falha na resposta do proxy ao sincronizar clientes');
       }
 
-      // Backend now saves to firebase automatically, no need to push here
       console.log('[CustomersRepository] Sincronização Omie de clientes concluída no backend.');
       return Result.success();
     } catch (error) {

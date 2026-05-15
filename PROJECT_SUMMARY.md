@@ -1,19 +1,22 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.16.0 (Atualizado em 13/05/2026 - Transição Prisma 1-4)
+**Versão:** v4.16.2 (Atualizado em 14/05/2026 - Correção no Rastreio de Produtos)
 
 ## 🎯 Objetivo
-Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Arquitetura 100% nativa de nuvem com Google Firebase.
+Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.7. Correção no TrackingLogic do Dashboard (v4.16.2)
+- **Correção no Double Wrapper API:** O arquivo `TrackingLogic.aggregateStage20Totals` no Frontend foi aprimorado para decodificar e processar sem falhas arrays encapsulados mais profundamente (ex: `rawData.data.data`). Isso garante que as rotas de totais devolvidas através dos `UseCases` com `HttpResponseBuilder` da API continuem hidratando perfeitamente a lista visível da página `Controle de Produção` sem a necessidade de interferir ou retroceder a robustez dos Responses Globais do Microserviço.
 ### 0.6. Integração Trello (MVP Webhook v4.15.0)
 - **Integração Backend-Driven (Trello Webhook):** Desenvolvido o MVP da integração do Trello com a aplicação, com processamento via webhook da nossa API do Firebase e criação automática de Ordem de Produção (OP).
 - **Idempotência e Cautela (SRP e ADR-007):** Criado fluxo paralelo na API que converte a requisição do Trello mapeando a string título do card para os dados requeridos e injeta chamando com re-uso total do `CreateProductionOrderUseCase` sem modificar o fluxo de OP Manual já existente.
 - **Testes Positivos:** O MVP (Versão 2 será apenas o merge completo pós aprovação e validação deste MVP) foi construído e verificado localmente usando os endpoints e fluxos do Cloud Firebase atual e já reflete em ambiente real sem comprometer estabilidade.
 
-### 0.4. Transição Firebase para Prisma (v4.16.0 - Em andamento)
-- **Motivação:** Escapar das limitações de cota gratuita (RESOURCE_EXHAUSTED) e amarrações de Vendor Lock-in geradas pelo Firebase.
+### 0.4. Transição Firebase para Prisma (v4.16.1 - Concluído no Frontend)
+- **Remoção do Offline Sync:** Todos os repositórios baseados em cache local e sincronização offline com o **Firebase Firestore** na camada do frontend (`apps/web`) foram completamente deletados. A aplicação Web agora atua 100% de forma direta via `apiClient`.
+- **Implementação Backend Integral:** Com o Prisma e PostgreSQL configurados na API, o fluxo deixou de utilizar a abordagem híbrida (salva redundante e sync offline na UI), assumindo puramente o back-end single source of truth para as coleções `sectors, planning, production, dashboard, goals, customers e collaborators`. Firebase Auth mantido ativo.
 - **Implementação (Etapas 1-4):** Integrado o Prisma ORM (`@prisma/client`) à API, configurando um banco local estruturado (em transição para PostgreSQL). Todos os repositórios Firebase Admin (`ProductionOrders`, `Goals`, `Collaborators`, `Stocks`) foram substituídos por implementações `Prisma*` (via Dependency Inversion - DIP), acompanhados por um refinamento rigoroso no `schema.prisma`.
 - **Sincronização Bidirecional Refatorada:** Os UseCases pesados de sincronização (Ordens, Clientes, Catálogo) também foram comutados de `Firebase` para os novos repositórios Prisma, sem impactar as interfaces Typescript existentes. A Etapa 5 (Migração final dos dados restantes) será executada em sequência.
 

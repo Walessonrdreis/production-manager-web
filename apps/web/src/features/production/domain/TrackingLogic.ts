@@ -19,6 +19,8 @@ export const TrackingLogic = {
       rawProducts = rawData;
     } else if (rawData.data && Array.isArray(rawData.data)) {
       rawProducts = rawData.data;
+    } else if (rawData.data && rawData.data.data && Array.isArray(rawData.data.data)) {
+      rawProducts = rawData.data.data;
     } else if (rawData.registros && Array.isArray(rawData.registros)) {
       rawProducts = rawData.registros;
     } else if (rawData.produtos && Array.isArray(rawData.produtos)) {

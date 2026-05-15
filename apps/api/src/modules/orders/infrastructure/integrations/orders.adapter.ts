@@ -34,6 +34,8 @@ export class OrdersAdapter {
           hasMore = false;
         } else {
           currentPage++;
+          // Add 1s delay to respect rate limit (status 429) upstream
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
       return allOrders;

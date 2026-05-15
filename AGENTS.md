@@ -1,184 +1,397 @@
-# Instruções para Agentes de IA
-Siga rigorosamente se precisar fazer algo que seja imcompativel pergunte
-Este projeto utiliza um arquivo de documentação viva chamado `PROJECT_SUMMARY.md`.
-#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:# Toda pergunta que eu fizer que terminar com ok? não é permitido codar é para responder via chat somente
-#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda pergunta que eu fizer que terminar com verifique! Busque o problema na plicação faz um relatorio crie ou edite um documento em em docs/BUGS com nome objetivo do problema e enel deve conter  a descrição do problema ,  toda atualização comcluida e testada será marcado como PRONTA! no final de cada passo  e apresente no chat sem codar, e agurde minha decisão.
-#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda tod acorreção realizada de um bug ou error deve ser registrada em docs/correcoes/historic_bugs criando um arquivo .md descrever como foi realizado a correção e como evitar.
-#AÇÂO OBRIGATORIA NUNCA ESQUEÇA:#Toda toda implementação deve ser registrada em docs/impprementacoes/historic_imprementations criando um arquivo .md que tenha a descrição de como foi feito e melhorias.
 
-## 1. Regra de Auto-Atualização
-Sempre que houver uma alteração na estrutura de arquivos, na arquitetura técnica ou na lógica de negócio (ex: novos endpoints no proxy, novas regras de dedução, novos hooks de persistência), você DEVE:
-Ler o conteúdo atual de `PROJECT_SUMMARY.md`.
-Atualizar as seções pertinentes com a nova lógica ou infraestrutura.
-Incrementar a versão no cabeçalho seguindo o padrão `v1.x.x` (correções menores) ou `vX.0.0` (mudanças estruturais grandes).
-Data da atualização deve ser a data atual da conversa.
-Isso garante que o proprietário do projeto sempre tenha um guia atualizado para estudo e evolução do sistema.
-##2. Nunna quebrar a aplicação no final da implementação. Os dados que são consumidos de https://production-manager-api.onrender.com/v1 não devem ser 
-removidos, qualquer endpoint, pode ser salvo no banco de dados mas nunca removidos da aplicação, sem confirmação
+## Instruções para Agentes de IA
 
-## 2. Regra de Granularidade (SRP Global) e TDD
-1 Arquivo = 1 Intenção: Se um arquivo faz "Fetch e Normalização", deve ser dividido em dois.
-Nomes Explícitos: Use o padrão `Verbo + Objeto` (ex: `GetSectors.ts`, `NormalizeProduct.ts`).
-Crescimento Orgânico: Se um arquivo ultrapassar a responsabilidade única, fragmente-o imediatamente.
-Sinal de Alerta: Se o teste de um arquivo exige muitos mocks complexos, o arquivo está grande demais.
-Toda nova funcionalidade será feita com TDD sem quebrar a aplicação verificando sempre os logs e corrigindo os erros.
+Este documento define regras obrigatórias, inegociáveis e cumulativas para qualquer Agente de IA que atue neste repositório.
 
-## 2.1. Padrão de UI para Listagens (Tables e Linhas)
-Listagens de dados devem adotar por padrão o visual limpo implementado na listagem de **Metas** (`GoalsManagementPage.tsx` e afins):
-- Linhas (tr): Utilizar `hover:bg-gray-50 transition-colors group` para feedback visual simples.
-- Células (td): Padding folgado com `px-6 py-4`. 
-- Empilhamento de dados: Para poupar colunas horizontais, empilhar informações primárias e secundárias na mesma célula, como `font-medium text-gray-900` e a descrição logo abaixo em `text-sm text-gray-500`.
-- Ações: Centralizar os botões de ação à direita na linha que são revelados apenas no hover (`opacity-0 group-hover:opacity-100 transition-opacity`).
+Qualquer violação destas regras é considerada erro grave de processo.
 
-## 3. Padrão de Resposta do Agente (Protocolo Obrigatório)
-Para toda e qualquer tarefa, o agente deve iniciar a resposta com:
-Citação da ADR/Guia: Indicar quais seções estão sendo respeitadas.
-Classificação da Mudança:
-(a) implementação funcional
-(b) refatoração local (permitida)
-(c) refatoração estrutural ampla (proibida sem autorização)
-Lista de Arquivos: Listar todos os arquivos que serão modificados.
-Bloqueio de Escopo: Se surgir a necessidade de alterar um arquivo fora da lista inicial, o agente deve parar e pedir nova autorização.
+Este projeto utiliza documentação viva.
+Nada é considerado concluído sem documentação adequada.
 
-## 4. Pilares Arquiteturais (Escalabilidade e Segurança)
-Para garantir a saúde do projeto frontend a longo prazo 7 pilares:
-1.Padronização de Retorno (Result Pattern): Camadas de UseCase e Serviço devem retornar `{ success: boolean, data?: T, error?: string }`. Isso força o tratamento explícito de erros e falhas de negócio em todas as camadas.
-Imutabilidade e Pureza de Domínio: Funções em `domain/` devem ser puras. Proibido mutar objetos de entrada; sempre retorne novas instâncias para evitar efeitos colaterais imprevisíveis.
-Validação de Fronteira (Contract-First): Toda entrada de dados (Request API ou Input UI) deve ser validada via Zod na entrada (`infra/` ou `presentation/`). O domínio nunca deve receber dados "sujos".
-Desacoplamento de Infraestrutura (DIP): O domínio não deve conhecer detalhes de persistência ou APIs externas (SQLite, IndexedDB, Omie). Utilize Interfaces/Contratos para definir as dependências do domínio.
-Isolamento de Lógica de Negócio: Nenhuma lógica de cálculo ou decisão deve estar em Componentes (React) ou Controladores (Express). Tudo deve estar centralizado e testado no `domain/` ou `usecases/`.
-Estratégia de Mapeamento (Mappers/Normalizers): Utilize mappers explícitos para converter dados entre camadas (Ex: `Persistence -> Domain` e `Domain -> API`). Evite o vazamento de estruturas externas para o núcleo do sistema.
-Test-Driven Development (TDD): 100% dos arquivos em `domain/` e `usecases/` devem ter testes acompanhando, cobrindo casos de sucesso, erro e limites.
-Documentação Viva e Rastreabilidade: O `PROJECT_SUMMARY.md` é a fonte da verdade técnica. Nenhuma funcionalidade é "Done" sem que sua lógica e contratos estejam documentados proativamente.
+Arquivo central da verdade técnica:
+- PROJECT_SUMMARY.md
 
-## 5. Backend estrutura 
-apps/api/
-├─ dist/
-├─ docs/
-│  ├─ prompts/
-│  ├─ templates/
-│  │  └─ module/
-│  │     ├─ application/
-│  │     │  └─ use-cases/
-│  │     ├─ infrastructure/
-│  │     └─ presentation/
-│  │        └─ http/
-│  └─ typedoc/
-├─ db/
-│  ├─ migrations/
-│  ├─ seeds/
-│  └─ schema/
-├─ scripts/
-│  └─ metrics/
-├─ tests/
-└─ src/
-├─ bootstrap/
-│  ├─ plugins/
-│  │  ├─ error-handler.ts
-│  │  ├─ job-lock.ts
-│  │  ├─ logger.ts
-│  │  └─ database.ts
-│  ├─ app.ts
-│  ├─ routes.ts
-│  └─ server.ts
-│
-├─ config/
-│  ├─ .env
-│  ├─ env.ts
-│  └─ index.ts
-│
-├─ contracts/
-│  └─ example.contract.ts
-│
-├─ infra/
-│  └─ db.ts
-│
-├─ legacy/
-│
-├─ lib/
-│  └─ http.ts
-│
-├─ shared/
-│  ├─ errors/
-│  │  ├─ AppError.ts
-│  │  ├─ domain-errors.ts
-│  │  └─ http-errors.ts
-│  ├─ http/
-│  │  ├─ response.ts
-│  │  └─ validate.ts
-│  ├─ integrations/
-│  │  └─ external/
-│  │     ├─ external.adapter.ts
-│  │     ├─ external.client.ts
-│  │     └─ external.utils.ts
-│  ├─ logger/
-│  │  ├─ index.ts
-│  │  └─ logger.ts
-│  └─ utils/
-│     ├─ backoff.ts
-│     └─ job-lock.ts
-│
-├─ modules/
-│  ├─ name_module/
-│  │  ├─ application/
-│  │  │  ├─ dtos/
-│  │  │  ├─ ports/
-│  │  │  └─ use-cases/
-│  │  ├─ infrastructure/
-│  │  │  ├─ db/
-│  │  │  ├─ integrations/
-│  │  │  └─ jobs/
-│  │  ├─ presentation/
-│  │  │  └─ http/
-│  │  │     ├─ controllers/
-│  │  │     ├─ routes.ts
-│  │  │     └─ schemas.ts
-│  │  └─ index.ts
-│  │
-│  └─ name_module/
-│     ├─ application/
-│     ├─ infrastructure/
-│     ├─ presentation/
-│     └─ index.ts
-│
-└─ server.ts
+## 0. Regra Fundamental de Autoridade
 
-## 6. Plano de Refatoração 
-A fim de manter o controle arquitetural e presevar tudo funcioando.
-- Toda e qualquer refatoração sej frontend ou backend deve ser implementada sem quebrar a aplicação, cria o que é necessario seguindo nossos padroes, mantendo o sistema funcionando depois só muda as importações
-- Não deve ser longa, para evitar erros no processo, trabalhe focando em partes por parte
+Sempre que uma solicitação não for claramente compatível com estas regras, o agente DEVE parar e perguntar.
 
-ATUALIZAÇÃO ENTREGUE: Refatoração de MyProducts finalizada (Storage migrado de Offline IndexDB para Nuvem via ApiMyProductsRepository respeitando o padrão Backend).
+É proibido:
+- Assumir intenção do usuário
+- Improvisar soluções fora do padrão definido
 
-## 7. Planejamento e Passos para a Migração do Frontend para apps/web
-Passo 1: Criação e Espelhamento Progressivo (Shadowing)
-Criar o diretório /apps/web/.
-Copiar (ao invés de mover) as pastas /src e /public e todos os arquivos de configuração do frontend (vite.config.ts, tailwind.config.js, tsconfig.json, index.html, etc.) para /apps/web/.
-Porque é seguro: O sistema atual continuará operando 100% da raiz enquanto o clone é estruturado.
-ATUALIZAÇÃO ENTREGUE
+Princípios:
+- Estabilidade acima de automação
+- Resolver um problema por vez
+- Criar primeiro, integrar depois
 
-Passo 2: Configuração Isolada do Workspace (Ajuste de Caminhos)
-Entrar no recém-criado /apps/web/ e ajustar estritamente dentro dele o vite.config.ts, tsconfig.json e eventuais arquivos específicos (ex: components.json).
-Garantir que os aliases (como @/) apontem corretamente para /apps/web/src.
-Porque é seguro: O Vite antigo na raiz permance inalterado.
-ATUALIZAÇÃO ENTREGUE
+## 1. Regra de Comandos do Usuário (Palavras‑Chave de Controle)
 
-Passo 3: Chaveamento Transparente do Express (API ↔ Vite)
-Ajustar o apps/api/src/bootstrap/server.ts para direcionar o middleware do Vite (em dev) e a varredura (express.static) para o caminho path.join(process.cwd(), 'apps/web').
-Porque é seguro: Se algo der errado na leitura, temos os logs exatos de onde o Express está tentando achar os arquivos, podendo ser rapidamente revertido para a raiz.
-ATUALIZAÇÃO ENTREGUE
+Perguntas que terminarem com "?":
+- É proibido codar
+- Responder somente via chat
+- Nenhum arquivo pode ser criado ou alterado
 
-Passo 4: Virada de Chave (Swapping) nos Scripts no package.json
-Atualizar os scripts no package.json da raiz:
-O comando de build será algo como vite build --config apps/web/vite.config.ts (ou rodar um npm script local se adotarmos package.json próprio no workspace no futuro).
-No Node, faremos o Vite trabalhar tendo /apps/web/ como pasta base de contexto.
-Reiniciar o servidor e testar minuciosamente se o frontend responde, consome o HMR perfeitamente e os Endpoints do Express são chamados corretamente.
-ATUALIZAÇÃO ENTREGUE
+Perguntas que terminarem com "documente!":
+- É proibido codar
+- Investigar o problema na aplicação
+- Criar ou editar documento em docs/BUGS
+- Nome do arquivo deve ser objetivo
+- Descrever problema, causa e passos realizados
+- Marcar cada passo concluído e testado como PRONTA
+- Apresentar o relatório no chat
+- Aguardar decisão explícita do usuário
 
-Passo 5: Clean-up (Limpeza) e Documentação (Ponto de Retorno Seguro)
-Apenas após validarmos que o frontend sobe com sucesso puramente a partir de /apps/web/, nós faremos a remoção (delete) da pasta /src, /public e as de configs de UI que ficaram sobrando na raiz.
-Atualizar os documentos vivos (PROJECT_SUMMARY.md e AGENTS.md) validando as entregas.
-ATUALIZAÇÃO ENTREGUE
+## 2. Regra de Centralização da Documentação (docs/)
+
+O diretório docs/ é a fonte única, obrigatória e oficial de documentação do projeto.
+
+É proibido:
+- Considerar documentação apenas no chat
+- Considerar documentação apenas no código
+- Criar documentação fora de docs/
+
+Toda decisão técnica, correção, implementação ou mudança estrutural
+deve possuir registro em docs/.
+
+## 3. Regra de Governança das Regras de Negócio
+
+As regras de negócio ativas DEVEM estar em:
+- docs/regras_negocio/README.md
+
+Esse arquivo representa a versão vigente das regras.
+
+É obrigatório:
+- Versionar regras em docs/regras_negocio/versoes
+- Nunca alterar versões antigas
+- Manter histórico de mudanças (changelog)
+
+## 4. Regra de Registro de Alterações
+
+Toda alteração no sistema DEVE ser registrada.
+
+Tipos de alteração:
+- Implementação de funcionalidade
+- Correção de bug
+- Ajuste técnico relevante
+
+Cada alteração deve possuir documentação própria,
+permitindo rastreabilidade histórica.
+
+## 5. Regra de Implementações (Responsabilidade Única)
+
+Uma implementação resolve UM único problema.
+
+É obrigatório:
+- Alterar poucos arquivos
+- Não misturar múltiplos objetivos
+- Documentar em docs/implementacoes
+- Versionar incrementalmente (vX.Y.Z)
+- Nunca sobrescrever versões antigas
+
+Sempre que possível, utilizar TDD.
+
+## 6. Regra de Correções de Bugs
+
+Toda correção de bug DEVE ser registrada em:
+- docs/correcoes/historic_bugs
+
+O registro deve conter:
+- Descrição do bug
+- Causa raiz
+- Como foi corrigido
+- Como evitar no futuro
+
+## 7. Regra de Auto‑Atualização da Documentação Viva
+
+Sempre que houver alteração em:
+- Estrutura de arquivos
+- Arquitetura técnica
+- Lógica de negócio
+- Endpoints
+- Integrações externas
+- Webhooks, jobs ou persistência
+
+O agente DEVE:
+- Atualizar PROJECT_SUMMARY.md
+- Incrementar versão corretamente
+- Atualizar a data
+
+Nenhuma funcionalidade é considerada concluída sem isso.
+
+## 8. Regra de Estabilidade Absoluta da Aplicação
+
+É proibido quebrar a aplicação.
+
+É proibido:
+- Remover endpoints existentes sem autorização
+- Alterar contratos de APIs sem validação
+
+Refatorações devem ser:
+- Incrementais
+- Seguras
+- Criando novo antes de substituir o antigo
+
+## 9. Regra de Foco, SRP Global e TDD
+
+Princípios obrigatórios:
+- 1 arquivo = 1 intenção
+- Buscar, normalizar e persistir são responsabilidades distintas
+- Arquivos grandes devem ser fragmentados
+- Evitar mudanças longas e abrangentes
+
+Toda nova funcionalidade deve ser feita com TDD.
+
+## 10. Regra de Padrão de UI para Listagens
+
+Listagens devem seguir padrão visual consistente:
+
+- Feedback visual simples em hover
+- Padding adequado nas células
+- Dados primários e secundários empilhados
+- Ações visíveis apenas no hover
+
+O padrão de referência é a tela de Metas.
+
+## 11. Regra de Protocolo de Resposta do Agente
+
+Toda resposta técnica DEVE iniciar com:
+- Citação da regra ou guia respeitado
+- Classificação da mudança:
+  - Implementação funcional
+  - Refatoração local
+  - Refatoração estrutural (proibida sem autorização)
+- Lista de arquivos afetados
+- Bloqueio de escopo, se aplicável
+
+## 12. Regra de Refatoração Incremental e Segura
+
+Toda refatoração deve:
+- Preservar o funcionamento do sistema
+- Ser feita em partes pequenas
+- Manter compatibilidade durante o processo
+
+Criar antes de trocar.
+Nunca refatorar tudo de uma vez.
+
+## 13. Regra de Migração Controlada do Frontend (apps/web)
+
+O diretório `apps/web` é o local oficial e exclusivo do frontend da aplicação.
+
+Toda a migração do frontend DEVE ocorrer exclusivamente dentro de `apps/web`,
+sem impactar o funcionamento do sistema existente até a conclusão de cada etapa.
+
+### Princípios Obrigatórios
+
+- A migração deve ser progressiva (shadowing).
+- O frontend antigo DEVE continuar funcionando até a virada de chave.
+- Nenhuma etapa pode quebrar o sistema em produção.
+- Cada etapa concluída DEVE ser explicitamente marcada como ATUALIZAÇÃO ENTREGUE.
+
+### Limites Estruturais
+
+- É proibido criar código de frontend fora de `apps/web`.
+- É proibido mover arquivos diretamente do frontend antigo para `apps/web`
+  sem cópia e validação prévia.
+- É proibido criar estruturas paralelas ou atalhos fora do padrão definido.
+
+### Relação com a Estrutura Canônica
+
+A migração do frontend DEVE respeitar integralmente a
+Regra 14 (Estrutura Canônica do Projeto),
+conforme definido em `docs/Estrutura_Projeto.md`.
+
+Nenhuma variação estrutural é permitida além do que está documentado.
+
+### Documentação Obrigatória
+
+- Cada etapa da migração DEVE ser documentada.
+- O `PROJECT_SUMMARY.md` DEVE ser atualizado ao final de cada etapa.
+- O `AGENTS.md` DEVE refletir o status atualizado da migração.
+
+Qualquer necessidade de mudança estrutural não prevista
+DEVE interromper o processo e solicitar autorização explícita.
+
+## 14. Regra de Estrutura Canônica do Projeto
+
+A estrutura oficial do projeto é definida exclusivamente em
+`docs/Estrutura_Projeto.md`.
+
+Esse arquivo é a fonte única de verdade sobre:
+- Organização de diretórios
+- Padrão de módulos
+- Limites estruturais
+- Áreas extensíveis e áreas proibidas
+
+É expressamente proibido:
+- Inferir estrutura fora do que está documentado
+- Criar pastas, módulos ou camadas não previstas
+- Alterar a organização estrutural do projeto
+
+Qualquer necessidade de mudança estrutural
+DEVE ser solicitada explicitamente antes da execução.
+
+Todas as regras que envolvem implementação, refatoração
+ou migração DEVEM respeitar esta regra.
+
+## 15. Regra de Refatoração Controlada da API (apps/api)
+
+O diretório `apps/api` é o local oficial e exclusivo do backend da aplicação.
+
+Qualquer refatoração no backend DEVE preservar integralmente:
+- O comportamento dos endpoints existentes
+- Os contratos de entrada e saída (payloads)
+- Os códigos de resposta HTTP
+- A compatibilidade com consumidores externos
+
+### Princípios Obrigatórios
+
+- Refatorações DEVEM ser incrementais e seguras.
+- Criar o novo antes de substituir o antigo.
+- Nunca refatorar grandes áreas de uma só vez.
+- Cada refatoração deve resolver um problema específico.
+
+### Limites Estruturais
+
+- É proibido alterar a estrutura do backend fora do padrão definido.
+- É proibido mover arquivos entre camadas sem necessidade explícita.
+- É proibido reorganizar módulos existentes durante refatorações locais.
+- É proibido remover endpoints, rotas ou integrações ativas.
+
+### Relação com a Estrutura Canônica
+
+Toda refatoração da API DEVE respeitar integralmente a
+Regra 14 (Estrutura Canônica do Projeto),
+conforme definido em `docs/Estrutura_Projeto.md`.
+
+Nenhuma refatoração pode introduzir variação estrutural
+não documentada ou não autorizada.
+
+### Testes e Validação
+
+- Logs DEVEM ser verificados durante e após a refatoração.
+- Testes existentes DEVEM continuar passando.
+- Novos testes DEVEM ser adicionados quando necessário.
+- A aplicação DEVE estar funcional ao final do processo.
+
+Qualquer necessidade de refatoração estrutural no backend
+DEVE interromper o processo e solicitar autorização explícita.
+
+## 16. Regra de Observabilidade e Logs (Produção)
+
+O sistema DEVE possuir logs suficientes para garantir observabilidade,
+diagnóstico e rastreabilidade em ambiente de produção.
+
+Logs existem para:
+- Diagnosticar falhas
+- Entender comportamento do sistema
+- Auditar decisões técnicas relevantes
+
+Logs NÃO existem para:
+- Substituir tratamento de erro
+- Mascarar falhas
+- Registrar dados sensíveis
+- Registrar tudo indiscriminadamente
+
+### Níveis de Log
+
+O uso de níveis é obrigatório:
+
+- DEBUG: detalhes técnicos de desenvolvimento (não usar em produção)
+- INFO: eventos relevantes do fluxo normal
+- WARN: situações anômalas recuperáveis
+- ERROR: falhas que afetam o fluxo esperado
+- FATAL: falhas que impedem continuidade do sistema
+
+### O que DEVE ser logado
+
+- Entrada e saída de fluxos críticos
+- Chamadas a integrações externas
+- Decisões de negócio relevantes
+- Erros capturados (com contexto)
+- Tentativas bloqueadas por regra
+- Eventos de idempotência
+- Falhas de validação de contrato
+
+### O que NÃO DEVE ser logado
+
+- Payloads completos de requisição ou resposta
+- Dados sensíveis (tokens, senhas, documentos)
+- Loops, polling ou fluxos de alta frequência
+- Logs redundantes em cada camada
+- Logs apenas para "marcar presença"
+
+### Logs NÃO substituem tratamento de erro
+
+É proibido:
+- Apenas logar e seguir o fluxo silenciosamente
+- Engolir erros sem decisão explícita
+- Depender de logs para manter o sistema estável
+
+Todo erro deve:
+- Ser tratado corretamente
+- Ser logado apenas uma vez
+- Retornar comportamento previsível ao consumidor
+
+### Relação com outras regras
+
+- Logs DEVEM respeitar a Regra 6 (Estabilidade Absoluta)
+- Logs DEVEM respeitar a Regra 7 (SRP e Foco)
+- Logs DEVEM respeitar a Regra 14 (Estrutura Canônica)
+- Logs DEVEM existir tanto em apps/api quanto em integrações externas
+
+### Regra de Ouro
+
+Se um erro só pode ser entendido olhando logs,
+então o sistema está mal projetado.
+
+Logs ajudam a investigar.
+Eles NÃO corrigem arquitetura ruim.
+
+## 17. Regra de Escopo de Leitura e Levantamento de Regras
+
+O agente NÃO DEVE percorrer, ler ou analisar todo o projeto por padrão.
+
+Toda atuação do agente DEVE ocorrer dentro de um escopo explícito,
+definido pela solicitação do usuário ou pela regra que está sendo aplicada.
+
+### Escopo para Levantamento de Regras de Negócio
+
+Ao listar, revisar ou criar versões das Regras de Negócio, o agente DEVE:
+
+- Basear-se apenas em regras já explicitadas pelo usuário,
+  documentação existente e decisões previamente acordadas.
+- Descrever o comportamento esperado do sistema,
+  não detalhes de implementação.
+- Evitar inferir regras a partir de código, pastas ou padrões técnicos.
+- Tratar regras implícitas como suspeitas,
+  solicitando validação antes de registrá-las.
+
+É proibido:
+- Varrer o código para “descobrir” regras de negócio
+- Inferir regra de negócio a partir de if/else ou validações técnicas
+- Misturar regra técnica com regra de domínio
+- Criar regras novas durante o levantamento da v1
+
+### Escopo Geral de Leitura
+
+Na ausência de instrução contrária, o escopo permitido é:
+- Documentação em `docs/`
+- Regras explicitadas no AGENTS.md
+- Regras explicitadas pelo usuário no chat
+- Arquivos explicitamente mencionados
+
+### Ampliação de Escopo
+
+Se o agente identificar necessidade de ampliar o escopo de leitura,
+DEVE parar e solicitar autorização explícita,
+informando exatamente o que deseja analisar e por quê.
 
 
-Todo Passo relizazada no final dela coloque ATUALIZAÇÂO ENTREGUE em AGENTS.md 7. Planejamento e Passos para a Migração do Frontend para apps/web, no final de cada Etapa.
+
+## Regra Final de Governança
+
+Nenhuma automação vale mais que a estabilidade.
+Nenhuma entrega é válida sem documentação.
+Em caso de dúvida: parar e perguntar.
+
+

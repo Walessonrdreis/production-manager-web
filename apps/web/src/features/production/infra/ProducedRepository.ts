@@ -1,26 +1,36 @@
 import { type ProducedRecord } from '../../../db/models';
-import { FirebaseProductionRepository } from './FirebaseProductionRepository';
 import { v4 as uuidv4 } from 'uuid';
 import { apiClient } from '../../../services/api/client';
 import { ENDPOINTS } from '../../../services/api/endpoints';
 
 export const ProducedRepository = {
-  async getAll() {
+  async getAll(): Promise<ProducedRecord[]> {
     try {
-      const response = await FirebaseProductionRepository.getAll();
-      if (response.success && response.data) {
+      const response = await apiClient.get(ENDPOINTS.PRODUCTION.PRODUCED);
+      if (response.data && response.data.data) {
+        return response.data.data;
+      }
+      if (Array.isArray(response.data)) {
         return response.data;
       }
       return [];
     } catch (error) {
-      console.warn('[ProducedRepository] Modo offline: não foi possível buscar da API.', error);
+      console.error('[ProducedRepository] falha ao buscar produced da API:', error);
       return [];
     }
   },
 
-  async getById(id: string) {
-    const res = await FirebaseProductionRepository.getById(id);
-    return res.data;
+  async getById(id: string): Promise<ProducedRecord | null> {
+    try {
+      const response = await apiClient.get(`${ENDPOINTS.PRODUCTION.PRODUCED}/${id}`);
+      if (response.data && response.data.data) {
+        return response.data.data;
+      }
+      return response.data;
+    } catch (error) {
+      console.error('[ProducedRepository] falha ao buscar item por id:', error);
+      return null;
+    }
   },
 
   async getByDescription(description: string) {
@@ -37,53 +47,39 @@ export const ProducedRepository = {
     };
     
     try {
-      await FirebaseProductionRepository.save(newRecord);
+      await apiClient.post(ENDPOINTS.PRODUCTION.PRODUCED, newRecord);
     } catch (error) {
-      console.warn('[ProducedRepository] Erro ao sincronizar item produzido:', error);
+      console.error('[ProducedRepository] Erro ao sincronizar item produzido:', error);
     }
     return newRecord;
   },
 
   async bulkSave(records: Omit<ProducedRecord, 'updatedAt' | 'synced'>[]): Promise<ProducedRecord[]> {
-    const now = new Date().toISOString();
-    const newRecords: ProducedRecord[] = records.map(r => ({
-      ...r,
-      id: r.id || uuidv4(),
-      synced: true,
-      updatedAt: now,
-    }));
-    
-    try {
-      for (const item of newRecords) {
-        await FirebaseProductionRepository.save(item);
-      }
-    } catch (error) {
-       console.warn('[ProducedRepository] Erro ao sincronizar itens produzidos em massa:', error);
-    }
-    return newRecords;
+    const promises = records.map(r => this.save(r));
+    return await Promise.all(promises);
   },
 
   async bulkDelete(ids: string[]): Promise<void> {
     try {
-       await Promise.all(ids.map(id => {
-         return FirebaseProductionRepository.delete(id);
-       }));
+      await Promise.all(ids.map(id => this.delete(id)));
     } catch (error) {
-       console.warn('[ProducedRepository] Erro ao deletar itens produzidos:', error);
+      console.error('[ProducedRepository] Erro ao deletar itens produzidos:', error);
     }
   },
 
   async markAsSynced(id: string) {
     try {
-      await FirebaseProductionRepository.update(id, { synced: true });
-    } catch (e) {}
+      await apiClient.put(`${ENDPOINTS.PRODUCTION.PRODUCED}/${id}`, { synced: true });
+    } catch (error) {
+      console.error('[ProducedRepository] falha ao marcar como synced:', error);
+    }
   },
 
   async delete(id: string) {
     try {
-      await FirebaseProductionRepository.delete(id);
+      await apiClient.delete(`${ENDPOINTS.PRODUCTION.PRODUCED}/${id}`);
     } catch (error) {
-      console.warn('[ProducedRepository] Erro ao deletar item produzido:', error);
+      console.error('[ProducedRepository] Erro ao deletar item produzido:', error);
     }
   }
 };

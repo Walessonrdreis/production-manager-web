@@ -1,5 +1,5 @@
 import { type Order } from '../../orders/domain/OrderNormalizer';
-import { FirebaseCustomerRepository } from '../infra/FirebaseCustomerRepository';
+import { CustomersRepository } from '../infra/CustomersRepository';
 
 /**
  * Enriquece ordens de serviço com informações da base local de clientes.
@@ -8,8 +8,8 @@ import { FirebaseCustomerRepository } from '../infra/FirebaseCustomerRepository'
  */
 export async function enrichOrdersWithLocalCustomers(orders: Order[]): Promise<Order[]> {
   try {
-    const response = await FirebaseCustomerRepository.getAll();
-    const localCustomers = (response.success && response.data) ? response.data : [];
+    const filterRes = await CustomersRepository.getAll();
+    const localCustomers = (filterRes.success && filterRes.data) ? filterRes.data : [];
     
     // Criar mapa para busca rápida por omieCode
     const customerMap = new Map();

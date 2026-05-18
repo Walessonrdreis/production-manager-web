@@ -13,24 +13,20 @@ interface AuthActions {
 type AuthStore = AuthState & AuthActions & { isLoading: boolean };
 
 export const useAuthStore = create<AuthStore>((set) => {
-  // Initialize listener
-  onAuthStateChanged(auth, (firebaseUser) => {
-    if (firebaseUser) {
-      set({
-        user: {
-          id: firebaseUser.uid,
-          name: firebaseUser.displayName || 'Usuário',
-          email: firebaseUser.email || '',
-          role: 'admin' // default
-        },
-        token: 'firebase-token',
-        isAuthenticated: true,
-        isLoading: false
-      });
-    } else {
-      set({ user: null, token: null, isAuthenticated: false, isLoading: false });
-    }
-  });
+  // Temporary bypass for auth
+  setTimeout(() => {
+    set({
+      user: {
+        id: 'mock-user-123',
+        name: 'Usuário (Bypass)',
+        email: 'mock@example.com',
+        role: 'admin'
+      },
+      token: 'mock-token',
+      isAuthenticated: true,
+      isLoading: false
+    });
+  }, 100);
 
   return {
     user: null,
@@ -40,12 +36,20 @@ export const useAuthStore = create<AuthStore>((set) => {
     setAuth: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
     setLoading: (loading) => set({ isLoading: loading }),
     logout: async () => {
-      await signOut(auth);
       set({ user: null, token: null, isAuthenticated: false });
     },
     login: async () => {
-      const result = await loginWithGoogle();
-      if (!result.success) throw result.error;
+      set({
+        user: {
+          id: 'mock-user-123',
+          name: 'Usuário (Bypass)',
+          email: 'mock@example.com',
+          role: 'admin'
+        },
+        token: 'mock-token',
+        isAuthenticated: true,
+        isLoading: false
+      });
     }
   };
 });

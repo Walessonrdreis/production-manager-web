@@ -4,7 +4,7 @@ import { AppError } from '../../../../shared/errors/AppError.js';
 export class ClientsAdapter {
   static async fetchFromExternalAPI(page: number = 1, pageSize: number = 5000) {
     try {
-      const targetUrl = `https://production-manager-api.onrender.com/v1/clients`;
+      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/clients`;
       let allClients: any[] = [];
       let currentPage = page;
       let hasMore = true;
@@ -38,17 +38,17 @@ export class ClientsAdapter {
       }
       return allClients;
     } catch (err: any) {
-      throw new AppError(`Failed to fetch clients: ${err.message}`, 502);
+      throw new AppError(`Failed to fetch clients: ${err.message}`, err.response?.status || 500);
     }
   }
 
   static async fetchClientsList(params?: any) {
     try {
-      const targetUrl = `https://production-manager-api.onrender.com/v1/clients`;
+      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/clients`;
       const response = await externalClient.get(targetUrl, { params });
       return response.data || [];
     } catch (err: any) {
-      throw new AppError(`Failed to fetch clients list: ${err.message}`, 502);
+      throw new AppError(`Failed to fetch clients list: ${err.message}`, err.response?.status || 500);
     }
   }
 }

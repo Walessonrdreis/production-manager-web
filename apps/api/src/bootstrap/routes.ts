@@ -21,7 +21,7 @@ export function buildApiRouter(): Router {
   router.use('/catalog', catalogRouter);
   router.use('/stocks', stocksRouter);
   router.use('/orders', ordersRouter);
-  // router.use('/clients', clientsRouter);
+  router.use('/clients', clientsRouter);
   router.use('/dashboard', dashboardRouter);
   router.use('/sectors', sectorsRouter);
   router.use('/planning', planningRouter);

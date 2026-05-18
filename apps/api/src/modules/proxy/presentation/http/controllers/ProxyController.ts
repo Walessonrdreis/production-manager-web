@@ -24,7 +24,7 @@ export class ProxyController {
     if (req.url === '/' && req.path === '/') return res.sendStatus(200);
 
     try {
-      const targetUrl = `https://production-manager-api.onrender.com/v1/${targetPath}`;
+      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/${targetPath}`;
       console.log(`[PROXY] ${req.method} ${rawPath}`);
       
       const headers: any = {

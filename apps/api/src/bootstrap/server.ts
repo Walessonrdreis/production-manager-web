@@ -28,18 +28,23 @@ export async function startServer() {
     const vite = await createViteServer({
       root: path.join(process.cwd(), 'apps/web'),
       server: { middlewareMode: true },
-      appType: 'spa',
+      appType: 'custom',
     });
     app.use(vite.middlewares);
 
     // Explicit fallback for client-side routing in dev
-    app.use('*', async (req, res, next) => {
+    app.use(async (req, res, next) => {
+      if (req.method !== 'GET') {
+        return next();
+      }
+      
       // Do not intercept API or static asset paths
       if (req.originalUrl.startsWith('/api') || req.originalUrl.includes('.')) {
         return next();
       }
 
       try {
+        console.log(`[SPA Fallback] Serving index.html for ${req.originalUrl}`);
         const fs = await import('fs');
         const template = fs.readFileSync(path.join(process.cwd(), 'apps/web/index.html'), 'utf-8');
         const html = await vite.transformIndexHtml(req.originalUrl, template);

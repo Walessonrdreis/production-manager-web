@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.17.11 (Atualizado em 18/05/2026 - Correção Mock Prisma e Erro 415)
+**Versão:** v4.17.12 (Atualizado em 18/05/2026 - Correção SPA e Infra Logging)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,10 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.22. Correções de Infraestrutura API e Fallback de Rotas SPA (v4.17.12)
+- **Correção SPA Router ("cannot get /"):** Em ambiente de desenvolvimento, requisições de frontend a rotas não mapeadas na API legavam erros devido a falha no repasse do fallback para SPA com middleware Vite. Configurada rota explícita `app.use('*')` no `server.ts` que delega requisições diretamente para renderizar e hidratar o index.html, garantindo suporte ao React Router DOM a cada recarregamento da página. Rota de prod pareada.
+- **Melhorias de Infra:** Introduzidas de acordo com a Regra 16 de Observabilidade. Foi instalado `helmet` e `cors` no App `apps/api` e embutidos loggers explícitos com os níveis INFO, WARN e ERROR reagindo de acordo com a premissa de capturar tráfego real em `/api`.
+
 ### 0.21. Resolução Constante de Crashes e Erros de Mock no Ambiente Local (v4.17.11)
 - **Correção de Crashes por Ausência de Banco (Erro 500):** O arquivo de configuração `prisma.ts` que instacia o PrismaClient injeta agora um `DeepProxy` estruturado perfeitamente. Antes, quando a variável global `DATABASE_URL` não estava presente, o client retornava uma função lançadora de erro para a propriedade do repositório (Ex: `prisma.producedRecord`), o que gerava um `TypeError` não tratável (ex. `findMany is not a function`) e estourava um Error 500 no console para toda a aplicação React. Com o Mock Dinâmico, métodos como `findMany`, `count`, e `findUnique` retornarão arrays vazios e inteiros nulos nos cenários offline-first como falhas graciosas em vez de matar a inicialização do app.
 - **Correção Stock Refresh (Erro 415):** O disparo de refresh de estoque estava devolvendo o cabeçalho 415 Unsupported Media Type da API remota pois o Axios não injetava cabeçalho de ContentType para verbos `.post` sem parâmetros de payload. Adicionado escopo manual `{ headers: { 'Content-Type': 'application/json' } }` em `catalog.adapter.ts`.

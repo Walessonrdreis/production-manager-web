@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.16.5 (Atualizado em 18/05/2026 - Correção Listagem de Setores)
+**Versão:** v4.17.10 (Atualizado em 18/05/2026 - Histórico Automatizado)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,9 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.20. Automação de Histórico de Produção via Integração (v4.17.10)
+- **Migração para Histórico por Ingestão Externa:** Seguindo a nova regra de negócio, os produtos presentes no `production-control` que forem retirados (ausentes via sync) após atualização da API V1 serão considerados como produzidos. A funcionalidade foi implementada de maneira nativa no backend no arquivo `SyncOrdersUseCase`. Antes de deletar a Ordem obsoleta (excluída do estágio 20 externo), o processo busca seus respectivos produtos internos (`items`) e lança automaticamente no PostgreSQL (`ProducedHistory`) injetando ID, quantidade e datestamp correta. Uma regra idempotente avalia se aquele evento exato não foi finalizado à mão, impossibilitando clonagens históricas.
+
 ### 1.1. Refatoração do Controle de Produção Híbrido (Prisma) (v4.17.0)
 - **Migração do Controle de Produção (Passo 1):** Criados os repositórios Prisma (`PrismaProductionRepository`) e atualizado localmente os USE CASES para fazer o merge com a API externa Render (preservando o double REST) substituindo a antiga lógica do banco local que não estava totalmente integrada ao Prisma na aba de Controle de Produção. Rotas de Save/Update/Delete de Produção agendada e concretizada foram expostas de volta à API interna ligadas nativamente ao PostgreSQL.
 - **Migração do Controle de Produção (Passo 2):** Inclusão de novos UseCases para busca singular detalhada por ID, também permitindo busca híbrida externa caso o ID não pertença ao Prisma, assim as rotas `GET /production/produced/:id` e `GET /production/schedules/:id` atendem transparentemente a renderização frontend.

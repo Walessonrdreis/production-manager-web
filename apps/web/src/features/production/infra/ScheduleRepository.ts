@@ -26,14 +26,18 @@ export const ScheduleRepository = {
        await apiClient.post(ENDPOINTS.PRODUCTION.SCHEDULES, toSave);
     } catch (error) {
       console.error('[ScheduleRepository] Erro ao sincronizar agendamento:', error);
+      throw error;
     }
   },
 
   async delete(id: string): Promise<void> {
     try {
-      await apiClient.delete(`${ENDPOINTS.PRODUCTION.SCHEDULES}/${id}`);
+      await apiClient.delete(`${ENDPOINTS.PRODUCTION.SCHEDULES}/${encodeURIComponent(id)}`, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
     } catch (error) {
       console.error('[ScheduleRepository] Erro ao deletar agendamento:', error);
+      throw error;
     }
   }
 };

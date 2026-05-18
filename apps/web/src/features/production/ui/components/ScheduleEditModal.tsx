@@ -26,8 +26,21 @@ export function ScheduleEditModal({
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
-    if (currentSchedule) {
-      setDate(currentSchedule.scheduledAt);
+    if (currentSchedule && currentSchedule.scheduledAt) {
+      // Handle both YYYY-MM-DD and ISO strings safely to match input type="date"
+      try {
+        const d = new Date(currentSchedule.scheduledAt);
+        if (!isNaN(d.getTime())) {
+          const yyyy = d.getUTCFullYear();
+          const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const dd = String(d.getUTCDate()).padStart(2, '0');
+          setDate(`${yyyy}-${mm}-${dd}`);
+        } else {
+          setDate(currentSchedule.scheduledAt.split('T')[0]);
+        }
+      } catch {
+        setDate(currentSchedule.scheduledAt.split('T')[0]);
+      }
       setNotes(currentSchedule.notes || '');
     } else {
       const now = new Date();

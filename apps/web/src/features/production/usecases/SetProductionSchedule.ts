@@ -12,14 +12,18 @@ export async function setProductionSchedule(
   sectorName?: string
 ): Promise<Result<void>> {
   try {
+    const schedules = await ScheduleRepository.getAll();
+    const existing = schedules.find(s => s.description === description);
+    const id = existing?.id || uuidv4();
+
     await ScheduleRepository.save({
-      id: uuidv4(),
-      productCode: productCode || '',
+      id,
+      productCode: productCode || existing?.productCode || '',
       description,
       scheduledAt,
-      quantity,
-      sectorId,
-      sectorName,
+      quantity: quantity || existing?.quantity,
+      sectorId: sectorId || existing?.sectorId,
+      sectorName: sectorName || existing?.sectorName,
       notes,
       synced: false,
       lastModified: Date.now(),
@@ -31,3 +35,4 @@ export async function setProductionSchedule(
     return Result.fail('Erro ao salvar a programação de produção.');
   }
 }
+

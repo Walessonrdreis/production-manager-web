@@ -34,23 +34,35 @@ export function MonitoringTable({
   };
 
   const formatDate = (dateStr: string) => {
-    const [year, month, day] = dateStr.split("-");
-    return `${day}/${month}/${year}`;
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const year = d.getUTCFullYear();
+      return `${day}/${month}/${year}`;
+    } catch {
+      return dateStr;
+    }
   };
 
-  const getBadgeColor = (date: string) => {
+  const getBadgeColor = (dateStr: string) => {
+    if (!dateStr) return "bg-zinc-100 text-zinc-500";
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setUTCHours(0, 0, 0, 0);
 
-    // Criar data local a partir da string YYYY-MM-DD para comparação justa
-    const [year, month, day] = date.split("-").map(Number);
-    const scheduled = new Date(year, month - 1, day);
-    scheduled.setHours(0, 0, 0, 0);
+    try {
+      const scheduled = new Date(dateStr);
+      scheduled.setUTCHours(0, 0, 0, 0);
 
-    if (scheduled < today) return "bg-red-100 text-red-700 border-red-200";
-    if (scheduled.getTime() === today.getTime())
-      return "bg-amber-100 text-amber-700 border-amber-200";
-    return "bg-blue-100 text-blue-700 border-blue-200";
+      if (scheduled < today) return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/50";
+      if (scheduled.getTime() === today.getTime())
+        return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50";
+      return "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/50";
+    } catch {
+      return "bg-zinc-100 text-zinc-500";
+    }
   };
 
   return (
@@ -175,23 +187,43 @@ export function MonitoringTable({
                       Programação
                     </span>
                     {schedule ? (
-                      <div
-                        className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onOpenSchedule(p.description);
-                        }}
-                      >
-                        <span
-                          className={cn(
-                            "px-2 py-1 rounded-md text-[11px] font-bold border flex items-center gap-1.5 w-max",
-                            getBadgeColor(schedule.scheduledAt),
-                          )}
-                        >
-                          <Calendar size={12} />
-                          {formatDate(schedule.scheduledAt)}
-                        </span>
-                      </div>
+                      (() => {
+                        const getFullDateTime = (dateStr: string) => {
+                          if (!dateStr) return '';
+                          try {
+                            const d = new Date(dateStr);
+                            if (isNaN(d.getTime())) return dateStr;
+                            const day = String(d.getDate()).padStart(2, '0');
+                            const month = String(d.getMonth() + 1).padStart(2, '0');
+                            const year = d.getFullYear();
+                            const hrs = String(d.getHours()).padStart(2, '0');
+                            const mins = String(d.getMinutes()).padStart(2, '0');
+                            return `${day}/${month}/${year} às ${hrs}:${mins}`;
+                          } catch {
+                            return dateStr;
+                          }
+                        };
+
+                        return (
+                          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onOpenSchedule(p.description);
+                            }}
+                            title={`Programado para: ${getFullDateTime(schedule.scheduledAt)}`}
+                          >
+                            <span
+                              className={cn(
+                                "px-2 py-1 rounded-md text-[11px] font-bold border flex items-center gap-1.5 w-max",
+                                getBadgeColor(schedule.scheduledAt),
+                              )}
+                            >
+                              <Calendar size={12} />
+                              {formatDate(schedule.scheduledAt)}
+                            </span>
+                          </div>
+                        );
+                      })()
                     ) : (
                       <div
                         className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium italic hover:text-blue-500 transition-colors cursor-pointer flex items-center gap-1 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded-md w-max"

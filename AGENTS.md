@@ -100,6 +100,7 @@ O registro deve conter:
 - Causa raiz
 - Como foi corrigido
 - Como evitar no futuro
+- Nunca introduzir um "Sucesso Falso
 
 ## 7. Regra de Auto‑Atualização da Documentação Viva
 

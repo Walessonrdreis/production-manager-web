@@ -6,10 +6,3 @@ export class GetStage20TotalsUseCase {
     return { data };
   }
 }
-
-export class GetDashboardProducedUseCase {
-  static async execute() {
-    const data = await DashboardAdapter.fetchProduced();
-    return { data };
-  }
-}

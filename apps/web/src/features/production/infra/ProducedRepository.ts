@@ -22,7 +22,12 @@ export const ProducedRepository = {
 
   async getById(id: string): Promise<ProducedRecord | null> {
     try {
-      const response = await apiClient.get(`${ENDPOINTS.PRODUCTION.PRODUCED}/${id}`);
+      const response = await apiClient.get(`${ENDPOINTS.PRODUCTION.PRODUCED}/${encodeURIComponent(id)}`, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
+      if (response.status === 404) {
+        return null;
+      }
       if (response.data && response.data.data) {
         return response.data.data;
       }
@@ -69,7 +74,7 @@ export const ProducedRepository = {
 
   async markAsSynced(id: string) {
     try {
-      await apiClient.put(`${ENDPOINTS.PRODUCTION.PRODUCED}/${id}`, { synced: true });
+      await apiClient.put(`${ENDPOINTS.PRODUCTION.PRODUCED}/${encodeURIComponent(id)}`, { synced: true });
     } catch (error) {
       console.error('[ProducedRepository] falha ao marcar como synced:', error);
     }
@@ -77,7 +82,9 @@ export const ProducedRepository = {
 
   async delete(id: string) {
     try {
-      await apiClient.delete(`${ENDPOINTS.PRODUCTION.PRODUCED}/${id}`);
+      await apiClient.delete(`${ENDPOINTS.PRODUCTION.PRODUCED}/${encodeURIComponent(id)}`, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
     } catch (error) {
       console.error('[ProducedRepository] Erro ao deletar item produzido:', error);
     }

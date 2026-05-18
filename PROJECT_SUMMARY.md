@@ -7,6 +7,37 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 1.1. Refatoração do Controle de Produção Híbrido (Prisma) (v4.17.0)
+- **Migração do Controle de Produção (Passo 1):** Criados os repositórios Prisma (`PrismaProductionRepository`) e atualizado localmente os USE CASES para fazer o merge com a API externa Render (preservando o double REST) substituindo a antiga lógica do banco local que não estava totalmente integrada ao Prisma na aba de Controle de Produção. Rotas de Save/Update/Delete de Produção agendada e concretizada foram expostas de volta à API interna ligadas nativamente ao PostgreSQL.
+- **Migração do Controle de Produção (Passo 2):** Inclusão de novos UseCases para busca singular detalhada por ID, também permitindo busca híbrida externa caso o ID não pertença ao Prisma, assim as rotas `GET /production/produced/:id` e `GET /production/schedules/:id` atendem transparentemente a renderização frontend.
+
+### 0.12. Correção na Formatação Transacional de Datas (v4.17.2)
+- **Ajuste de Exibição de Data:** Foi corrigido um bug crítico onde datas provenientes do banco Prisma (ISO String) quebraram o cálculo visual do front-end (`Production MonitoringTable`), retornando strings mal formatadas como `19T00:00:00.000Z/05/2026`. Formatações UTC genéricas foram colocadas tanto no painel quanto no InputHTML da Modal.
+
+### 0.19. Ajuste no Tratamento de 404 (Axios Interceptors) (v4.17.9)
+- **Mitigação de Global Toasts:** Operações como verificação prévia (`getById`) ou deledade idempotente devolviam "Erros Críticos na Interface" porque o banco Prisma estrito passou a devolver 404 e o Axios em sua configuração reage aos 4XX rejeitando Promise. A camada HTTP repositória do local do Frontend (`ProducedRepository` e `ScheduleRepository`) agora utiliza a diretiva `validateStatus` do Axios, tratando status 404 como "Resolvidos/Sucesso Idempotente", para que a interface flua perfeitamente sem notificações assustadoras quando um registro não for encontrado propositalmente.
+
+### 0.18. Correção de Mapeamento de ID na Exclusão (v4.17.8)
+- **Ajuste de ID via Frontend:** Como mitigação ao controle estrito de 404 implementado no Prisma, foi resolvido o problema onde o Frontend tentava deletar agendamentos usando a `description` da produção mapeada frouxamente como o `id`. O `RemoveProductionSchedule` foi adaptado para traduzir a descrição e extrair o `uuidv4` autêntico usando a listagem em memória, despachando a chamada `DELETE` adequadamente para o ID no backend, o painel agora apaga efetivamente com status 200.
+
+### 0.17. Remoção de Sucesso Falso na Deleção do Prisma (v4.17.7)
+- **Correção de Retorno no PrismaProductionRepository:** Em observação estrita à nova regra adicionada ao AGENTS.md, os "sucessos falsos" previamente colocados no repositório foram removidos. Agora, quando os métodos `deleteProducedRecord` ou `deleteSchedule` solicitarem a exclusão de um ID inexistente no banco local (lançando `P2025` no Prisma), eles irão estourar explicitamente um erro 404 de "Record not found" por meio do `AppError`, ao invés de prosseguir silenciosamente.
+
+### 0.16. Fixação do Gerenciamento Centralizado de Produção (v4.17.6)
+- **Remoção de Requisições da API Externa para Controle de Produção:** Acatando a regra de negócio definida, a API legada em Render agora é usada estritamente para `Produtos` e `Pedidos`. O recurso de Listagem Híbrida e Deleção Dupla de Produção (Agendada e Concretizada) foram removidos de `ProductionUseCases`. Dados de produção são manipulados 100% de forma local usando o Prisma/PostgreSQL. Removedor o Adapter `production.adapter.ts`.
+
+### 0.15. Correção de Remoção Híbrida de Produção no Backend (v4.17.5)
+- **Delete Simulatêneo Rest-API Externa e Prisma:** Após a supressão do erro 500 do Prisma (em dados exógenos de listagem híbrida híbrida), o delete "silencioso" não executava a ação na API Externa. O item voltava a ser listado pela rota Get após a página atualizar. Foram implementadas as chamadas HTTP `DELETE` na API legada no `ProductionAdapter` resolvendo o problema nos UseCases e apagando de fato o dado online.
+
+### 0.14. Correção de Erro (500) em Deleção Híbrida de Produção (v4.17.4)
+- **Supressão do Erro P2025 do Prisma:** Refatorado o `PrismaProductionRepository` para ignorar pacificamente erros `P2025` ("Record to delete does not exist") nos métodos de `deleteProducedRecord` e `deleteSchedule`. Isso estabiliza a interface quando o usuário manda excluir dados exógenos (que vem somente da API externa mas não constam no PostgreSQL local).
+
+### 0.13. Correção de Fetch de APIs de Produção (v4.17.3)
+- **Correção no Endpoints do Adapter Backend:** A listagem e reversões de Controles de Produção estavam falhando perante um `404` originado na comunicação do Prisma Proxy (`ProductionAdapter`) com a API Externa Renderizada devido à uma URL incorreta (`/admin/produced`). Redirecionado para a correta `/dashboard/produced` e implantado graceful fallback de arrays vazios `[]` para listagens incompletas do legado.
+
+### 0.11. Correção de Encoding em URLs na Produção (v4.17.1)
+- **Correção no Encode de Parâmetros ID:** Resolvido o problema em que IDs textuais de Produção que continham espaços ou símbolos como `%` geravam erros `400 Bad Request` do servidor Nginx. Adicionada a função `encodeURIComponent(id)` nos repositórios front-end para envio seguro de deleções e reversões.
+
 ### 0.10. Correção de Consumo de Sectores e Operações (v4.16.5)
 - **Correção da Listagem de Setores:** A tela de "/sectors" parou de puxar dados da API externa OnRender devido ao retorno duplo envelopado (Double Wrapper JSON). O `SectorsAdapter` do backend foi ajustado para efetivamente planificar as listas devolvendo apenas o Array bruto.
 - **Implementação do CRUD Baseado em Adapter Externo:** Foram implementados os casos de uso de Criação, Deleção e Atualização na API Intermediária conectando as rotas tradicionais aos verbos requeridos na API online Onrender visando manter perfeitamente operante as integrações.

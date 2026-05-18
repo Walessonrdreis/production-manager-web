@@ -6,7 +6,10 @@ import { ENDPOINTS } from '../../../services/api/endpoints';
 export const ProducedRepository = {
   async getAll(): Promise<ProducedRecord[]> {
     try {
-      const response = await apiClient.get(ENDPOINTS.PRODUCTION.PRODUCED);
+      const response = await apiClient.get(ENDPOINTS.PRODUCTION.PRODUCED, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
+      if (response.status === 404) return [];
       if (response.data && response.data.data) {
         return response.data.data;
       }

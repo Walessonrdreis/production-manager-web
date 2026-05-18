@@ -6,7 +6,10 @@ import { ENDPOINTS } from '../../../services/api/endpoints';
 export const PlanningRepository = {
   async getAll(): Promise<PlanningItem[]> {
     try {
-      const response = await apiClient.get(ENDPOINTS.PLANNING.BASE);
+      const response = await apiClient.get(ENDPOINTS.PLANNING.BASE, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
+      if (response.status === 404) return [];
       if (response.data && response.data.data) {
         return response.data.data;
       }
@@ -31,7 +34,9 @@ export const PlanningRepository = {
     };
     
     try {
-      await apiClient.post(ENDPOINTS.PLANNING.BASE, newItem);
+      await apiClient.post(ENDPOINTS.PLANNING.BASE, newItem, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
     } catch (error) {
       console.warn('[PlanningRepository] Erro ao salvar planejamento na API:', error);
     }
@@ -40,7 +45,9 @@ export const PlanningRepository = {
 
   async update(id: string, updates: Partial<PlanningItem>) {
     try {
-      await apiClient.put(`${ENDPOINTS.PLANNING.BASE}/${id}`, updates);
+      await apiClient.put(`${ENDPOINTS.PLANNING.BASE}/${id}`, updates, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
     } catch (error) {
       console.warn('[PlanningRepository] Erro ao atualizar planejamento na API:', error);
     }
@@ -48,7 +55,9 @@ export const PlanningRepository = {
 
   async delete(id: string) {
     try {
-      await apiClient.delete(`${ENDPOINTS.PLANNING.BASE}/${id}`);
+      await apiClient.delete(`${ENDPOINTS.PLANNING.BASE}/${id}`, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
     } catch (error) {
       console.warn('[PlanningRepository] Erro ao deletar planejamento na API:', error);
     }

@@ -6,7 +6,10 @@ import { ENDPOINTS } from '../../../services/api/endpoints';
 export const ScheduleRepository = {
   async getAll(): Promise<ProductionSchedule[]> {
     try {
-      const response = await apiClient.get(ENDPOINTS.PRODUCTION.SCHEDULES);
+      const response = await apiClient.get(ENDPOINTS.PRODUCTION.SCHEDULES, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
+      if (response.status === 404) return [];
       if (response.data && response.data.data) {
         return response.data.data;
       }

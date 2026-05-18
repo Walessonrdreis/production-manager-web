@@ -4,7 +4,10 @@ import { ENDPOINTS } from '../../../services/api/endpoints';
 export const ProductionRepository = {
   async getStage20Totals(): Promise<any> {
     try {
-      const response = await apiClient.get(ENDPOINTS.DASHBOARD.STAGE20_TOTALS);
+      const response = await apiClient.get(ENDPOINTS.DASHBOARD.STAGE20_TOTALS, {
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 404
+      });
+      if (response.status === 404) return { data: [] };
       return response.data; 
     } catch (err) {
       console.error('[ProductionRepository] Falha ao buscar stage20 totals na api', err);

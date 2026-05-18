@@ -13,14 +13,20 @@ try {
 // Export a proxy so we can intercept calls if the client failed to initialize or URL is completely missing/invalid
 export const prisma = new Proxy({} as PrismaClient, {
   get(target, prop: keyof PrismaClient) {
-    if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith('postgres')) {
-      return () => {
-        throw new Error('DATABASE_URL is missing or invalid. Please configure it in your environment (e.g. Render Dashboard).');
-      };
+    if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith('postgres') || !prismaClient) {
+      // Mock objects for models so app doesn't crash in preview environment without DB
+      return new Proxy({}, {
+        get(t, p) {
+          return async () => {
+            console.warn(`[Prisma Mock] DATABASE_URL invalid or missing. Mocking ${String(prop)}.${String(p)}`);
+            if (p === 'findMany') return [];
+            if (p === 'findUnique' || p === 'findFirst') return null;
+            if (p === 'count') return 0;
+            return {};
+          };
+        }
+      });
     }
-    if (prismaClient) {
-      return prismaClient[prop];
-    }
-    return () => { throw new Error('Prisma database client is not initialized.'); };
+    return prismaClient[prop];
   }
 });

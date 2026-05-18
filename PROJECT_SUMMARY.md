@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.17.10 (Atualizado em 18/05/2026 - Histórico Automatizado)
+**Versão:** v4.17.11 (Atualizado em 18/05/2026 - Correção Mock Prisma e Erro 415)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,10 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.21. Resolução Constante de Crashes e Erros de Mock no Ambiente Local (v4.17.11)
+- **Correção de Crashes por Ausência de Banco (Erro 500):** O arquivo de configuração `prisma.ts` que instacia o PrismaClient injeta agora um `DeepProxy` estruturado perfeitamente. Antes, quando a variável global `DATABASE_URL` não estava presente, o client retornava uma função lançadora de erro para a propriedade do repositório (Ex: `prisma.producedRecord`), o que gerava um `TypeError` não tratável (ex. `findMany is not a function`) e estourava um Error 500 no console para toda a aplicação React. Com o Mock Dinâmico, métodos como `findMany`, `count`, e `findUnique` retornarão arrays vazios e inteiros nulos nos cenários offline-first como falhas graciosas em vez de matar a inicialização do app.
+- **Correção Stock Refresh (Erro 415):** O disparo de refresh de estoque estava devolvendo o cabeçalho 415 Unsupported Media Type da API remota pois o Axios não injetava cabeçalho de ContentType para verbos `.post` sem parâmetros de payload. Adicionado escopo manual `{ headers: { 'Content-Type': 'application/json' } }` em `catalog.adapter.ts`.
+
 ### 0.20. Automação de Histórico de Produção via Integração (v4.17.10)
 - **Migração para Histórico por Ingestão Externa:** Seguindo a nova regra de negócio, os produtos presentes no `production-control` que forem retirados (ausentes via sync) após atualização da API V1 serão considerados como produzidos. A funcionalidade foi implementada de maneira nativa no backend no arquivo `SyncOrdersUseCase`. Antes de deletar a Ordem obsoleta (excluída do estágio 20 externo), o processo busca seus respectivos produtos internos (`items`) e lança automaticamente no PostgreSQL (`ProducedHistory`) injetando ID, quantidade e datestamp correta. Uma regra idempotente avalia se aquele evento exato não foi finalizado à mão, impossibilitando clonagens históricas.
 

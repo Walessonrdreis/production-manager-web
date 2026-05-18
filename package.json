@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "tsx server.ts",
-    "start": "npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss && node dist/server.cjs",
+    "start": "npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && node dist/server.cjs",
     "build": "npx prisma generate --schema=apps/api/prisma/schema.prisma && vite build --config apps/web/vite.config.ts && esbuild server.ts --bundle --platform=node --target=node22 --packages=external --outfile=dist/server.cjs",
     "preview": "vite preview",
     "test": "vitest run",

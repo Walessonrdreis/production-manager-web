@@ -31,16 +31,16 @@ export function PlanningSelectedItems({ items, onUpdateQuantity, onRemoveItem, s
   return (
     <Card>
       <div className="mb-4">
-        <h2 className="text-lg font-bold text-slate-900">Resumo por Setor</h2>
-        <p className="text-sm text-slate-500">Confira a distribuição da produção antes de gerar o PDF.</p>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Resumo por Setor</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Confira a distribuição da produção antes de gerar o PDF.</p>
       </div>
 
       <div className="space-y-6">
         {sectorKeys.map((key) => (
           <div key={key} className="space-y-2">
-            <div className="flex items-center gap-2 px-2 py-1 bg-zinc-100 rounded-lg">
-              <Factory size={14} className="text-zinc-500" />
-              <span className="text-[10px] font-black uppercase text-zinc-600 tracking-wider">
+            <div className="flex items-center gap-2 px-2 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
+              <Factory size={14} className="text-zinc-500 dark:text-zinc-400" />
+              <span className="text-[10px] font-black uppercase text-zinc-600 dark:text-zinc-400 tracking-wider">
                 SETOR: {groupedItems[key].name}
               </span>
               <span className="ml-auto text-[10px] font-bold text-zinc-400">
@@ -52,9 +52,9 @@ export function PlanningSelectedItems({ items, onUpdateQuantity, onRemoveItem, s
               {groupedItems[key].items.map((item: any) => (
                 <div key={item.id} className="flex items-center gap-4 p-4 rounded-xl border border-blue-100 bg-blue-50/30">
                   <div className="flex-1 min-w-0">
-                      <div className="font-bold text-slate-900 uppercase text-xs truncate">{item.description}</div>
+                      <div className="font-bold text-slate-900 dark:text-slate-100 uppercase text-xs truncate">{item.description}</div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] text-slate-500 font-mono italic">Cód: {item.code}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono italic">Cód: {item.code}</span>
                         <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">
                           {scheduledAt.split('-').reverse().join('/')}
                         </span>

@@ -6,9 +6,40 @@ export class SectorsAdapter {
     try {
       const targetUrl = `https://production-manager-api.onrender.com/v1/admin/sectors`;
       const response = await externalClient.get(targetUrl);
-      return response.data || [];
+      const data = response.data;
+      return data?.sectors || data?.data?.sectors || data?.data || data || [];
     } catch (err: any) {
       throw new AppError(`Failed to fetch sectors: ${err.message}`, 502);
+    }
+  }
+
+  static async createSector(sector: any) {
+    try {
+      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/sectors`;
+      const response = await externalClient.post(targetUrl, sector);
+      return response.data?.data || response.data?.sector || response.data;
+    } catch (err: any) {
+      throw new AppError(`Failed to create sector: ${err.message}`, 502);
+    }
+  }
+
+  static async updateSector(id: string, sector: any) {
+    try {
+      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/sectors/${id}`;
+      const response = await externalClient.put(targetUrl, sector);
+      return response.data?.data || response.data?.sector || response.data;
+    } catch (err: any) {
+      throw new AppError(`Failed to update sector: ${err.message}`, 502);
+    }
+  }
+
+  static async deleteSector(id: string) {
+    try {
+      const targetUrl = `https://production-manager-api.onrender.com/v1/admin/sectors/${id}`;
+      await externalClient.delete(targetUrl);
+      return { success: true };
+    } catch (err: any) {
+      throw new AppError(`Failed to delete sector: ${err.message}`, 502);
     }
   }
 }

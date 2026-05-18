@@ -6,7 +6,7 @@ interface PageContainerProps {
 
 export function PageContainer({ children }: PageContainerProps) {
   return (
-    <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-8 bg-slate-50">
+    <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-8 bg-slate-50 dark:bg-slate-950">
       <div className="max-w-7xl mx-auto">
         {children}
       </div>

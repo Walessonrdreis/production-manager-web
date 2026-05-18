@@ -33,8 +33,8 @@ export function SaveToStockModal({ isOpen, onClose, onConfirm, count }: SaveToSt
     <Modal isOpen={isOpen} onClose={onClose} title="Adicionar aos Estoques">
       <div className="p-6">
         <div className="mb-6">
-          <p className="text-slate-600">
-            Você está adicionando <strong className="text-slate-900">{count} {count === 1 ? 'produto' : 'produtos'}</strong>.
+          <p className="text-slate-600 dark:text-slate-400">
+            Você está adicionando <strong className="text-slate-900 dark:text-slate-100">{count} {count === 1 ? 'produto' : 'produtos'}</strong>.
             Em qual estoque você deseja salvá-los?
           </p>
         </div>
@@ -48,14 +48,14 @@ export function SaveToStockModal({ isOpen, onClose, onConfirm, count }: SaveToSt
                 "cursor-pointer border rounded-xl p-3 flex flex-col gap-1 transition-colors",
                 selectedStock === stock.id 
                   ? "border-blue-500 bg-blue-50 text-blue-900" 
-                  : "border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700"
+                  : "border-slate-200 dark:border-slate-800 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300"
               )}
             >
               <div className="flex items-center justify-between">
                  <span className="font-bold text-sm">{stock.label}</span>
                  <Layers size={16} className={selectedStock === stock.id ? "text-blue-500" : "text-slate-400"} />
               </div>
-              <p className={cn("text-xs leading-snug", selectedStock === stock.id ? "text-blue-700" : "text-slate-500")}>
+              <p className={cn("text-xs leading-snug", selectedStock === stock.id ? "text-blue-700" : "text-slate-500 dark:text-slate-400")}>
                  {stock.description}
               </p>
             </div>

@@ -25,8 +25,8 @@ export function OrderDetailsModal({ isOpen, onClose, selectedOrder }: OrderDetai
             </h4>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-base font-bold text-slate-900 leading-tight">{selectedOrder.customerName}</div>
-                <div className="text-xs text-slate-500 mt-1">Código Omie: {selectedOrder.customerId || 'N/A'}</div>
+                <div className="text-base font-bold text-slate-900 dark:text-slate-100 leading-tight">{selectedOrder.customerName}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Código Omie: {selectedOrder.customerId || 'N/A'}</div>
               </div>
               {selectedOrder.isLocalCustomer && (
                 <div className="bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
@@ -37,35 +37,35 @@ export function OrderDetailsModal({ isOpen, onClose, selectedOrder }: OrderDetai
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+            <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2 text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-1">
                 <Hash size={12} />
                 Omie Code
               </div>
-              <div className="text-sm font-mono font-bold text-zinc-700">{selectedOrder.id}</div>
+              <div className="text-sm font-mono font-bold text-zinc-700 dark:text-zinc-300">{selectedOrder.id}</div>
             </div>
-            <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+            <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2 text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-1">
                 <Calendar size={12} />
                 Previsão
               </div>
-              <div className="text-sm font-bold text-zinc-700">
+              <div className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
                 {selectedOrder.dataPrevisao ? new Date(selectedOrder.dataPrevisao).toLocaleDateString('pt-BR') : 'N/A'}
               </div>
             </div>
-            <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+            <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2 text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-1">
                 <Tag size={12} />
                 Etapa
               </div>
-              <div className="text-sm font-bold text-zinc-700">{selectedOrder.etapa}</div>
+              <div className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{selectedOrder.etapa}</div>
             </div>
-             <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+             <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2 text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-1">
                 <ClipboardList size={12} />
                 Status
               </div>
-              <div className="text-sm font-bold text-zinc-700 capitalize">{selectedOrder.status}</div>
+              <div className="text-sm font-bold text-zinc-700 dark:text-zinc-300 capitalize">{selectedOrder.status}</div>
             </div>
           </div>
 
@@ -76,9 +76,9 @@ export function OrderDetailsModal({ isOpen, onClose, selectedOrder }: OrderDetai
             </h3>
             <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
               {selectedOrder.items?.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center p-3 bg-white border border-zinc-100 rounded-xl shadow-sm">
+                <div key={idx} className="flex justify-between items-center p-3 bg-white dark:bg-slate-900 border border-zinc-100 dark:border-zinc-800 rounded-xl shadow-sm">
                   <div className="flex-1 min-w-0 pr-4">
-                    <div className="text-sm font-bold text-zinc-900 truncate">{item.description}</div>
+                    <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{item.description}</div>
                     <div className="text-[10px] text-zinc-400 font-mono">CODE: {item.omieItemCode}</div>
                   </div>
                   <div className="text-right">

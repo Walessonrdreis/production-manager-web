@@ -118,7 +118,7 @@ export function MonitoringPage() {
         <div className="bg-red-50 p-6 rounded-2xl border border-red-100 max-w-sm">
           <AlertCircle size={32} className="text-red-500 mx-auto mb-3" />
           <h2 className="text-lg font-bold text-red-900 mb-1">Atenção</h2>
-          <p className="text-red-700 text-sm mb-6 bg-white py-2 px-4 rounded border border-red-100 italic">
+          <p className="text-red-700 text-sm mb-6 bg-white dark:bg-slate-900 py-2 px-4 rounded border border-red-100 italic">
             {typeof error === 'string' ? error : 'Ocorreu um erro ao carregar os dados.'}
           </p>
           <Button onClick={() => refetchTotals()} variant="outline" size="sm" className="w-full">
@@ -139,12 +139,12 @@ export function MonitoringPage() {
         subtitle="Monitoramento em tempo real (Etapa 20)"
       />
 
-      <div className="flex bg-zinc-100 p-1 rounded-xl w-max">
+      <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl w-max">
         <button
           onClick={() => setActiveTab('monitoring')}
           className={cn(
             "px-4 py-2 rounded-lg text-sm font-bold transition-colors",
-            activeTab === 'monitoring' ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"
+            activeTab === 'monitoring' ? "bg-white dark:bg-slate-900 text-zinc-900 dark:text-zinc-100 shadow-sm" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:text-zinc-300"
           )}
         >
           Monitoramento
@@ -153,7 +153,7 @@ export function MonitoringPage() {
           onClick={() => setActiveTab('history')}
           className={cn(
             "px-4 py-2 rounded-lg text-sm font-bold transition-colors",
-            activeTab === 'history' ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"
+            activeTab === 'history' ? "bg-white dark:bg-slate-900 text-zinc-900 dark:text-zinc-100 shadow-sm" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:text-zinc-300"
           )}
         >
           Histórico
@@ -169,7 +169,7 @@ export function MonitoringPage() {
             isLoading={isLoading}
           />
 
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-zinc-100">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
             <div className="flex items-center gap-3">
               <Filter size={18} className="text-zinc-400" />
               <div className="flex flex-wrap gap-2">
@@ -187,7 +187,7 @@ export function MonitoringPage() {
                       "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
                       filter === f.id 
                         ? "bg-zinc-900 text-white shadow-sm" 
-                        : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100",
+                        : "bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-800 dark:bg-zinc-800",
                       f.color && filter !== f.id ? f.color : ""
                     )}
                   >
@@ -197,7 +197,7 @@ export function MonitoringPage() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
+            <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
               <CalendarIcon size={14} />
               {filteredData.length} itens mostrados
             </div>

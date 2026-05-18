@@ -84,8 +84,8 @@ export function PendingChangesModal({ isOpen, onClose }: PendingChangesModalProp
             <div className="h-16 w-16 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
               <CloudAlert className="text-emerald-500" size={32} />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900">Tudo em ordem!</h3>
-            <p className="text-slate-500 max-w-xs">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Tudo em ordem!</h3>
+            <p className="text-slate-500 dark:text-slate-400 max-w-xs">
               Não há alterações pendentes no momento. Todos os seus dados estão sincronizados com o SQLite e Servidor.
             </p>
           </div>
@@ -101,7 +101,7 @@ export function PendingChangesModal({ isOpen, onClose }: PendingChangesModalProp
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                   key={`${item.type}-${item.id}`}
-                  className="flex items-start gap-4 p-3 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all group"
+                  className="flex items-start gap-4 p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900/50 transition-all group"
                 >
                   <div className={`p-2 rounded-lg ${config.bg} ${config.color} shrink-0`}>
                     <Icon size={18} />
@@ -109,15 +109,15 @@ export function PendingChangesModal({ isOpen, onClose }: PendingChangesModalProp
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <h4 className="text-sm font-semibold text-slate-900 truncate">
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
                         {item.title}
                       </h4>
-                      <span className="text-[10px] font-bold uppercase py-0.5 px-2 rounded-full bg-slate-100 text-slate-500 shrink-0">
+                      <span className="text-[10px] font-bold uppercase py-0.5 px-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shrink-0">
                         {config.label}
                       </span>
                     </div>
                     {item.subtitle && (
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         {item.subtitle}
                       </p>
                     )}
@@ -129,7 +129,7 @@ export function PendingChangesModal({ isOpen, onClose }: PendingChangesModalProp
         )}
 
         {!isEmpty && (
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
             <span>{count} item{count > 1 ? 's' : ''} aguardando sincronização</span>
             <span>Local v{new Date().toLocaleDateString()}</span>
           </div>

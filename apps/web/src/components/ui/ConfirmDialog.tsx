@@ -33,8 +33,8 @@ export function ConfirmDialog({
         }`}>
           <AlertTriangle size={32} />
         </div>
-        <h3 className="text-xl font-bold text-zinc-900 mb-2">{title}</h3>
-        <p className="text-zinc-500 mb-8">{message}</p>
+        <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">{title}</h3>
+        <p className="text-zinc-500 dark:text-zinc-400 mb-8">{message}</p>
         
         <div className="flex gap-3 w-full">
           <Button variant="ghost" className="flex-1" onClick={onCancel}>

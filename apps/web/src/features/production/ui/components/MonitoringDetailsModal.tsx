@@ -56,13 +56,13 @@ export function MonitoringDetailsModal({
         title={selectedProduct || 'Detalhes do Produto'}
       >
         <div className="space-y-6">
-          <div className="flex justify-between items-center bg-zinc-50 p-4 rounded-xl border border-zinc-100">
+          <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-900/50 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
             <div>
-              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Total Pendente (API)</p>
-              <p className="text-2xl font-bold text-zinc-900">{currentProductData?.totalQuantity || 0} <span className="text-sm font-normal text-zinc-500">unidades</span></p>
+              <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Total Pendente (API)</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{currentProductData?.totalQuantity || 0} <span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">unidades</span></p>
             </div>
             <div className="text-right">
-              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Status Local</p>
+              <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Status Local</p>
               <div className="flex items-center gap-2">
                 <p className="text-2xl font-bold text-emerald-600">{producedQuantity}</p>
                 <div className="h-8 w-px bg-zinc-200 mx-1"></div>
@@ -73,7 +73,7 @@ export function MonitoringDetailsModal({
 
           <div>
              <div className="flex justify-between items-center mb-3">
-               <h3 className="text-sm font-bold text-zinc-900">Pedidos contendo este item</h3>
+               <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Pedidos contendo este item</h3>
                <div className="flex gap-2">
                  {onOpenSchedule && (
                    <Button 
@@ -101,7 +101,7 @@ export function MonitoringDetailsModal({
              </div>
              
              {ordersWithProduct.length === 0 ? (
-               <div className="text-center py-8 text-zinc-500 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
+               <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/50/50 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
                  Não encontramos pedidos detalhados para este item.
                </div>
              ) : (
@@ -115,27 +115,27 @@ export function MonitoringDetailsModal({
                       key={order.id} 
                       className={cn(
                         "flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer",
-                        isProduced ? "bg-emerald-50 border-emerald-100" : "bg-white border-zinc-200 hover:border-blue-400"
+                        isProduced ? "bg-emerald-50 border-emerald-100" : "bg-white dark:bg-slate-900 border-zinc-200 dark:border-zinc-800 hover:border-blue-400"
                       )}
                       onClick={() => handleOrderClick(order.id, selectedProduct!, Number(order.itemQuantity), order.orderNumber, isProduced)}
                      >
                         <div className="flex items-center gap-3">
                           <div className={cn(
                             "w-5 h-5 rounded border flex items-center justify-center transition-all",
-                            isProduced ? "bg-emerald-500 border-emerald-500 text-white" : "border-zinc-300 bg-white"
+                            isProduced ? "bg-emerald-500 border-emerald-500 text-white" : "border-zinc-300 bg-white dark:bg-slate-900"
                           )}>
                             {isProduced && <CheckCircle2 size={12} strokeWidth={3} />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className={cn(
                               "text-sm font-bold truncate leading-tight mb-0.5", 
-                              isProduced ? "text-emerald-900" : "text-zinc-900",
+                              isProduced ? "text-emerald-900" : "text-zinc-900 dark:text-zinc-100",
                               order.customerName ? "text-[15px]" : ""
                             )}>
                               {order.customerName || 'Cliente não informado'}
                             </p>
                             <div className="flex items-center gap-2">
-                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">
                                 #{order.orderNumber}
                               </span>
                               <span className="text-[10px] text-zinc-400 font-medium italic">ref. pedido</span>
@@ -143,7 +143,7 @@ export function MonitoringDetailsModal({
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-bold text-zinc-900">{order.itemQuantity} un</p>
+                          <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{order.itemQuantity} un</p>
                           <div className="flex flex-col items-end">
                             <p className={cn("text-[10px] uppercase font-bold", isProduced ? "text-emerald-600" : "text-zinc-400")}>
                               {isProduced ? 'Produzido' : 'Pendente'}
@@ -181,7 +181,7 @@ export function MonitoringDetailsModal({
             <AlertTriangle className="shrink-0" size={24} />
             <p className="text-sm">Você está prestes a reverter a conclusão deste item. Ele voltará para o status Pendente.</p>
           </div>
-          <p className="text-sm text-zinc-700 mb-6 focus:outline-none">
+          <p className="text-sm text-zinc-700 dark:text-zinc-300 mb-6 focus:outline-none">
             Tem certeza de que deseja desfazer a marcação de <strong>produzido</strong> para este pedido?
           </p>
           <div className="flex gap-3 justify-end mt-6">

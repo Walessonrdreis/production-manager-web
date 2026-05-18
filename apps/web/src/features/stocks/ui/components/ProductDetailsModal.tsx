@@ -152,8 +152,8 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        <div className={`p-6 border-b flex justify-between items-start ${isCritical ? 'bg-red-50/80 border-red-100' : isWarning ? 'bg-amber-50/80 border-amber-100' : 'bg-slate-50/50 border-slate-100'}`}>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className={`p-6 border-b flex justify-between items-start ${isCritical ? 'bg-red-50/80 border-red-100' : isWarning ? 'bg-amber-50/80 border-amber-100' : 'bg-slate-50 dark:bg-slate-900/50/50 border-slate-100 dark:border-slate-800'}`}>
           <div className="flex items-start space-x-4">
             <div className={`p-3 rounded-xl ${isCritical ? 'bg-red-100 text-red-600' : isWarning ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
               <Package size={24} />
@@ -163,18 +163,18 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                 <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${isCritical ? 'bg-red-100 text-red-700' : isWarning ? 'bg-amber-100 text-amber-700' : 'bg-blue-50 text-blue-600'}`}>
                   {product.code || product.id}
                 </span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
                   DETALHES DO PRODUTO
                 </span>
               </div>
-              <h2 className="text-xl font-bold text-slate-900 uppercase leading-tight pr-8">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 uppercase leading-tight pr-8">
                 {product.description}
               </h2>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 rounded-full transition-colors shrink-0"
+            className="text-slate-400 hover:text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-800 dark:bg-slate-800 p-2 rounded-full transition-colors shrink-0"
           >
             <X size={20} />
           </button>
@@ -183,47 +183,47 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
         <div className="p-6 overflow-y-auto space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                <div className="flex items-center space-x-2 text-slate-500 mb-2">
+              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
+                <div className="flex items-center space-x-2 text-slate-500 dark:text-slate-400 mb-2">
                   <Tag size={16} />
                   <span className="text-xs font-bold uppercase tracking-wider">Detalhes do Produto</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">omieCode</div>
-                    <div className="font-mono text-sm text-slate-900">{product.code || 'Não informado'}</div>
+                    <div className="font-mono text-sm text-slate-900 dark:text-slate-100">{product.code || 'Não informado'}</div>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">sku</div>
-                    <div className="font-mono text-sm text-slate-900">null</div>
+                    <div className="font-mono text-sm text-slate-900 dark:text-slate-100">null</div>
                   </div>
                   <div className="col-span-2">
                     <div className="text-[10px] text-slate-400 uppercase font-bold">description</div>
-                    <div className="font-medium text-sm text-slate-900">{product.description || 'Não informada'}</div>
+                    <div className="font-medium text-sm text-slate-900 dark:text-slate-100">{product.description || 'Não informada'}</div>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">family</div>
-                    <div className="font-medium text-sm text-slate-900 uppercase">{product.family || 'null'}</div>
+                    <div className="font-medium text-sm text-slate-900 dark:text-slate-100 uppercase">{product.family || 'null'}</div>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">active</div>
-                    <div className="font-medium text-sm text-slate-900">true</div>
+                    <div className="font-medium text-sm text-slate-900 dark:text-slate-100">true</div>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">stockQuantity</div>
-                    <div className="font-medium text-sm text-slate-900">{product.stock || 0}</div>
+                    <div className="font-medium text-sm text-slate-900 dark:text-slate-100">{product.stock || 0}</div>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">minimumStock</div>
-                    <div className="font-medium text-sm text-slate-900">{product.minStock || 0}</div>
+                    <div className="font-medium text-sm text-slate-900 dark:text-slate-100">{product.minStock || 0}</div>
                   </div>
                   <div className="col-span-2">
                     <div className="text-[10px] text-slate-400 uppercase font-bold">product-structure</div>
-                    <div className="font-mono text-sm text-slate-500 italic">null</div>
+                    <div className="font-mono text-sm text-slate-500 dark:text-slate-400 italic">null</div>
                   </div>
                 </div>
                 
-                <div className="space-y-3 pt-3 border-t border-slate-200">
+                <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800">
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold text-indigo-600 mb-1">Categoria</div>
                      <select
@@ -239,13 +239,13 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">Identificação Interna</div>
-                    <div className="font-mono text-xs text-slate-900">{product.id}</div>
+                    <div className="font-mono text-xs text-slate-900 dark:text-slate-100">{product.id}</div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                <div className="flex items-center space-x-2 text-slate-500 mb-3">
+              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
+                <div className="flex items-center space-x-2 text-slate-500 dark:text-slate-400 mb-3">
                   <Layers size={16} />
                   <span className="text-xs font-bold uppercase tracking-wider">Roteiro de Produção (Setores)</span>
                 </div>
@@ -262,7 +262,7 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                           className={`px-3 py-1.5 text-xs font-bold uppercase rounded-lg border transition-colors ${
                             isSelected 
                               ? 'bg-blue-100 border-blue-200 text-blue-700 hover:bg-blue-200' 
-                              : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100 hover:border-slate-300'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-800 dark:bg-slate-800 hover:border-slate-300'
                           }`}
                         >
                           {sector.name}
@@ -275,8 +275,8 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
             </div>
 
             <div className="space-y-4">
-              <div className={`rounded-xl p-4 border ${isCritical ? 'bg-red-50 border-red-100' : isWarning ? 'bg-amber-50 border-amber-100' : 'bg-slate-50 border-slate-100'}`}>
-                <div className={`flex items-center space-x-2 mb-2 ${isCritical ? 'text-red-500' : isWarning ? 'text-amber-500' : 'text-slate-500'}`}>
+              <div className={`rounded-xl p-4 border ${isCritical ? 'bg-red-50 border-red-100' : isWarning ? 'bg-amber-50 border-amber-100' : 'bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800'}`}>
+                <div className={`flex items-center space-x-2 mb-2 ${isCritical ? 'text-red-500' : isWarning ? 'text-amber-500' : 'text-slate-500 dark:text-slate-400'}`}>
                   {isCritical || isWarning ? <AlertTriangle size={16} /> : <Archive size={16} />}
                   <span className="text-xs font-bold uppercase tracking-wider">Inventário & Demanda</span>
                 </div>
@@ -284,15 +284,15 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">Estoque Atual</div>
                     <div className="flex items-baseline space-x-1 mt-1">
-                      <span className={`text-2xl font-bold ${stock === 0 ? 'text-slate-400' : isCritical ? 'text-red-700' : 'text-slate-900'}`}>{stock}</span>
-                      <span className="text-xs font-bold text-slate-500 uppercase">{product.unit}</span>
+                      <span className={`text-2xl font-bold ${stock === 0 ? 'text-slate-400' : isCritical ? 'text-red-700' : 'text-slate-900 dark:text-slate-100'}`}>{stock}</span>
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">{product.unit}</span>
                     </div>
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">Demanda Pendente</div>
                     <div className="flex items-baseline space-x-1 mt-1">
                       <span className={`text-xl font-bold ${demand > 0 ? (isCritical ? 'text-red-700' : 'text-amber-600') : 'text-slate-400'}`}>{demand}</span>
-                      <span className="text-xs font-bold text-slate-500 uppercase">{product.unit}</span>
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">{product.unit}</span>
                     </div>
                   </div>
                   <div>
@@ -316,7 +316,7 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                       </div>
                     )}
                   </div>
-                  <div className="col-span-3 pt-2 border-t border-slate-200/50">
+                  <div className="col-span-3 pt-2 border-t border-slate-200 dark:border-slate-800/50">
                     <div className="text-[10px] text-slate-400 uppercase font-bold mb-1">Status / Déficit</div>
                     <div className={`text-sm font-bold ${isCritical ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-emerald-600'}`}>
                       {isCritical 
@@ -332,7 +332,7 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
             </div>
           </div>
 
-          <div className="border-t border-slate-200 pt-6">
+          <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2 text-indigo-600">
                 <Target size={20} />
@@ -347,20 +347,20 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">Quantidade</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">Quantidade</label>
                     <input 
                       type="number"
                       value={targetQty || ''}
                       onChange={e => setTargetQty(Number(e.target.value))}
-                      className="w-full text-sm p-2 rounded border border-slate-200 focus:outline-none focus:border-indigo-400"
+                      className="w-full text-sm p-2 rounded border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-indigo-400"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">Período</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">Período</label>
                     <select 
                       value={period}
                       onChange={e => setPeriod(e.target.value as GoalPeriod)}
-                      className="w-full text-sm p-2 rounded border border-slate-200 focus:outline-none focus:border-indigo-400"
+                      className="w-full text-sm p-2 rounded border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-indigo-400"
                     >
                       <option value="daily">Diário</option>
                       <option value="weekly">Semanal</option>
@@ -387,9 +387,9 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
                   const goal = productGoals.find(g => g.period === p);
                   const isEditing = inlineEditingPeriod === p;
                   return (
-                    <div key={p} className={`flex justify-between items-center p-3 rounded-lg group border transition-colors ${isEditing ? 'bg-indigo-50/50 border-indigo-200' : 'bg-slate-50 border-slate-100 hover:border-indigo-200 hover:bg-white'}`}>
+                    <div key={p} className={`flex justify-between items-center p-3 rounded-lg group border transition-colors ${isEditing ? 'bg-indigo-50/50 border-indigo-200' : 'bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-indigo-200 hover:bg-white dark:bg-slate-900'}`}>
                       <div>
-                        <div className="text-xs font-bold text-slate-700 uppercase mb-1">
+                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                           {p === 'daily' ? 'Diária' : p === 'weekly' ? 'Semanal' : 'Mensal'}
                         </div>
                         {isEditing ? (
@@ -439,7 +439,7 @@ export function ProductDetailsModal({ product, demandMap = {}, isOpen, onClose, 
           </div>
         </div>
 
-        <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
+        <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center">
           {onPlanProduct ? (
             <Button 
               onClick={() => {

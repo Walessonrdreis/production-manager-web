@@ -31,8 +31,8 @@ export function PlanningProductList({
     <Card>
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Adicionar Produtos</h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Adicionar Produtos</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Destino: <span className="font-bold text-blue-600">{activeSectorName || 'Nenhum setor selecionado'}</span>
           </p>
         </div>
@@ -66,13 +66,13 @@ export function PlanningProductList({
             checked={selectedIds.length === filteredProducts.length && filteredProducts.length > 0}
             onChange={onToggleSelectAll}
           />
-          <span className="text-[10px] font-bold text-slate-500 uppercase">Selecionar Todos</span>
+          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Selecionar Todos</span>
         </div>
       )}
 
       <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
         {filteredProducts.map((p) => (
-          <div key={p.id} className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
+          <div key={p.id} className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900/50 transition-colors">
             <input 
               type="checkbox" 
               className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
@@ -81,26 +81,26 @@ export function PlanningProductList({
             />
             
             <div className="flex-1 min-w-0 pr-2">
-                <div className="font-bold text-slate-900 uppercase text-xs truncate">{p.description}</div>
+                <div className="font-bold text-slate-900 dark:text-slate-100 uppercase text-xs truncate">{p.description}</div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
                   <div className="text-[10px] text-blue-600 font-mono font-bold">CÓD: {p.code || p.id}</div>
                   {p.sectorIds && p.sectorIds.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {p.sectorIds.map((sid: string) => (
-                        <div key={sid} className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tight">
+                        <div key={sid} className="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-1.5 py-0.5 rounded font-black uppercase tracking-tight">
                           🏠 {sectors.find(s => s.id === sid)?.name || 'Setor desconhecido'}
                         </div>
                       ))}
                     </div>
                   )}
                   {!p.sectorIds && p.sectorId && (
-                    <div className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tight">
+                    <div className="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-1.5 py-0.5 rounded font-black uppercase tracking-tight">
                       🏠 {sectors.find(s => s.id === p.sectorId)?.name || 'Setor desconhecido'}
                     </div>
                   )}
-                  {p.family && <div className="text-[10px] text-zinc-500 font-bold uppercase">Família: {p.family}</div>}
-                  <div className="text-[10px] text-slate-500 font-bold uppercase">ESTOQUE: {p.stock} {p.unit}</div>
-                  <div className="text-[10px] text-slate-900 font-bold">
+                  {p.family && <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase">Família: {p.family}</div>}
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">ESTOQUE: {p.stock} {p.unit}</div>
+                  <div className="text-[10px] text-slate-900 dark:text-slate-100 font-bold">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.price)}
                   </div>
                 </div>

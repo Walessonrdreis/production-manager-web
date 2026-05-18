@@ -93,7 +93,7 @@ export function CollaboratorsPage() {
             <Users className="w-6 h-6 text-indigo-600" />
             Equipe / Colaboradores
           </h1>
-          <p className="text-gray-500 mt-1">Gerencie as pessoas e capacidade da sua fábrica</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Gerencie as pessoas e capacidade da sua fábrica</p>
         </div>
         <Button onClick={() => handleOpenModal()} className="shadow-md">
           <Plus className="w-4 h-4 mr-2" />
@@ -103,7 +103,7 @@ export function CollaboratorsPage() {
 
       <div className="flex flex-col gap-3 pb-4">
         {collaborators.length === 0 ? (
-          <div className="text-center py-12 text-zinc-500 italic bg-white rounded-xl border border-dashed border-zinc-200">
+          <div className="text-center py-12 text-zinc-500 dark:text-zinc-400 italic bg-white dark:bg-slate-900 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
             Nenhum colaborador cadastrado.
           </div>
         ) : (
@@ -112,7 +112,7 @@ export function CollaboratorsPage() {
             return (
               <div 
                 key={collab.id} 
-                className="group bg-white rounded-xl p-4 shadow-sm border border-zinc-200 hover:shadow-md hover:border-blue-100 transition-all cursor-pointer relative flex flex-col sm:flex-row sm:items-center justify-between gap-4" 
+                className="group bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-zinc-200 dark:border-zinc-800 hover:shadow-md hover:border-blue-100 transition-all cursor-pointer relative flex flex-col sm:flex-row sm:items-center justify-between gap-4" 
                 onClick={() => setViewingCollaborator(collab)}
               >
                 <div className="flex flex-1 items-center gap-4">
@@ -120,14 +120,14 @@ export function CollaboratorsPage() {
                     <span className="text-blue-700 font-bold text-lg">{collab.name.charAt(0).toUpperCase()}</span>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-zinc-900 group-hover:text-blue-600 transition-colors line-clamp-1" title={collab.name}>
+                    <h3 className="font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-blue-600 transition-colors line-clamp-1" title={collab.name}>
                       {collab.name}
                     </h3>
-                    <p className="text-sm text-zinc-500 line-clamp-1">{collab.role || 'Sem cargo definido'}</p>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-1">{collab.role || 'Sem cargo definido'}</p>
                   </div>
                 </div>
 
-                <div className="flex flex-1 items-center justify-between gap-6 sm:border-l sm:border-zinc-100 sm:pl-6 pt-3 sm:pt-0 border-t sm:border-t-0 border-zinc-100">
+                <div className="flex flex-1 items-center justify-between gap-6 sm:border-l sm:border-zinc-100 dark:border-zinc-800 sm:pl-6 pt-3 sm:pt-0 border-t sm:border-t-0 border-zinc-100 dark:border-zinc-800">
                   <div className="flex flex-wrap gap-1.5 align-middle items-center">
                     {sector && (
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase">
@@ -148,17 +148,17 @@ export function CollaboratorsPage() {
                          "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold w-fit uppercase",
                          collab.status === 'active' 
                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
-                           : 'bg-zinc-100 text-zinc-600 border border-zinc-200'
+                           : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'
                        )}>
                          <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5", collab.status === 'active' ? 'bg-emerald-500' : 'bg-zinc-400')} />
                          {collab.status === 'active' ? 'Ativo' : 'Inativo'}
                        </span>
                     </div>
 
-                    <div className="flex gap-2 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pl-2 border-l border-zinc-100">
+                    <div className="flex gap-2 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pl-2 border-l border-zinc-100 dark:border-zinc-800">
                        <button
                           onClick={(e) => { e.stopPropagation(); handleOpenModal(collab); }}
-                          className="p-2 border border-zinc-100 text-zinc-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded-lg transition-all shadow-sm"
+                          className="p-2 border border-zinc-100 dark:border-zinc-800 text-zinc-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded-lg transition-all shadow-sm"
                           title="Editar"
                           aria-label={`Editar colaborador ${collab.name}`}
                         >
@@ -166,7 +166,7 @@ export function CollaboratorsPage() {
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); setDeletingId(collab.id); }}
-                          className="p-2 border border-zinc-100 text-zinc-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 rounded-lg transition-all shadow-sm"
+                          className="p-2 border border-zinc-100 dark:border-zinc-800 text-zinc-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 rounded-lg transition-all shadow-sm"
                           title="Remover"
                           aria-label={`Remover colaborador ${collab.name}`}
                         >
@@ -209,7 +209,7 @@ export function CollaboratorsPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Setor</label>
             <select
-              className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+              className="flex h-10 w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-slate-900 px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
               value={formData.sectorId}
               onChange={e => setFormData({ ...formData, sectorId: e.target.value })}
             >
@@ -224,7 +224,7 @@ export function CollaboratorsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Categoria de Produto</label>
               <select
-                className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                className="flex h-10 w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-slate-900 px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                 value={formData.category}
                 onChange={e => setFormData({ ...formData, category: e.target.value })}
               >
@@ -249,7 +249,7 @@ export function CollaboratorsPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <select
-              className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+              className="flex h-10 w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-slate-900 px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
               value={formData.status}
               onChange={e => setFormData({ ...formData, status: e.target.value })}
             >
@@ -286,18 +286,18 @@ export function CollaboratorsPage() {
       >
         {viewingCollaborator && (
           <div className="space-y-4">
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-               <h3 className="text-lg font-bold text-slate-800">{viewingCollaborator.name}</h3>
-               <p className="text-sm text-slate-500">{viewingCollaborator.role || 'Sem função definida'}</p>
+            <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+               <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">{viewingCollaborator.name}</h3>
+               <p className="text-sm text-slate-500 dark:text-slate-400">{viewingCollaborator.role || 'Sem função definida'}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-3 rounded-xl border border-slate-200">
+              <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
                 <span className="block text-xs font-bold text-slate-400 uppercase">Setor</span>
-                <span className="block mt-1 font-medium text-slate-700">
+                <span className="block mt-1 font-medium text-slate-700 dark:text-slate-300">
                   {sectors.find(s => s.id === viewingCollaborator.sectorId)?.name || '-'}
                 </span>
               </div>
-              <div className="bg-white p-3 rounded-xl border border-slate-200">
+              <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
                 <span className="block text-xs font-bold text-slate-400 uppercase">Status</span>
                 <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium ${
                     viewingCollaborator.status === 'active' 

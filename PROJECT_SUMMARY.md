@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.16.2 (Atualizado em 14/05/2026 - Correção no Rastreio de Produtos)
+**Versão:** v4.16.5 (Atualizado em 18/05/2026 - Correção Listagem de Setores)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,16 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.10. Correção de Consumo de Sectores e Operações (v4.16.5)
+- **Correção da Listagem de Setores:** A tela de "/sectors" parou de puxar dados da API externa OnRender devido ao retorno duplo envelopado (Double Wrapper JSON). O `SectorsAdapter` do backend foi ajustado para efetivamente planificar as listas devolvendo apenas o Array bruto.
+- **Implementação do CRUD Baseado em Adapter Externo:** Foram implementados os casos de uso de Criação, Deleção e Atualização na API Intermediária conectando as rotas tradicionais aos verbos requeridos na API online Onrender visando manter perfeitamente operante as integrações.
+
+### 0.9. Otimização de Boot de Container (v4.16.4)
+- **Correção de Gargalo de CPU:** Foi inserido um limitador de tempo (`setTimeout` de 15s) no arquivo `jobs.ts` para as requisições iniciais síncronas (`runAllSyncs`) de `Orders` e `Catalog` na API externa (Render). Isso resolveu um efeito dominó severo em que a aplicação travava o Render React no momento em que a Sandbox acordava, criando o looping visual irritante "Build -> Render Start".
+
+### 0.8. Adicionado Modo Noturno (v4.16.3)
+- **Implementação do Tema Noturno:** Adicionada a customização de tema `Dark Mode` suportada pela versão do TailwindCSS v4. Criado `ThemeContext.tsx` mantendo persistência no localStorage. O toggle foi incluído nativamente no `Topbar.tsx`, trocando dinamicamente as classes da estrutura base (`AppLayout`, `PageContainer`, `Card`) e garantindo adaptabilidade visual, sendo agora o padrão para novas telas do app.
+
 ### 0.7. Correção no TrackingLogic do Dashboard (v4.16.2)
 - **Correção no Double Wrapper API:** O arquivo `TrackingLogic.aggregateStage20Totals` no Frontend foi aprimorado para decodificar e processar sem falhas arrays encapsulados mais profundamente (ex: `rawData.data.data`). Isso garante que as rotas de totais devolvidas através dos `UseCases` com `HttpResponseBuilder` da API continuem hidratando perfeitamente a lista visível da página `Controle de Produção` sem a necessidade de interferir ou retroceder a robustez dos Responses Globais do Microserviço.
 ### 0.6. Integração Trello (MVP Webhook v4.15.0)

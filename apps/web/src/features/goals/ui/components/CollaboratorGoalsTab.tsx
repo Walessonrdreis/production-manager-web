@@ -97,25 +97,25 @@ export function CollaboratorGoalsTab() {
         <div className="flex border-b border-gray-200 flex-1">
           <button
             onClick={() => setActiveTab('monthly')}
-            className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors ${activeTab === 'monthly' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors ${activeTab === 'monthly' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'}`}
           >
             Mensais
           </button>
           <button
             onClick={() => setActiveTab('weekly')}
-            className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors ${activeTab === 'weekly' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors ${activeTab === 'weekly' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'}`}
           >
             Semanais
           </button>
           <button
             onClick={() => setActiveTab('daily')}
-            className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors ${activeTab === 'daily' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors ${activeTab === 'daily' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'}`}
           >
             Diárias
           </button>
           <button
             onClick={() => setActiveTab('all')}
-            className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors ${activeTab === 'all' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors ${activeTab === 'all' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'}`}
           >
             Todas
           </button>
@@ -131,7 +131,7 @@ export function CollaboratorGoalsTab() {
       </div>
 
       {/* Busca e Filtros */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 dark:border-gray-800 flex gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input 
@@ -147,7 +147,7 @@ export function CollaboratorGoalsTab() {
       {/* Tabela de Metas -> Grid de Cards */}
       <div className="flex flex-col gap-3">
         {filteredGoals.length === 0 ? (
-          <div className="py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
+          <div className="py-12 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-200">
             Nenhuma meta cadastrada para os critérios atuais.
           </div>
         ) : (
@@ -155,7 +155,7 @@ export function CollaboratorGoalsTab() {
             <motion.div 
               layout
               key={goal.id} 
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all relative group flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer hover:border-indigo-200 gap-4"
+              className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 dark:border-gray-800 hover:shadow-md transition-all relative group flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer hover:border-indigo-200 gap-4"
               onClick={() => openEditModal(goal)}
             >
               <div className="flex items-center gap-4 flex-1">
@@ -164,7 +164,7 @@ export function CollaboratorGoalsTab() {
                   title={goal.isActive ? 'Ativo' : 'Inativo'}
                   aria-label={goal.isActive ? 'Status ativo' : 'Status inativo'}
                 />
-                <h3 className="font-bold text-gray-900 leading-tight flex-1">
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 leading-tight flex-1">
                   {goal.collaboratorName || 'Desconhecido'}
                 </h3>
               </div>
@@ -181,17 +181,17 @@ export function CollaboratorGoalsTab() {
                   </span>
                 </div>
 
-                <div className="flex gap-2 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pl-2 border-l border-gray-100">
+                <div className="flex gap-2 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pl-2 border-l border-gray-100 dark:border-gray-800 dark:border-gray-800">
                   <button 
                     onClick={(e) => { e.stopPropagation(); openEditModal(goal); }}
-                    className="text-gray-400 hover:text-indigo-600 p-2 border border-gray-100 rounded-lg hover:border-indigo-200 hover:bg-indigo-50 focus:bg-indigo-50 outline-none transition-all shadow-sm"
+                    className="text-gray-400 hover:text-indigo-600 p-2 border border-gray-100 dark:border-gray-800 dark:border-gray-800 rounded-lg hover:border-indigo-200 hover:bg-indigo-50 focus:bg-indigo-50 outline-none transition-all shadow-sm"
                     title="Editar Meta"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setDeletingId(goal.id); }}
-                    className="text-gray-400 hover:text-red-600 p-2 border border-gray-100 rounded-lg hover:border-red-200 hover:bg-red-50 focus:bg-red-50 outline-none transition-all shadow-sm"
+                    className="text-gray-400 hover:text-red-600 p-2 border border-gray-100 dark:border-gray-800 dark:border-gray-800 rounded-lg hover:border-red-200 hover:bg-red-50 focus:bg-red-50 outline-none transition-all shadow-sm"
                     title="Excluir Meta"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -211,7 +211,7 @@ export function CollaboratorGoalsTab() {
         >
           <motion.div 
             initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4"
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4"
           >
             <h2 className="text-xl font-bold">{editingGoal ? 'Editar Meta' : 'Definir Meta de Colaborador'}</h2>
             
@@ -289,7 +289,7 @@ export function CollaboratorGoalsTab() {
         >
           <motion.div 
             initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4"
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4"
           >
             <div className="flex items-center gap-3 text-red-600">
               <AlertTriangle className="w-6 h-6" />

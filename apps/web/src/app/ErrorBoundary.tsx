@@ -44,16 +44,16 @@ export class ErrorBoundary extends React.Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center">
-          <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 max-w-md w-full">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center p-6 text-center">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 max-w-md w-full">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertTriangle className="text-red-600" size={32} />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Ops! Algo deu errado.</h1>
-            <p className="text-slate-500 mb-8 text-sm leading-relaxed">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Ops! Algo deu errado.</h1>
+            <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm leading-relaxed">
               Ocorreu um erro inesperado na aplicação. Nossa equipe técnica já foi notificada.
               {error && (
-                <span className="block mt-2 font-mono text-[10px] bg-slate-50 p-2 rounded border border-slate-200 overflow-auto max-h-24">
+                <span className="block mt-2 font-mono text-[10px] bg-slate-50 dark:bg-slate-900/50 p-2 rounded border border-slate-200 dark:border-slate-800 overflow-auto max-h-24">
                   {error.message}
                 </span>
               )}

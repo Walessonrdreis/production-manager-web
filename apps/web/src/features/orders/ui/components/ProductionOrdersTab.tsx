@@ -149,7 +149,7 @@ export function ProductionOrdersTab() {
         </button>
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 dark:border-gray-800 flex gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input 
@@ -164,11 +164,11 @@ export function ProductionOrdersTab() {
 
       <div className="flex flex-col gap-3">
         {isLoading ? (
-          <div className="py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
+          <div className="py-12 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-200">
             Carregando ordens de produção...
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
+          <div className="py-12 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-200">
             Nenhuma ordem de produção encontrada.
           </div>
         ) : (
@@ -176,7 +176,7 @@ export function ProductionOrdersTab() {
             <motion.div 
               layout
               key={order.id} 
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all relative group flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer hover:border-indigo-200 gap-4"
+              className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 dark:border-gray-800 hover:shadow-md transition-all relative group flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer hover:border-indigo-200 gap-4"
               onClick={() => openEditModal(order)}
             >
               <div className="flex items-center gap-4 flex-1 border-r border-gray-50 pr-4">
@@ -189,7 +189,7 @@ export function ProductionOrdersTab() {
                       {statusLabels[order.status]}
                     </span>
                   </div>
-                  <h3 className="font-bold text-gray-900 leading-tight">
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 leading-tight">
                     {order.productDescription}
                   </h3>
                   {order.productCode && (
@@ -206,7 +206,7 @@ export function ProductionOrdersTab() {
                   <p className="text-sm font-bold text-gray-800 truncate" title={order.sectorName || 'Não definido'}>
                     {order.sectorName || '-'}
                   </p>
-                  <p className="text-xs text-gray-500 truncate mt-0.5" title={order.collaboratorName || 'Não definido'}>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5" title={order.collaboratorName || 'Não definido'}>
                     {order.collaboratorName || '-'}
                   </p>
                 </div>
@@ -216,17 +216,17 @@ export function ProductionOrdersTab() {
                   <p className="text-2xl font-mono text-indigo-600 font-black leading-none">{order.quantity}</p>
                 </div>
 
-                <div className="flex gap-2 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pl-2 border-l border-gray-100">
+                <div className="flex gap-2 lg:opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pl-2 border-l border-gray-100 dark:border-gray-800 dark:border-gray-800">
                   <button 
                     onClick={(e) => { e.stopPropagation(); openEditModal(order); }}
-                    className="text-gray-400 hover:text-indigo-600 p-2 border border-gray-100 rounded-lg hover:border-indigo-200 hover:bg-indigo-50 focus:bg-indigo-50 outline-none transition-all shadow-sm"
+                    className="text-gray-400 hover:text-indigo-600 p-2 border border-gray-100 dark:border-gray-800 dark:border-gray-800 rounded-lg hover:border-indigo-200 hover:bg-indigo-50 focus:bg-indigo-50 outline-none transition-all shadow-sm"
                     title="Editar OP"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setDeletingId(order.id); }}
-                    className="text-gray-400 hover:text-red-600 p-2 border border-gray-100 rounded-lg hover:border-red-200 hover:bg-red-50 focus:bg-red-50 outline-none transition-all shadow-sm"
+                    className="text-gray-400 hover:text-red-600 p-2 border border-gray-100 dark:border-gray-800 dark:border-gray-800 rounded-lg hover:border-red-200 hover:bg-red-50 focus:bg-red-50 outline-none transition-all shadow-sm"
                     title="Excluir OP"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -245,7 +245,7 @@ export function ProductionOrdersTab() {
         >
           <motion.div 
             initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4"
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4"
           >
             <h2 className="text-xl font-bold">{editingOrder ? 'Editar OP' : 'Nova Ordem de Produção'}</h2>
             
@@ -360,7 +360,7 @@ export function ProductionOrdersTab() {
         >
           <motion.div 
             initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4"
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4"
           >
             <div className="flex items-center gap-3 text-red-600">
               <h2 className="text-xl font-bold">Atenção!</h2>

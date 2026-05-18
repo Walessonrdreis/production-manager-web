@@ -63,7 +63,7 @@ export function MonitoringTable({
           <RefreshCw size={32} className="animate-spin text-blue-600" />
         </div>
       ) : data.length === 0 ? (
-        <div className="text-center py-12 text-zinc-500 italic">
+        <div className="text-center py-12 text-zinc-500 dark:text-zinc-400 italic">
           Nenhum item pendente para produção no momento.
         </div>
       ) : (
@@ -78,7 +78,7 @@ export function MonitoringTable({
               <div
                 key={index}
                 className={cn(
-                  "group flex flex-col md:flex-row md:items-center justify-between p-3 md:px-4 gap-3 md:gap-4 bg-white border border-zinc-200 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer relative",
+                  "group flex flex-col md:flex-row md:items-center justify-between p-3 md:px-4 gap-3 md:gap-4 bg-white dark:bg-slate-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer relative",
                   isFullyProduced
                     ? "border-emerald-100 bg-emerald-50/10 grayscale-[0.3]"
                     : "hover:border-blue-200",
@@ -92,7 +92,7 @@ export function MonitoringTable({
                       "w-5 h-5 rounded border flex shrink-0 items-center justify-center transition-all cursor-pointer",
                       isFullyProduced
                         ? "bg-emerald-500 border-emerald-500 text-white"
-                        : "border-zinc-300 bg-white group-hover:border-blue-400",
+                        : "border-zinc-300 bg-white dark:bg-slate-900 group-hover:border-blue-400",
                     )}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -110,7 +110,7 @@ export function MonitoringTable({
                         "font-bold text-sm leading-tight transition-all uppercase truncate",
                         isFullyProduced
                           ? "text-zinc-400 line-through"
-                          : "text-zinc-900 group-hover:text-blue-600",
+                          : "text-zinc-900 dark:text-zinc-100 group-hover:text-blue-600",
                       )}
                       title={p.description}
                     >
@@ -142,7 +142,7 @@ export function MonitoringTable({
                 </div>
 
                 {/* Valores e Ações */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between w-full md:w-[35%] pt-3 border-t border-zinc-100 md:border-t-0 md:pt-0 gap-3 shrink-0">
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between w-full md:w-[35%] pt-3 border-t border-zinc-100 dark:border-zinc-800 md:border-t-0 md:pt-0 gap-3 shrink-0">
                   <div className="flex flex-col items-start md:items-end flex-1 min-w-[70px]">
                     <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider mb-0.5">
                       Pendente
@@ -194,7 +194,7 @@ export function MonitoringTable({
                       </div>
                     ) : (
                       <div
-                        className="text-[11px] text-zinc-500 font-medium italic hover:text-blue-500 transition-colors cursor-pointer flex items-center gap-1 bg-zinc-50 border border-zinc-200 px-2 py-1 rounded-md w-max"
+                        className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium italic hover:text-blue-500 transition-colors cursor-pointer flex items-center gap-1 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded-md w-max"
                         onClick={(e) => {
                           e.stopPropagation();
                           onOpenSchedule(p.description);
@@ -210,7 +210,7 @@ export function MonitoringTable({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-xs h-8 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100"
+                      className="text-xs h-8 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-800 dark:bg-zinc-800"
                       onClick={(e) => {
                         e.stopPropagation();
                         onSelectProduct(p.description);

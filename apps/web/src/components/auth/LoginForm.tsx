@@ -41,13 +41,13 @@ export function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-md"
     >
-      <div className="bg-white p-8 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 dark:border-slate-800">
         <div className="text-center mb-8">
           <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
             <LogIn className="text-white" size={24} />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Acesse sua conta</h2>
-          <p className="mt-2 text-sm text-slate-500">Faça login com sua conta do Google para gerenciar a produção</p>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Acesse sua conta</h2>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Faça login com sua conta do Google para gerenciar a produção</p>
         </div>
 
         <div className="space-y-5">

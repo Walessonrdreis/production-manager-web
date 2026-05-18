@@ -23,7 +23,7 @@ export function AppLayout() {
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex overflow-hidden relative">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex overflow-hidden relative">
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={closeSidebar} 

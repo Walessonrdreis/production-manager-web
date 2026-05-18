@@ -68,8 +68,8 @@ export function CustomersPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Base de Clientes</h1>
-          <p className="text-slate-500 text-sm">Gerencie os clientes para identificação em ordens de serviço.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Base de Clientes</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Gerencie os clientes para identificação em ordens de serviço.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button 
@@ -105,20 +105,20 @@ export function CustomersPage() {
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1,2,3].map(i => <div key={i} className="h-40 bg-slate-100 animate-pulse rounded-xl" />)}
+          {[1,2,3].map(i => <div key={i} className="h-40 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-xl" />)}
         </div>
       ) : paginatedCustomers.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedCustomers.map((customer) => (
-              <Card key={customer.id} className="p-5 hover:shadow-md transition-shadow border-slate-200 group">
+              <Card key={customer.id} className="p-5 hover:shadow-md transition-shadow border-slate-200 dark:border-slate-800 group">
                 <div className="flex justify-between items-start mb-4">
                   <div className="px-2.5 py-1 rounded-md bg-blue-50 text-blue-600 text-xs font-bold font-mono border border-blue-100 flex items-center justify-center">
                     {customer.omieCode || 'LOCAL'}
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button variant="ghost" size="sm" onClick={() => handleOpenModal(customer)} className="h-8 w-8 p-0">
-                      <Edit2 size={14} className="text-slate-600" />
+                      <Edit2 size={14} className="text-slate-600 dark:text-slate-400" />
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => deleteCustomer(customer.id)} className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
                       <Trash2 size={14} />
@@ -126,23 +126,23 @@ export function CustomersPage() {
                   </div>
                 </div>
                 
-                <h3 className="font-bold text-slate-900 mb-1">{customer.name}</h3>
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1">{customer.name}</h3>
                 
                 <div className="space-y-2">
                   {customer.document && (
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                       <FileText size={14} />
                       <span>{customer.document}</span>
                     </div>
                   )}
                   {customer.email && (
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                       <Mail size={14} />
                       <span className="truncate">{customer.email}</span>
                     </div>
                   )}
                   {customer.phone && (
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                       <Phone size={14} />
                       <span>{customer.phone}</span>
                     </div>
@@ -162,7 +162,7 @@ export function CustomersPage() {
               >
                 Anterior
               </Button>
-              <div className="text-sm font-medium text-slate-500">
+              <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Página {currentPage} de {totalPages}
               </div>
               <Button
@@ -193,7 +193,7 @@ export function CustomersPage() {
       >
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Nome Completo / Razão Social *</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Nome Completo / Razão Social *</label>
             <Input 
               required
               placeholder="Ex: João Silva ou Metalúrgica ABC" 
@@ -204,7 +204,7 @@ export function CustomersPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">CPF / CNPJ</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">CPF / CNPJ</label>
               <Input 
                 placeholder="00.000.000/0001-00" 
                 value={formData.document}
@@ -212,7 +212,7 @@ export function CustomersPage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Código Omie (opcional)</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Código Omie (opcional)</label>
               <Input 
                 placeholder="ID Externo" 
                 value={formData.omieCode}
@@ -222,7 +222,7 @@ export function CustomersPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">E-mail</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">E-mail</label>
             <Input 
               type="email"
               placeholder="cliente@email.com" 
@@ -232,7 +232,7 @@ export function CustomersPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Telefone</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Telefone</label>
             <Input 
               placeholder="(00) 00000-0000" 
               value={formData.phone}

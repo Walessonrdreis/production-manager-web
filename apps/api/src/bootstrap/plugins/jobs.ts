@@ -29,8 +29,10 @@ export function startBackgroundJobs() {
     }
   };
 
-  // Run immediately on start
-  runAllSyncs().catch(err => console.error('[JOBS] Unhandled error in runAllSyncs on start:', err));
+  // Delay the initial sync to avoid blocking boot and giving the Render API time to respond, without tying up initial resources
+  setTimeout(() => {
+    runAllSyncs().catch(err => console.error('[JOBS] Unhandled error in runAllSyncs on start:', err));
+  }, 15000); // Wait 15 seconds after boot
 
   // Schedule Orders sync to run more frequently (e.g., every 3 minutes)
   cron.schedule('*/3 * * * *', async () => {

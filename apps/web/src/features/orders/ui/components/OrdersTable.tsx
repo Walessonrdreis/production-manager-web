@@ -21,8 +21,8 @@ export function OrdersTable({ orders, isLoading, onOpenDetails }: OrdersTablePro
     return (
       <div className="text-center py-24 flex flex-col items-center">
         <Package className="text-slate-200 mb-4" size={64} />
-        <h3 className="text-slate-900 font-bold text-lg">Nenhuma ordem encontrada</h3>
-        <p className="text-slate-500">O sistema não encontrou registros processados.</p>
+        <h3 className="text-slate-900 dark:text-slate-100 font-bold text-lg">Nenhuma ordem encontrada</h3>
+        <p className="text-slate-500 dark:text-slate-400">O sistema não encontrou registros processados.</p>
       </div>
     );
   }
@@ -30,9 +30,9 @@ export function OrdersTable({ orders, isLoading, onOpenDetails }: OrdersTablePro
   return (
     <div className="flex flex-col gap-3">
       {orders.map((o) => (
-        <div key={o.id} className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-all p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 relative group cursor-pointer hover:border-blue-200" onClick={() => onOpenDetails(o)}>
+        <div key={o.id} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 relative group cursor-pointer hover:border-blue-200" onClick={() => onOpenDetails(o)}>
           <div className="flex flex-1 items-center gap-4">
-             <div className="pr-4 border-r border-slate-100">
+             <div className="pr-4 border-r border-slate-100 dark:border-slate-800">
                 <div className="font-mono font-bold text-blue-700 text-sm bg-blue-50 px-2.5 py-1 rounded-md mb-1.5">#{o.orderNumber}</div>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide inline-block ${o.cancelado === 'Y' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
                    {o.status}
@@ -40,24 +40,24 @@ export function OrdersTable({ orders, isLoading, onOpenDetails }: OrdersTablePro
              </div>
              <div>
                 <div className="flex items-center gap-2">
-                  <div className="font-bold text-slate-800 text-base leading-tight">{o.customerName}</div>
+                  <div className="font-bold text-slate-800 dark:text-slate-200 text-base leading-tight">{o.customerName}</div>
                   {o.isLocalCustomer && (
                     <span className="bg-blue-100 text-blue-700 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">LOCAL</span>
                   )}
                 </div>
-                <div className="text-[11px] text-slate-500 font-mono mt-1">Cod Cli: {o.customerId || 'N/A'}</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-1">Cod Cli: {o.customerId || 'N/A'}</div>
              </div>
           </div>
 
-          <div className="flex-1 flex items-center justify-between gap-6 md:border-l md:border-slate-100 md:pl-6 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
+          <div className="flex-1 flex items-center justify-between gap-6 md:border-l md:border-slate-100 dark:border-slate-800 md:pl-6 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
              <div className="hidden sm:block">
                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-0.5">Itens</div>
-               <div className="flex items-center gap-1.5 text-slate-800 font-medium text-sm">
+               <div className="flex items-center gap-1.5 text-slate-800 dark:text-slate-200 font-medium text-sm">
                  <Package size={14} className="text-slate-400" />
                  {o.items?.length || 0} Itens
                </div>
                 {o.items && o.items.length > 0 && (
-                   <div className="text-[11px] text-slate-500 truncate mt-1 max-w-[150px] md:max-w-[180px]" title={o.items[0]?.description}>
+                   <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-1 max-w-[150px] md:max-w-[180px]" title={o.items[0]?.description}>
                        {o.items[0]?.description}
                    </div>
                )}
@@ -65,11 +65,11 @@ export function OrdersTable({ orders, isLoading, onOpenDetails }: OrdersTablePro
              
              <div className="text-right">
                 <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-0.5">Previsão</div>
-                <div className="font-bold text-slate-800 text-sm">
+                <div className="font-bold text-slate-800 dark:text-slate-200 text-sm">
                    {o.dataPrevisao ? new Date(o.dataPrevisao).toLocaleDateString('pt-BR') : '-'}
                 </div>
                 <div className="mt-1">
-                  <span className="text-[10px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">Etapa {o.etapa}</span>
+                  <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">Etapa {o.etapa}</span>
                 </div>
              </div>
              

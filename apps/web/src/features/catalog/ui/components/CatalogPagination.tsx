@@ -12,8 +12,8 @@ export function CatalogPagination({ currentPage, totalPages, totalItems, onPageC
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
-      <p className="text-xs text-slate-500">Total: {totalItems} itens</p>
+    <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+      <p className="text-xs text-slate-500 dark:text-slate-400">Total: {totalItems} itens</p>
       <div className="flex items-center gap-1.5">
         <Button 
           variant="outline" 

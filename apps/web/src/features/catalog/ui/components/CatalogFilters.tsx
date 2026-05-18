@@ -47,7 +47,7 @@ export function CatalogFilters({
               <select 
                 value={familyFilter || 'Todas'}
                 onChange={(e) => onFamilyChange(e.target.value)}
-                className="w-full h-11 pl-10 pr-8 rounded-xl border border-slate-200 bg-white text-sm appearance-none cursor-pointer focus:ring-2 focus:ring-blue-500/20 outline-none"
+                className="w-full h-11 pl-10 pr-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm appearance-none cursor-pointer focus:ring-2 focus:ring-blue-500/20 outline-none"
               >
                 {families.map(f => (
                   <option key={f} value={f}>{f}</option>
@@ -77,13 +77,13 @@ export function CatalogFilters({
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase">Setor</label>
                 <select 
                   value={sectorFilter}
                   onChange={(e) => onSectorChange(e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-white text-xs outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs outline-none focus:ring-2 focus:ring-blue-500/20"
                 >
                   <option value="">Todos os Setores</option>
                   {sectors?.map(s => (
@@ -102,7 +102,7 @@ export function CatalogFilters({
                       onClick={() => onStockLevelChange(level)}
                       className={cn(
                         "flex-1 h-10 rounded-lg border text-[10px] font-bold uppercase transition-all",
-                        stockLevel === level ? "bg-slate-900 border-slate-900 text-white shadow-sm" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
+                        stockLevel === level ? "bg-slate-900 border-slate-900 text-white shadow-sm" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900/50"
                       )}
                     >
                       {level === 'all' ? 'Ver Tudo' : level === 'low' ? 'Baixo' : 'Normal'}

@@ -14,8 +14,8 @@ export function CatalogHeader({ productsCount, isFetching, onSync, isSyncing, on
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Catálogo de Produtos</h1>
-        <p className="text-zinc-500 text-xs sm:text-sm">
+        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Catálogo de Produtos</h1>
+        <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm">
           {isFetching ? 'Atualizando catálogo...' : `Exibindo ${productsCount} produtos sincronizados`}
         </p>
       </div>
@@ -31,7 +31,7 @@ export function CatalogHeader({ productsCount, isFetching, onSync, isSyncing, on
         <button 
           onClick={onSync} 
           disabled={isSyncing}
-          className="flex-1 sm:flex-none inline-flex items-center justify-center rounded-xl px-4 py-2 text-xs font-bold transition-all border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          className="flex-1 sm:flex-none inline-flex items-center justify-center rounded-xl px-4 py-2 text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900/50 disabled:opacity-50"
         >
           <RefreshCw size={14} className={`mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
           Sincronizar Tudo

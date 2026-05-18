@@ -9,7 +9,7 @@ interface ProductionHistoryListProps {
 export function ProductionHistoryList({ records, isLoading }: ProductionHistoryListProps) {
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64 text-zinc-500">
+      <div className="flex justify-center items-center h-64 text-zinc-500 dark:text-zinc-400">
         Carregando histórico...
       </div>
     );
@@ -22,10 +22,10 @@ export function ProductionHistoryList({ records, isLoading }: ProductionHistoryL
 
   if (sortedRecords.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center bg-white rounded-xl border border-dashed border-zinc-200">
+      <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-slate-900 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
         <PackageCheck size={48} className="text-zinc-200 mb-4" />
-        <h3 className="text-lg font-bold text-zinc-900 mb-1">Nenhum histórico encontrado</h3>
-        <p className="text-zinc-500 text-sm max-w-sm">
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1">Nenhum histórico encontrado</h3>
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm">
           Os produtos que você marcar como produzidos aparecerão aqui.
         </p>
       </div>
@@ -33,26 +33,26 @@ export function ProductionHistoryList({ records, isLoading }: ProductionHistoryL
   }
 
   return (
-    <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden">
-      <div className="p-4 md:p-6 border-b border-zinc-100 flex items-center justify-between">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+      <div className="p-4 md:p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-zinc-900">Histórico de Produção</h2>
-          <p className="text-sm text-zinc-500">Últimos itens finalizados</p>
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Histórico de Produção</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Últimos itens finalizados</p>
         </div>
       </div>
       
       <div className="divide-y divide-zinc-100 max-h-[600px] overflow-y-auto">
         {sortedRecords.map((record) => (
-          <div key={record.id} className="p-4 hover:bg-zinc-50 transition-colors flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <div key={record.id} className="p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:bg-zinc-900/50 transition-colors flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
             <div className="flex gap-3 items-start">
               <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                 <CheckCircleIcon size={20} />
               </div>
               <div>
-                <h4 className="font-bold text-zinc-900 leading-tight mb-1">{record.description}</h4>
-                <div className="flex items-center gap-3 text-xs text-zinc-500">
+                <h4 className="font-bold text-zinc-900 dark:text-zinc-100 leading-tight mb-1">{record.description}</h4>
+                <div className="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400">
                   {record.orderNumber && (
-                    <span className="flex items-center gap-1 font-medium bg-zinc-100 px-2 py-0.5 rounded text-zinc-600">
+                    <span className="flex items-center gap-1 font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-zinc-600 dark:text-zinc-400">
                       <Box size={12} />
                       Pedido #{record.orderNumber}
                     </span>
@@ -66,10 +66,10 @@ export function ProductionHistoryList({ records, isLoading }: ProductionHistoryL
             </div>
             
             <div className="flex items-baseline space-x-1 shrink-0 ml-12 md:ml-0">
-              <span className="text-xl font-black text-slate-900">
+              <span className="text-xl font-black text-slate-900 dark:text-slate-100">
                 +{record.quantity}
               </span>
-              <span className="text-xs uppercase text-slate-500 font-bold">
+              <span className="text-xs uppercase text-slate-500 dark:text-slate-400 font-bold">
                 un
               </span>
             </div>

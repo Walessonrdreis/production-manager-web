@@ -188,7 +188,7 @@ export function MyProductsTable({
               variant="outline"
               size="sm"
               onClick={() => setSelectedIds(new Set())}
-              className="bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+              className="bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900/50"
             >
               Cancelar
             </Button>
@@ -244,7 +244,7 @@ export function MyProductsTable({
 
       <div className="flex flex-col gap-2">
         {products.length === 0 ? (
-          <div className="py-12 text-center text-slate-500 bg-white rounded-xl border border-dashed border-slate-200">
+          <div className="py-12 text-center text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
             Nenhum produto encontrado.
           </div>
         ) : (
@@ -267,7 +267,7 @@ export function MyProductsTable({
               <div
                 key={p.id}
                 onClick={() => onViewDetails(p)}
-                className={`group flex flex-col md:flex-row md:items-center justify-between p-3 md:px-4 gap-3 md:gap-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer relative ${
+                className={`group flex flex-col md:flex-row md:items-center justify-between p-3 md:px-4 gap-3 md:gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer relative ${
                   isSelected
                     ? "ring-2 ring-indigo-500 border-indigo-200 bg-indigo-50/30"
                     : isCritical
@@ -307,7 +307,7 @@ export function MyProductsTable({
                             : undefined
                       }
                     >
-                      <h3 className="text-sm font-bold text-slate-900 leading-tight uppercase truncate">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight uppercase truncate">
                         {p.description}
                       </h3>
                       {isCritical && (
@@ -329,7 +329,7 @@ export function MyProductsTable({
                 {/* Classificação */}
                 <div className="flex flex-col gap-1 items-start w-full md:w-[25%] shrink-0 min-w-0">
                   {p.family && (
-                    <span className="text-[10px] font-bold text-slate-500 uppercase leading-none truncate w-full">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase leading-none truncate w-full">
                       Família: {p.family}
                     </span>
                   )}
@@ -367,7 +367,7 @@ export function MyProductsTable({
                 </div>
 
                 {/* Valores e Ações */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between w-full md:w-[35%] pt-3 border-t border-slate-100 md:border-t-0 md:pt-0 gap-3 shrink-0">
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between w-full md:w-[35%] pt-3 border-t border-slate-100 dark:border-slate-800 md:border-t-0 md:pt-0 gap-3 shrink-0">
                   <div className="flex flex-col items-start md:items-end flex-1 min-w-[70px]">
                     {demand > 0 && (
                       <span
@@ -379,18 +379,18 @@ export function MyProductsTable({
                     )}
                     <div className="flex items-baseline space-x-1">
                       <span
-                        className={`text-base leading-none font-black ${isCritical ? "text-red-600" : "text-slate-900"}`}
+                        className={`text-base leading-none font-black ${isCritical ? "text-red-600" : "text-slate-900 dark:text-slate-100"}`}
                       >
                         {stock}
                       </span>
-                      <span className="text-[10px] uppercase text-slate-500 font-bold">
+                      <span className="text-[10px] uppercase text-slate-500 dark:text-slate-400 font-bold">
                         {p.unit}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex flex-col items-end whitespace-nowrap flex-1 min-w-[80px]">
-                    <span className="text-sm font-bold text-slate-900">
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                       {new Intl.NumberFormat("pt-BR", {
                         style: "currency",
                         currency: "BRL",
@@ -398,12 +398,12 @@ export function MyProductsTable({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-end gap-1 shrink-0 ml-auto bg-slate-50 md:bg-transparent rounded-lg p-1 md:p-0">
+                  <div className="flex items-center justify-end gap-1 shrink-0 ml-auto bg-slate-50 dark:bg-slate-900/50 md:bg-transparent rounded-lg p-1 md:p-0">
                     {onPlanProduct && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 text-slate-500 md:text-slate-400 hover:text-amber-600 hover:bg-amber-100 md:hover:bg-amber-50 rounded-md md:rounded-full"
+                        className="h-8 w-8 p-0 text-slate-500 dark:text-slate-400 md:text-slate-400 hover:text-amber-600 hover:bg-amber-100 md:hover:bg-amber-50 rounded-md md:rounded-full"
                         title="Planejar Produção"
                         aria-label={`Planejar produção para o produto ${p.code}`}
                         onClick={(e) => {
@@ -417,7 +417,7 @@ export function MyProductsTable({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-slate-500 md:text-slate-400 hover:text-red-600 hover:bg-red-100 md:hover:bg-red-50 rounded-md md:rounded-full"
+                      className="h-8 w-8 p-0 text-slate-500 dark:text-slate-400 md:text-slate-400 hover:text-red-600 hover:bg-red-100 md:hover:bg-red-50 rounded-md md:rounded-full"
                       title="Remover produto"
                       aria-label={`Remover produto ${p.code}`}
                       onClick={(e) => {
@@ -441,21 +441,21 @@ export function MyProductsTable({
         title="Estoque Mínimo em Lote"
       >
         <div className="p-6">
-          <p className="text-sm text-slate-600 mb-6">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
             Defina o mesmo estoque mínimo para os{" "}
-            <strong className="text-zinc-900">{selectedCount}</strong> produtos
+            <strong className="text-zinc-900 dark:text-zinc-100">{selectedCount}</strong> produtos
             selecionados.
           </p>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Quantidade Mínima
               </label>
               <input
                 type="number"
                 min="0"
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 value={bulkMinStockValue}
                 onChange={(e) => setBulkMinStockValue(Number(e.target.value))}
                 autoFocus
@@ -489,19 +489,19 @@ export function MyProductsTable({
         title="Categoria em Lote"
       >
         <div className="p-6">
-          <p className="text-sm text-slate-600 mb-6">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
             Defina a categoria para os{" "}
-            <strong className="text-zinc-900">{selectedCount}</strong> produtos
+            <strong className="text-zinc-900 dark:text-zinc-100">{selectedCount}</strong> produtos
             selecionados.
           </p>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Categoria Produtiva
               </label>
               <select
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 value={bulkCategoryValue}
                 onChange={(e) => setBulkCategoryValue(e.target.value)}
               >
@@ -539,9 +539,9 @@ export function MyProductsTable({
         title="Setores em Lote"
       >
         <div className="p-6">
-          <p className="text-sm text-slate-600 mb-6">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
             Defina os setores para os{" "}
-            <strong className="text-zinc-900">{selectedCount}</strong> produtos
+            <strong className="text-zinc-900 dark:text-zinc-100">{selectedCount}</strong> produtos
             selecionados.
           </p>
 
@@ -550,7 +550,7 @@ export function MyProductsTable({
               {sectors.map((sector) => (
                 <label
                   key={sector.id}
-                  className="flex items-center space-x-2 text-sm bg-white p-2 rounded border border-slate-200"
+                  className="flex items-center space-x-2 text-sm bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-800"
                 >
                   <input
                     type="checkbox"
@@ -565,7 +565,7 @@ export function MyProductsTable({
                     }}
                     className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
                   />
-                  <span className="text-slate-700 font-medium">
+                  <span className="text-slate-700 dark:text-slate-300 font-medium">
                     {sector.name}
                   </span>
                 </label>
@@ -599,19 +599,19 @@ export function MyProductsTable({
         title="Metas em Lote"
       >
         <div className="p-6">
-          <p className="text-sm text-slate-600 mb-6">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
             Defina uma meta produtiva para os{" "}
-            <strong className="text-zinc-900">{selectedCount}</strong> produtos
+            <strong className="text-zinc-900 dark:text-zinc-100">{selectedCount}</strong> produtos
             selecionados.
           </p>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Setor
               </label>
               <select
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500"
+                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500"
                 value={bulkGoalSector}
                 onChange={(e) => setBulkGoalSector(e.target.value)}
               >
@@ -628,7 +628,7 @@ export function MyProductsTable({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Quantidade
                 </label>
                 <Input
@@ -640,11 +640,11 @@ export function MyProductsTable({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Período
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500"
                   value={bulkGoalPeriod}
                   onChange={(e) =>
                     setBulkGoalPeriod(e.target.value as GoalPeriod)

@@ -39,13 +39,21 @@ model ProductionOrder {
 }
 
 model Goal {
-  id            String   @id
-  title         String
-  description   String?
-  targetDate    DateTime
-  status        String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                 String   @id
+  type               String?
+  productCode        String?
+  productDescription String?
+  collaboratorId     String?
+  collaboratorName   String?
+  sectorId           String?
+  sectorName         String?
+  targetQuantity     Int
+  period             String
+  isActive           Boolean  @default(true)
+  synced             Boolean  @default(true)
+  lastModified       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 model Collaborator {

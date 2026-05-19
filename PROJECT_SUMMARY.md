@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.17.13 (Atualizado em 19/05/2026 - Correção de Build e Artifacts)
+**Versão:** v4.17.14 (Atualizado em 19/05/2026 - Correção de Build e Banco Postgres)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,9 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.24. Sincronização Local-Postgres de Metas (v4.17.14)
+- **Correção de Prisma Model para Metas:** As metas (Goals) criadas no Frontend não estavam sendo persistidas no PostgreSQL porque o `schema.prisma` backend contava com uma estrutura `Goal` desatualizada (sem colunas de tipo, SKU, setor ou colaborador). O Schema foi adequadamente sincronizado à interface `ProductionGoal` e aplicado `db push` de forma a garantir que toda entrada local reflita imediatamente ao DB central.
+
 ### 0.23. Correção de Diretório de Build Artifacts e Full-Stack Deploy (v4.17.13)
 - **Correção no Output do Vite e Server Root:** A pipeline de deploy do AI Studio requer que os *build artifacts* da SPA sejam gerados no diretório mapeável `dist` da raiz do repositório para o contêiner gerenciar a inicialização corretamente. O `vite.config.ts` possuía a config `outDir: 'dist'` que estava gerando os arquivos de client dentro de `apps/web/dist` em vez de os convergir junto à premissa do `server.cjs` no diretório de release.
 - **Integração Full-Stack AI Studio (app-entry vs server):** O script `start` foi restabelecido para `node server.ts` acoplando um stub que executa exatamente o pacote compilado e bundlado `dist/server.cjs` do backend. O endpoint estático hospedado pelo Server Node agora aponta consistentemente para `dist`, resolvendo os erros de 404 e tela em branco além de estabilizar a rotina "Build artifacts are empty", sincronizando a aplicação entre Dev, Homolog e Prod.

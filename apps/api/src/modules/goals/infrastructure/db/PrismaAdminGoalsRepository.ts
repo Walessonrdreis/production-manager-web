@@ -10,7 +10,6 @@ export class PrismaAdminGoalsRepository {
         ...g,
         createdAt: g.createdAt.toISOString(),
         updatedAt: g.updatedAt.toISOString(),
-        targetDate: g.targetDate.toISOString(),
       }));
     } catch (err: any) {
       throw new AppError(`Failed to fetch goals from Prisma: ${err.message}`, 500);
@@ -25,7 +24,6 @@ export class PrismaAdminGoalsRepository {
         ...g,
         createdAt: g.createdAt.toISOString(),
         updatedAt: g.updatedAt.toISOString(),
-        targetDate: g.targetDate.toISOString(),
       };
     } catch (err: any) {
       throw new AppError(`Failed to fetch goal from Prisma: ${err.message}`, 500);
@@ -35,20 +33,42 @@ export class PrismaAdminGoalsRepository {
   static async save(goal: any) {
     try {
       const id = goal.id || uuidv4();
-      const saved = await prisma.goal.create({
-        data: {
+      const saved = await prisma.goal.upsert({
+        where: { id },
+        update: {
+          type: goal.type || 'product',
+          productCode: goal.productCode || null,
+          productDescription: goal.productDescription || null,
+          collaboratorId: goal.collaboratorId || null,
+          collaboratorName: goal.collaboratorName || null,
+          sectorId: goal.sectorId || null,
+          sectorName: goal.sectorName || null,
+          targetQuantity: Number(goal.targetQuantity) || 0,
+          period: goal.period || 'monthly',
+          isActive: goal.isActive !== undefined ? goal.isActive : true,
+          synced: goal.synced !== undefined ? goal.synced : true,
+          lastModified: goal.lastModified ? String(goal.lastModified) : null,
+        },
+        create: {
           id,
-          title: goal.title || '',
-          description: goal.description || '',
-          targetDate: goal.targetDate ? new Date(goal.targetDate) : new Date(),
-          status: goal.status || 'PENDING',
+          type: goal.type || 'product',
+          productCode: goal.productCode || null,
+          productDescription: goal.productDescription || null,
+          collaboratorId: goal.collaboratorId || null,
+          collaboratorName: goal.collaboratorName || null,
+          sectorId: goal.sectorId || null,
+          sectorName: goal.sectorName || null,
+          targetQuantity: Number(goal.targetQuantity) || 0,
+          period: goal.period || 'monthly',
+          isActive: goal.isActive !== undefined ? goal.isActive : true,
+          synced: goal.synced !== undefined ? goal.synced : true,
+          lastModified: goal.lastModified ? String(goal.lastModified) : null,
         },
       });
       return {
         ...saved,
         createdAt: saved.createdAt.toISOString(),
         updatedAt: saved.updatedAt.toISOString(),
-        targetDate: saved.targetDate.toISOString(),
       };
     } catch (err: any) {
       throw new AppError(`Failed to save goal to Prisma: ${err.message}`, 500);
@@ -58,7 +78,6 @@ export class PrismaAdminGoalsRepository {
   static async update(id: string, goal: any) {
     try {
       const dataToUpdate: any = { ...goal };
-      if (goal.targetDate) dataToUpdate.targetDate = new Date(goal.targetDate);
       
       const updated = await prisma.goal.update({
         where: { id },
@@ -68,7 +87,6 @@ export class PrismaAdminGoalsRepository {
         ...updated,
         createdAt: updated.createdAt.toISOString(),
         updatedAt: updated.updatedAt.toISOString(),
-        targetDate: updated.targetDate.toISOString(),
       };
     } catch (err: any) {
       throw new AppError(`Failed to update goal in Prisma: ${err.message}`, 500);

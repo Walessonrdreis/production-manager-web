@@ -7,9 +7,9 @@ export function useOrders() {
   const ordersQuery = useQuery({
     queryKey: ['orders'],
     queryFn: getOrders,
-    refetchInterval: 1000 * 60 * 30,
+    refetchInterval: 1000 * 60 * 5, // A cada 5 minutos
     refetchIntervalInBackground: true,
-    staleTime: 1000 * 60 * 30,
+    staleTime: 0,
   });
 
   const result = ordersQuery.data;

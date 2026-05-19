@@ -9,7 +9,9 @@ export function useGoals() {
 
   const { data: goals = [], isLoading } = useQuery({
     queryKey: ['goals'],
-    queryFn: () => GoalsRepository.getAll()
+    queryFn: () => GoalsRepository.getAll(),
+    staleTime: 0,
+    gcTime: 30 * 60 * 1000,
   });
 
   const invalidate = useCallback(() => {

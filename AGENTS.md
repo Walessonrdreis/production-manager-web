@@ -76,6 +76,7 @@ Tipos de alteração:
 
 Cada alteração deve possuir documentação própria,
 permitindo rastreabilidade histórica.
+Cada Alteração deve seguir passo a passo, definir os passos e aguardar a aprovação fazendo passo por vez.
 
 ## 5. Regra de Implementações (Responsabilidade Única)
 

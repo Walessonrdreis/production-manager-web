@@ -5,7 +5,8 @@ export function useOmieProducts() {
   const query = useQuery({
     queryKey: ['products-raw'],
     queryFn: getOmieProducts,
-    staleTime: 1000 * 60 * 10, 
+    staleTime: 0,
+    gcTime: 30 * 60 * 1000,
   });
 
   const result = query.data;

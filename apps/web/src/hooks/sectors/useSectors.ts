@@ -11,7 +11,7 @@ export function useSectors() {
   const query = useQuery({
     queryKey: ['sectors'],
     queryFn: getSectors,
-    staleTime: 5 * 60 * 1000, // 5 minutos de cache
+    staleTime: 0, // Sem cache para evitar atrasos na leitura do DB
     gcTime: 30 * 60 * 1000,   // Perdurar por 30 minutos
   });
 

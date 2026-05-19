@@ -23,9 +23,39 @@ export function CollaboratorGoalsTab() {
   const [period, setPeriod] = useState<GoalPeriod>('monthly');
 
   // Filter only collaborator goals
-  const collaboratorGoals = goals.filter(g => g.type === 'collaborator');
+  const dbCollaboratorGoals = goals.filter(g => g.type === 'collaborator');
 
-  const filteredGoals = collaboratorGoals.filter(g => 
+  // Convert collaborator's built-in dailyGoal into implicit goals
+  const implicitCollaboratorGoals: ProductionGoal[] = collaborators
+    .filter(c => c.dailyGoal && Number(c.dailyGoal) > 0)
+    .map(c => ({
+      id: `implicit-collab-${c.id}`, // Pseudo ID
+      type: 'collaborator' as const,
+      collaboratorId: c.id,
+      collaboratorName: c.name,
+      targetQuantity: Number(c.dailyGoal),
+      period: 'daily' as GoalPeriod,
+      isActive: c.status !== 'inactive',
+      synced: true,
+      lastModified: Date.now(),
+      version: 1,
+      createdAt: c.createdAt || new Date().toISOString(),
+      updatedAt: c.updatedAt || new Date().toISOString(),
+    }));
+
+  // Merge DB goals with implicit goals (prefer DB goals if they overlap)
+  const mergedCollaboratorGoals = [...implicitCollaboratorGoals];
+
+  dbCollaboratorGoals.forEach(dbGoal => {
+    const existingIndex = mergedCollaboratorGoals.findIndex(g => g.collaboratorId === dbGoal.collaboratorId && g.period === dbGoal.period);
+    if (existingIndex >= 0) {
+      mergedCollaboratorGoals[existingIndex] = dbGoal; // Override implicit with explicit DB record
+    } else {
+      mergedCollaboratorGoals.push(dbGoal);
+    }
+  });
+
+  const filteredGoals = mergedCollaboratorGoals.filter(g => 
     (activeTab === 'all' || g.period === activeTab) &&
     ((g.collaboratorName || '').toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -50,22 +80,26 @@ export function CollaboratorGoalsTab() {
     const collaborator = collaborators.find(c => c.id === selectedCollabId);
     if (!collaborator || targetQty <= 0) return;
 
-    if (!editingGoal) {
-      // Validação: Impedir metas duplicadas
-      const existingGoal = collaboratorGoals.find(g => g.collaboratorId === collaborator.id && g.period === period);
-      if (existingGoal) {
-        alert(`Já existe uma meta ${period === 'daily' ? 'diária' : period === 'weekly' ? 'semanal' : 'mensal'} para este colaborador.`);
-        return;
+    if (!editingGoal || editingGoal.id.startsWith('implicit-collab-')) {
+      // Validação: Impedir metas duplicadas no banco (usamos o dbCollaboratorGoals)
+      const existingDbGoal = dbCollaboratorGoals.find(g => g.collaboratorId === collaborator.id && g.period === period);
+      
+      if (existingDbGoal) {
+        // Se já existir no banco, atualiza
+        await updateGoal(existingDbGoal.id, {
+          targetQuantity: targetQty,
+          period,
+        });
+      } else {
+        await saveGoal({
+          type: 'collaborator',
+          collaboratorId: collaborator.id,
+          collaboratorName: collaborator.name,
+          targetQuantity: targetQty,
+          period,
+          isActive: true
+        });
       }
-
-      await saveGoal({
-        type: 'collaborator',
-        collaboratorId: collaborator.id,
-        collaboratorName: collaborator.name,
-        targetQuantity: targetQty,
-        period,
-        isActive: true
-      });
     } else {
       await updateGoal(editingGoal.id, {
         type: 'collaborator',
@@ -85,7 +119,11 @@ export function CollaboratorGoalsTab() {
 
   const confirmDelete = async () => {
     if (deletingId) {
-      await deleteGoal(deletingId);
+      if (!deletingId.startsWith('implicit-collab-')) {
+        await deleteGoal(deletingId);
+      } else {
+        alert("Esta meta reflete a Meta Diária do colaborador. Para removê-la, edite o cadastro na aba de Colaboradores.");
+      }
       setDeletingId(null);
     }
   };
@@ -220,7 +258,15 @@ export function CollaboratorGoalsTab() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Colaborador</label>
                 <select 
                   value={selectedCollabId}
-                  onChange={(e) => setSelectedCollabId(e.target.value)}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setSelectedCollabId(id);
+                    const c = collaborators.find(x => x.id === id);
+                    if (c && c.dailyGoal && !editingGoal) {
+                      setTargetQty(Number(c.dailyGoal));
+                      setPeriod('daily');
+                    }
+                  }}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 >
                   <option value="">Selecione um colaborador...</option>

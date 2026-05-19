@@ -2,7 +2,7 @@ import React from 'react';
 import { QueryClient, QueryCache, MutationCache, QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -77,17 +77,17 @@ export function AppProviders({ children }: AppProvidersProps) {
             maxAge: 1000 * 60 * 60 * 24,
           }}
         >
-          <BrowserRouter>
+          <HashRouter>
             {children}
-          </BrowserRouter>
+          </HashRouter>
           <Toaster position="top-right" richColors closeButton />
         </PersistQueryClientProvider>
       ) : (
         // Fallback when persistence is unavailable
         <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
+          <HashRouter>
             {children}
-          </BrowserRouter>
+          </HashRouter>
           <Toaster position="top-right" richColors closeButton />
         </QueryClientProvider>
       )}

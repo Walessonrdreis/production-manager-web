@@ -88,7 +88,7 @@ Uma implementação resolve UM único problema.
 - Versionar incrementalmente (vX.Y.Z)
 - Nunca sobrescrever versões antigas
 
-Sempre que possível, utilizar TDD.
+Sempre utilizar TDD.
 
 ## 6. Regra de Correções de Bugs
 
@@ -388,6 +388,25 @@ DEVE parar e solicitar autorização explícita,
 informando exatamente o que deseja analisar e por quê.
 
 
+
+## 18. Regra de Protocolo de Build e Configuração (Deploy)
+
+As configurações de build representam o principal ponto de falha para deployments na nuvem.
+O comportamento do build e do mapeamento de arquivos gerados (artefatos) DEVE ser estritamente preservado.
+
+### Diretório Unificado de Artifacts (`dist/` na raiz)
+- O único local aceitável para *build artifacts* finais do ambiente e de toda a SPA é o diretório `dist` na **raiz** do projeto (Root `dist/`).
+- O frontend no Vite DEVE apontar sempre para a raiz, configurando no seu respectivo `vite.config.ts` o outDir adequado (ex: `outDir: '../../dist'`).
+- É TERMINANTEMENTE PROIBIDO exportar assets do frontend para subdiretórios restritos (ex: `apps/web/dist`). O AI Studio Build System confia na estrutura central.
+
+### Entrypoints (Full-Stack Integrado)
+- A aplicação é servida no pacote gerado a partir do `dist/server.cjs` ou injetado via entrypoint central, como `server.ts`. 
+- Caso o script de start (`"start"`) no `package.json` esteja utilizando `"node server.ts"` consumindo a aplicação compilada, isso DEVE ser respeitado e preservado sem renomeações inconsequentes ou remoções de path.
+- O App de API gerencia como arquivos estáticos são servidos, e este roteamento `app.use(express.static(...))` obrigatoriamente tem de apontar para a pasta que contém o `index.html` e *assets* (o unificado root `dist/`).
+
+### Teste de Build
+- Se o agente alterar qualquer biblioteca de bundler (ex: vite, esbuild) ou manipular caminhos que refletem ao output, é OBRIGATÓRIO verificar a resiliência chamando o build. Se houver falha na geração dos artefatos (Artifacts array empty), a correção é emergencial antes de qualquer implementação.
+- Não quebre os scripts do `package.json`.
 
 ## Regra Final de Governança
 

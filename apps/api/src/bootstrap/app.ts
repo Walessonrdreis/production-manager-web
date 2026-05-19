@@ -40,6 +40,14 @@ export function configureApp(app: Express) {
   // API Routes
   app.use('/api', buildApiRouter());
 
+  // Catch-all para rotas não encontradas no /api (não deve retornar HTML)
+  app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+    res.status(404).json({
+      success: false,
+      error: `Route ${req.method} ${req.originalUrl} not found`,
+    });
+  });
+
   // Global Error Handler for API endpoints
   app.use('/api', globalErrorHandler);
 }

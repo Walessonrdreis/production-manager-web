@@ -7,9 +7,10 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "tsx server.ts",
-    "start": "npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && node dist/server.cjs",
-    "build": "npx prisma generate --schema=apps/api/prisma/schema.prisma && vite build --config apps/web/vite.config.ts && esbuild server.ts --bundle --platform=node --target=node22 --packages=external --outfile=dist/server.cjs",
+    "dev": "tsx app-entry.ts",
+    "prestart": "npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma",
+    "start": "node server.ts",
+    "build": "npx prisma generate --schema=apps/api/prisma/schema.prisma && vite build --config apps/web/vite.config.ts && esbuild app-entry.ts --bundle --platform=node --target=node22 --packages=external --outfile=dist/server.cjs",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "tsc --noEmit",
@@ -21,8 +22,12 @@
     "@vitejs/plugin-react": "^5.0.4",
     "cors": "^2.8.6",
     "date-fns": "^4.1.0",
+    "esbuild": "^0.28.0",
     "helmet": "^8.1.0",
     "node-cron": "^4.2.1",
+    "prisma": "^5.14.0",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
     "vite": "^6.2.0"
   },
   "devDependencies": {
@@ -37,12 +42,9 @@
     "@types/react-dom": "^19.0.0",
     "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.21",
-    "esbuild": "^0.28.0",
     "jsdom": "^29.0.2",
     "msw": "^2.13.4",
     "tailwindcss": "^4.1.14",
-    "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
     "vitest": "^4.1.4"
   }
 }

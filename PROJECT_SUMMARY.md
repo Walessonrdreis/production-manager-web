@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.17.14 (Atualizado em 19/05/2026 - Correção de Build e Banco Postgres)
+**Versão:** v4.17.15 (Atualizado em 19/05/2026 - Correção de Banco Postgres para Colaboradores)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,9 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.25. Sincronização Local-Postgres de Colaboradores (v4.17.15)
+- **Correção de Prisma Model para Colaboradores:** Os colaboradores (Collaborators) criados ou atualizados não estavam persistindo os novos campos (`sectorId`, `category`, `dailyGoal`, `status`) pois o schema não refletia tais atributos e o método de _update_ repassava o payload inteiro, causando rejeição do Prisma (exibindo apenas nome e cargo gravados). O modelo e os métodos de upsert/update foram refinados para mapear explicitamente os campos no PostgreSQL, corrigindo bugs na listagem e quebras na atualização.
+
 ### 0.24. Sincronização Local-Postgres de Metas (v4.17.14)
 - **Correção de Prisma Model para Metas:** As metas (Goals) criadas no Frontend não estavam sendo persistidas no PostgreSQL porque o `schema.prisma` backend contava com uma estrutura `Goal` desatualizada (sem colunas de tipo, SKU, setor ou colaborador). O Schema foi adequadamente sincronizado à interface `ProductionGoal` e aplicado `db push` de forma a garantir que toda entrada local reflita imediatamente ao DB central.
 

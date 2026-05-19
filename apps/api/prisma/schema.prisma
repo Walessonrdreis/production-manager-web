@@ -60,6 +60,10 @@ model Collaborator {
   id        String   @id
   name      String
   role      String?
+  sectorId  String?
+  category  String?
+  dailyGoal Int?
+  status    String?  @default("active")
   metrics   String?  // Store JSON as string
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

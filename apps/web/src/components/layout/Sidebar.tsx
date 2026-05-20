@@ -5,6 +5,7 @@ import {
   Package, 
   Layers, 
   ShoppingCart, 
+  ClipboardList,
   CalendarRange, 
   LogOut,
   X,
@@ -35,7 +36,8 @@ const menuCategories = [
     icon: Factory,
     items: [
       { id: 'production-control', label: 'Controle de Produção', path: '/production-control', icon: Activity },
-      { id: 'orders', label: 'Ordens Pendentes', path: '/orders', icon: ShoppingCart },
+      { id: 'orders', label: 'Pedidos', path: '/orders', icon: ShoppingCart },
+      { id: 'production-orders', label: 'Ordens de Produção', path: '/production-orders', icon: ClipboardList },
       { id: 'planning', label: 'Gerador de Plano', path: '/planning', icon: CalendarRange },
     ]
   },
@@ -155,17 +157,28 @@ export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
                   </button>
 
                   <div className={cn(
-                    "flex flex-col space-y-1 overflow-hidden transition-all duration-300 ease-in-out",
-                    isExpanded ? "max-h-[500px] opacity-100 mt-1" : "max-h-0 opacity-0",
-                    "ml-[24px] pl-3 border-l-2 border-slate-800/50",
-                    "lg:ml-0 lg:pl-0 lg:border-transparent lg:group-hover:ml-[24px] lg:group-hover:pl-3 lg:group-hover:border-slate-800/50"
+                    "grid transition-all ease-in-out",
+                    isExpanded ? "duration-500 grid-rows-[1fr] mt-1" : "duration-1000 grid-rows-[0fr]",
+                    "ml-[24px] border-l-2 border-slate-800/50",
+                    "lg:ml-0 lg:border-transparent lg:group-hover:ml-[24px] lg:group-hover:border-slate-800/50"
                   )}>
-                    {category.items.map((item) => (
+                    <div className={cn(
+                      "flex flex-col space-y-1 overflow-hidden",
+                      "pl-3 lg:pl-0 lg:group-hover:pl-3"
+                    )}>
+                      {category.items.map((item) => (
                       <NavLink
                         key={item.id}
                         to={item.path}
                         onClick={() => {
                           if (window.innerWidth < 1024) onClose();
+                          setExpandedCategories(prev => {
+                            const newState: Record<string, boolean> = {};
+                            menuCategories.forEach(c => {
+                              newState[c.title] = c.title === category.title;
+                            });
+                            return newState;
+                          });
                         }}
                         title={item.label}
                         className={({ isActive }) => cn(
@@ -185,6 +198,7 @@ export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
                         </span>
                       </NavLink>
                     ))}
+                    </div>
                   </div>
                 </div>
               );

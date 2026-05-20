@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.20.0 (Atualizado em 20/05/2026 - Agrupamento de Menu por Categorias UI)
+**Versão:** v4.22.3 (Atualizado em 20/05/2026 - Correção na Animação do Menu Sanfona)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,23 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 1.10. Correção na Animação Visual da Sidebar (v4.22.3)
+- **Remoção de Opacidade Preemptiva:** Corrigido o bug visual no UX onde o fechamento simulava rapidez instantânea. Ao desatrelar a classe de opacidade, o elemento não desaparece mais invisivelmente antes do reskin. A velocidade de retraimento do menu agora dura deliberadamente 1 segundo inteiro (`duration-1000`), forçando estritamente a visão do container decrescendo suavemente seu Grid natural.
+
+### 1.9. Suavização Dinâmica na Retração do Menu (v4.22.2)
+- **Duração Assimétrica:** Aperfeiçoado o timing do submenu no modo Focus. A transição possui durações flexíveis dependendo do contexto da animação: 500ms para abertura (oferecendo expansão suave) e 250ms para fechamento (otimizando a liberação de espaço visual e proporcionando agilidade na resposta em tela cheia da UI).
+
+### 1.8. Suavização de UX na Sidebar (v4.22.1)
+- **Refatoração com CSS Grid:** Transição do container de itens (`max-h`) para grid fracional (`grid-rows-[1fr]/[0fr]`), o que entrega uma fluidez muito mais limpa eliminando solavancos de altura na hora de reabrir ou intergir. A duração da transição foi ampliada de 300ms para 500ms provendo total suavidade e clareza visual a fechar um submenu e abrir simultaneamente.
+
+### 1.7. UX Focus Mode no Menu Lateral (v4.22.0)
+- **Melhoria de Navegação (Auto-Collapse):** Adicionada funcionalidade de inteligência no roteamento. Ao clicar em um elemento de navegação (filho) no menu lateral expandido, o sistema automaticamente mapeia a aba pai do link correspondido e força uma expiração visual sobre qualquer outro grupo/categoria que estivesse outrora aberto. Essa abordagem imita um comportamento focado de "Accordion Dinâmico", mantendo as abas do sidebar limpas e reduzindo scroll desnecessário em telas pequenas ou em abas preenchidas com muitos submódulos.
+
+### 1.6. Separação de Pedidos e Ordens de Produção (v4.21.0)
+- **Desacoplamento de UI:** A antiga página unificada de "Gestão de Ordens" (`/orders`), que dependia de uma estrutura de abas misturando contexto externo de **Pedidos de Venda** e contexto interno de **Ordens de Produção**, foi quebrada em duas páginas independentes no Frontend.
+- **Isolamento de Rota e Contexto:** A rota `/orders` agora atende unicamente "Pedidos de Venda", enquanto a nova rota `/production-orders` atende "Ordens de Produção". Esse setup resolve os erros e resets de estado (abas voltando ao padrão devido ao Recarregamento) e isola lógicas de negócio.
+- **Navegação Coesa:** As opções no menu lateral da categoria "Produção" foram enriquecidas, permitindo acessos explícitos e imediatos a "Pedidos" e "Ordens de Produção" de modo autônomo.
+
 ### 1.5. Agrupamento de Menu do Frontend (v4.20.0)
 - **Melhoria de UI/UX:** A barra lateral (Sidebar) foi reestruturada para exibir os links de navegação agrupados por categorias ("Visão Geral", "Produção", "Estoque", "Administração").
 - **Design Intuitivo:** Implementados títulos em formato `uppercase` que são exibidos dinamicamente de acordo com o estado do menu (expandido ou recolhido), e as categorias foram dispostas iterativamente usando aninhamento no React JSX. O agrupamento possui funcionalidade sanfona (accordion) que vem retraída por padrão, auto-expandindo apenas a categoria correspondente à página atual.

@@ -5,6 +5,7 @@ import { CatalogPage } from '../pages/catalog/CatalogPage';
 import { StocksPage } from '../pages/stocks/StocksPage';
 import { SectorsPage } from '../pages/sectors/SectorsPage';
 import { OrdersPage } from '../pages/orders/OrdersPage';
+import { ProductionOrdersPage } from '../pages/orders/ProductionOrdersPage';
 import { PlanningPage } from '../pages/planner/PlanningPage';
 import { GoalsManagementPage } from '../features/goals/ui/GoalsManagementPage';
 import { CollaboratorsPage } from '../features/collaborators/ui/CollaboratorsPage';
@@ -26,6 +27,7 @@ export function AppRouter() {
         {/* <Route path="/customers" element={<CustomersPage />} /> */}
         <Route path="/sectors" element={<SectorsPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/production-orders" element={<ProductionOrdersPage />} />
         <Route path="/planning" element={<PlanningPage />} />
         <Route path="/goals" element={<GoalsManagementPage />} />
         <Route path="/collaborators" element={<CollaboratorsPage />} />

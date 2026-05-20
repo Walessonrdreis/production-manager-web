@@ -1,5 +1,6 @@
-import { Package, RefreshCw, Eye } from 'lucide-react';
+import { Package, Eye } from 'lucide-react';
 import { Button } from '../../../../components/ui/Button';
+import { Skeleton } from '../../../../components/ui/Skeleton';
 import { Order } from '../../../../hooks/orders/useOrders';
 
 interface OrdersTableProps {
@@ -11,8 +12,28 @@ interface OrdersTableProps {
 export function OrdersTable({ orders, isLoading, onOpenDetails }: OrdersTableProps) {
   if (isLoading) {
     return (
-      <div className="flex h-60 items-center justify-center">
-        <RefreshCw size={40} className="animate-spin text-blue-600" />
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 flex flex-col md:flex-row gap-4 h-auto md:h-[84px] items-start md:items-center">
+            <div className="flex gap-4 flex-1 w-full">
+              <Skeleton className="w-[80px] h-[50px] rounded-md shrink-0" />
+              <div className="flex flex-col gap-2 flex-1">
+                <Skeleton className="h-5 w-[50%] max-w-[200px] rounded" />
+                <Skeleton className="h-4 w-[30%] max-w-[120px] rounded" />
+              </div>
+            </div>
+            <div className="hidden sm:flex flex-1 flex-col gap-2 border-l border-slate-100 dark:border-slate-800 pl-6">
+               <Skeleton className="h-3 w-[60px] rounded" />
+               <Skeleton className="h-4 w-[120px] rounded" />
+            </div>
+            <div className="flex flex-1 justify-end w-full sm:w-auto">
+               <div className="flex flex-col items-end gap-2 shrink-0">
+                 <Skeleton className="h-3 w-[50px] rounded" />
+                 <Skeleton className="h-5 w-[80px] rounded" />
+               </div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

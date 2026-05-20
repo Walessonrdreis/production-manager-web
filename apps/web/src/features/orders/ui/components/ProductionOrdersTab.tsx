@@ -5,6 +5,7 @@ import { useProductionOrders } from '../../../../hooks/orders/useProductionOrder
 import { useStocks } from '../../../../hooks/stocks/useStocks';
 import { useSectors } from '../../../../hooks/sectors/useSectors';
 import { useCollaborators } from '../../../../hooks/collaborators/useCollaborators';
+import { Skeleton } from '../../../../components/ui/Skeleton';
 import { ProductionOrder, ProductionOrderStatus } from '../../domain/ProductionOrder';
 
 export function ProductionOrdersTab() {
@@ -164,9 +165,33 @@ export function ProductionOrdersTab() {
 
       <div className="flex flex-col gap-3">
         {isLoading ? (
-          <div className="py-12 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-200">
-            Carregando ordens de produção...
-          </div>
+          <>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4 flex-1 border-r border-gray-50 pr-4">
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="flex gap-2">
+                       <Skeleton className="h-4 w-[80px]" />
+                       <Skeleton className="h-4 w-[60px]" />
+                    </div>
+                    <Skeleton className="h-5 w-[60%] max-w-[200px]" />
+                    <Skeleton className="h-3 w-[40%] max-w-[120px]" />
+                  </div>
+                </div>
+                <div className="flex flex-1 items-center justify-between gap-6 pl-2">
+                  <div className="hidden sm:flex flex-col gap-2 w-full">
+                    <Skeleton className="h-3 w-[80px]" />
+                    <Skeleton className="h-4 w-[120px]" />
+                    <Skeleton className="h-3 w-[100px]" />
+                  </div>
+                  <div className="text-right flex flex-col justify-end gap-2 items-end">
+                    <Skeleton className="h-3 w-[40px]" />
+                    <Skeleton className="h-6 w-[60px]" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </>
         ) : filteredOrders.length === 0 ? (
           <div className="py-12 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-200">
             Nenhuma ordem de produção encontrada.

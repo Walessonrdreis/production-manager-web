@@ -23,6 +23,16 @@
   }
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite linear;
+}
+
 @keyframes slide-in-from-right {
   from {
     transform: translateX(100%);

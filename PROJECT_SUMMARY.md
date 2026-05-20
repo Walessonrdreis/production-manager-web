@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.22.3 (Atualizado em 20/05/2026 - Correção na Animação do Menu Sanfona)
+**Versão:** v4.23.0 (Atualizado em 20/05/2026 - UX: Shimmer Effect & Skeleton Loading)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,9 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 1.11. Efeito Shimmer e Skeleton Loading (v4.23.0)
+- **Feedback Visual Avançado:** O mecanismo de placeholder durante o processamento (Loading) foi reestruturado de um icon spinner tradicional para um Skeleton dinâmico com overlay de Shimmer de gradiente linear em diversas telas do App (Catálogo de Produtos, Tabela de Ordens, Timeline Dashboard e Ordens de Produção). A base está localizada em `apps/web/src/components/ui/Skeleton.tsx` e injeta animações CSS de altíssima performance.
+
 ### 1.10. Correção na Animação Visual da Sidebar (v4.22.3)
 - **Remoção de Opacidade Preemptiva:** Corrigido o bug visual no UX onde o fechamento simulava rapidez instantânea. Ao desatrelar a classe de opacidade, o elemento não desaparece mais invisivelmente antes do reskin. A velocidade de retraimento do menu agora dura deliberadamente 1 segundo inteiro (`duration-1000`), forçando estritamente a visão do container decrescendo suavemente seu Grid natural.
 

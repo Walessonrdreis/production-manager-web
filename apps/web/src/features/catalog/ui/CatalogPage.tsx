@@ -4,6 +4,7 @@ import { useSyncCatalog, useSyncStock } from '../../../hooks/catalog/useSyncCata
 import { useSectors } from '../../../hooks/sectors/useSectors';
 import { useStocks } from '../../../hooks/stocks/useStocks';
 import { Card } from '../../../components/ui/Card';
+import { Skeleton } from '../../../components/ui/Skeleton';
 import { Button } from '../../../components/ui/Button';
 import { useToast } from '../../../components/ui/Toast';
 import { RefreshCw } from 'lucide-react';
@@ -149,8 +150,17 @@ export function CatalogPage() {
         />
 
         {isLoading ? (
-          <div className="flex h-64 items-center justify-center">
-            <RefreshCw size={32} className="animate-spin text-blue-600" />
+          <div className="p-4 space-y-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex gap-4 items-center">
+                <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-[60%] max-w-[200px]" />
+                  <Skeleton className="h-4 w-[80%] max-w-[300px]" />
+                </div>
+                <Skeleton className="h-10 w-24 rounded-lg hidden sm:block" />
+              </div>
+            ))}
           </div>
         ) : (
           <>

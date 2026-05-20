@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Package, CalendarClock, Target, Layers, ArrowRight, CloudOff, Cloud } from 'lucide-react';
+import { Skeleton } from '../../../components/ui/Skeleton';
 import { useActivityLogs, ActivityLogItem } from '../../../hooks/dashboard/useActivityLogs';
 
 const icons = {
@@ -21,11 +22,11 @@ export function ActivityLogViewer() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4 animate-pulse">
-        <div className="h-6 w-48 bg-zinc-200 dark:bg-slate-800 rounded"></div>
+      <div className="flex flex-col gap-4">
+        <Skeleton className="h-6 w-48 rounded" />
         <div className="space-y-3">
-          {[1,2,3,4].map(i => (
-             <div key={i} className="h-16 w-full bg-zinc-100 dark:bg-zinc-800 dark:bg-slate-800 rounded-lg"></div>
+          {Array.from({ length: 4 }).map((_, i) => (
+             <Skeleton key={i} className="h-16 w-full rounded-lg" />
           ))}
         </div>
       </div>

@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.23.0 (Atualizado em 20/05/2026 - UX: Shimmer Effect & Skeleton Loading)
+**Versão:** v4.23.1 (Atualizado em 20/05/2026 - Backend: Correção Graceful para Integração API Omie Offline)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,10 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 1.12. Desligamento Transparente de API Externa (Omie) no Backend (v4.23.1)
+- **Circuit Breaker com Variável de Ambiente:** Implementado um interceptor no `external.client.ts` do backend que verifica a variável de ambiente `DISABLE_EXTERNAL_SYNC`. Quando essa flag está setada como `true` no Render/Hospedagem, o serviço bloqueia proativamente as chamadas de sincronização com a API legada (Omie), estourando um 503 HTTP controlado.
+- **Graceful Fallback:** Ao receberem a falha do Axios, as controllers e use cases do backend recuam pacificamente, evitando deletar cachês antigos ou corromper o PostgreSQL. No Frontend, os endpoints respondem falha devolvendo arrays vazios `[]`, estabilizando a performance perante inatividades do legado.
+
 ### 1.11. Efeito Shimmer e Skeleton Loading (v4.23.0)
 - **Feedback Visual Avançado:** O mecanismo de placeholder durante o processamento (Loading) foi reestruturado de um icon spinner tradicional para um Skeleton dinâmico com overlay de Shimmer de gradiente linear em diversas telas do App (Catálogo de Produtos, Tabela de Ordens, Timeline Dashboard e Ordens de Produção). A base está localizada em `apps/web/src/components/ui/Skeleton.tsx` e injeta animações CSS de altíssima performance.
 

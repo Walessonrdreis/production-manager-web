@@ -21,6 +21,13 @@ export const externalClient = axios.create({
   httpAgent: new http.Agent({ keepAlive: true, maxSockets: 50 })
 });
 
+externalClient.interceptors.request.use(config => {
+  if (process.env.DISABLE_EXTERNAL_SYNC === 'true') {
+    return Promise.reject(Object.assign(new Error('Integração com Omie (API externa) temporariamente desativada'), { response: { status: 503 } }));
+  }
+  return config;
+});
+
 externalClient.interceptors.response.use(
   (response) => response,
   async (error) => {

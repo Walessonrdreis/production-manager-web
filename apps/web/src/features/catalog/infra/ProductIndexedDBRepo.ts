@@ -93,6 +93,16 @@ export class ProductIndexedDBRepo implements IProductRepository {
       synced: false
     });
   }
+
+  async bulkSave(products: SavedProduct[]): Promise<void> {
+    await this.ensureMigration();
+    // Bulk put using Dexie's bulkPut method which inserts or updates
+    await catalogDb.products.bulkPut(products.map(p => ({
+      ...p,
+      lastModified: Date.now(),
+      synced: p.synced !== undefined ? p.synced : true
+    })));
+  }
 }
 
 export const productRepository = new ProductIndexedDBRepo();

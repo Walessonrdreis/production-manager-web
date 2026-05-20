@@ -2,9 +2,11 @@ export const ENDPOINTS = {
   AUTH: {
     LOGIN: 'auth/login',
   },
+  PRODUCTION_CONTROL: {
+    STAGE20_TOTALS: 'production-control/stage20/totals',
+    SYNC_STAGE20: 'orders/sync'
+  },
   DASHBOARD: {
-    STAGE20_TOTALS: 'dashboard/stage20/totals',
-    SYNC_STAGE20: 'orders/sync',
     PRODUCED: 'dashboard/produced'
   },
   CATALOG: {

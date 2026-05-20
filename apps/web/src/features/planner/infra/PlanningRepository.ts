@@ -2,6 +2,7 @@ import { type PlanningItem } from '../../../db/models';
 import { v4 as uuidv4 } from 'uuid';
 import { apiClient } from '../../../services/api/client';
 import { ENDPOINTS } from '../../../services/api/endpoints';
+import { planningLocalRepository } from './PlanningIndexedDBRepo';
 
 export const PlanningRepository = {
   async getAll(): Promise<PlanningItem[]> {
@@ -10,15 +11,37 @@ export const PlanningRepository = {
         validateStatus: (status) => (status >= 200 && status < 300) || status === 404
       });
       if (response.status === 404) return [];
+      
+      let items: PlanningItem[] = [];
       if (response.data && response.data.data) {
-        return response.data.data;
+        items = response.data.data;
+      } else if (Array.isArray(response.data)) {
+        items = response.data;
       }
-      if (Array.isArray(response.data)) {
-        return response.data;
+      
+      if (items.length > 0) {
+        setTimeout(() => {
+          items.forEach(item => {
+            planningLocalRepository.saveItem({
+              ...item,
+              synced: true,
+              lastModified: Date.now()
+            }).catch(() => {});
+          });
+        }, 0);
       }
-      return [];
+
+      return items;
     } catch (error) {
-      console.warn('[PlanningRepository] falha ao buscar planejamento da API:', error);
+      console.warn('[PlanningRepository] falha ao buscar planejamento da API, tentando Cache Local:', error);
+      try {
+        const localItems = await planningLocalRepository.getAllItems();
+        if (localItems && localItems.length > 0) {
+          return localItems;
+        }
+      } catch (localErr) {
+        console.error('[PlanningRepository] Falha ao buscar dados do Cache Local:', localErr);
+      }
       return [];
     }
   },

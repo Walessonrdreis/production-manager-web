@@ -1,0 +1,7 @@
+# Correção: Array Root Oculto no Sync Backend Causando Wipe Local
+
+- **Data:** 20/05/2026
+- **Bug:** O painel `/production-control` parou misteriosamente de listar os produtos, assumindo os subtotais como zerados, porém a aba `/#/orders` continuava exibindo seus pedidos normalmente.
+- **Causa Raiz:** O backend possuía uma falha de desestruturação oculta em `orders.adapter.ts`. Ao consumir a API externa (`/admin/orders/stage20/enriched`), o backend aguardava um payload do tipo `{ enrichedOrders: [...] }` ou `{ data: [...] }`. No entanto, quando a API devolvia um `Array` limpo no root (`[ ... ]`), o backend falhava em identificá-lo, resultando em uma lista vazia (`[ ]`). Combinado à nossa recente alteração de "Purga de Cache" em `SyncOrdersUseCase` (onde permitimos deletar o banco se a lista da Etapa 20 visse vazia), o sistema pensou intencionalmente que o Omie não tinha mais nada e apagou todos os produtos do cache local.
+- **Como foi corrigido:** O adapter `OrdersAdapter.fetchFromExternalAPI` foi atualizado para suportar instâncias brutas de Arrays com `Array.isArray(responseData) ? responseData : ...`. O retorno correto das ordens previne que o banco local sofra falsos *wipes*.
+- **Como evitar no futuro:** Sempre utilizar verificações extensivas de instâncias (`Array.isArray()`) ao lidar com o endpoint "Enriched" ou dados sensíveis de Omie que flutuam sua estrutura base dependendo de quem serializa a resposta, e proteger fluxos inteiros de sincronia garantindo a correta serialização pré-Processamento.

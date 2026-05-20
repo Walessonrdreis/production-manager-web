@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.17.15 (Atualizado em 19/05/2026 - Correção de Banco Postgres para Colaboradores)
+**Versão:** v4.18.2 (Atualizado em 20/05/2026 - Correção de Formato Array no Sync da Produção)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,23 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 0.30. Correção de Formato Array no Sync da Produção (v4.18.2)
+- **Falha de Mapeamento Root Resolvida:** A interface `OrdersAdapter` falhava ao interagir com retornos Array base (sem formatação container objeto) enviados pelo upstream da Etapa 20. Tratar o retorno como fallback falho preenchia a sincronização zero, ativando erroneamente o wipe local que apagava os itens do motor de agregadores do banco. Inclusão da checagem de tipos e estabilização garantem sync transparente.
+
+### 0.29. Correção de Sincronização Passiva (v4.18.1)
+- **Correção da Purga de Cache:** Resolvido caso extremo no `SyncOrdersUseCase` em que o encerramento sistêmico final de operações de painel impossibilitava itens de moverem ao Histórico Local. O gatilho condicional de proteção (`size > 0`) mantinha relíquias e itens atrasados travados na UI quando nenhum card oriundo da API restava em estágio inicial 20 (Omie).
+
+### 0.28. Centralização do Motor de Agregação da Etapa 20 e Novo Modulo Backend (v4.18.0)
+- **Desacoplamento de UI e Renomeação:** A inteligência primária de consolidação e aglutinação dos produtos do fluxo do estágio 20 foi movida integralmente da UI do Frontend (`TrackingLogic.ts`) para dentro da API Backend. Adicionalmente, aderindo as regras de padronização arquitetural e isolamento semântico de módulos, o endpoint responsável que habitava de forma genérica o módulo `dashboard` foi realocado.
+- **Módulo `production-control`**: Criado ao substituir o genérico `dashboard` no backend, resultando em rotas mais coesas (`/production-control/stage20/totals`), mantendo Controllers e UseCases isolados e aprimorados para devolver dados formatados e agregados (soma de quantidades).
+- **Adequação no Frontend:** As chamadas originais e endpoits de integração no `DashboardRepository` e `OrdersRepository` foram atualizadas com `ENDPOINTS.PRODUCTION_CONTROL` e isentadas do pré-processamento.
+
+### 0.27. Transição do Monitoramento da Etapa 20 para o Banco de Dados Local (v4.17.17)
+- **Correção da Defasagem da UI:** A tela de Controle de Produção (Etapa 20) estava listando dados não espelhados ou ausentes porque ainda dependia de chamadas para servidor exógeno (`dashboard.adapter.ts`). Refatoramos o caso de uso `GetStage20TotalsUseCase` para consultar os registros de ordens puramente através do PostgreeSQL via `prisma.order`, resultando em um Painel livre de anomalias com dados nativos e alinhados e removendo dependências antigas.
+
+### 0.26. Reversão Segura de Baixa Automática (v4.17.16)
+- **Correção da Lógica de Remoção Obsoleta da Etapa 20:** Ao sair da etapa 20, o SyncOrdersUseCase emite a baixa dos itens do pedido como produzidos. Caso o status do pedido regresse para a Etapa 20 de forma manual ou por acidente/correção na API externa (Omie), ele antes ficava constando eternamente como "Produzido" prejudicando o fluxo. Implementado mecanismo que marca as auto-baixas com o UUID customizado (`auto-`) e deleta em cascata sempre que o pedido reaparecer no monitoramento.
+
 ### 0.25. Sincronização Local-Postgres de Colaboradores (v4.17.15)
 - **Correção de Prisma Model para Colaboradores:** Os colaboradores (Collaborators) criados ou atualizados não estavam persistindo os novos campos (`sectorId`, `category`, `dailyGoal`, `status`) pois o schema não refletia tais atributos e o método de _update_ repassava o payload inteiro, causando rejeição do Prisma (exibindo apenas nome e cargo gravados). O modelo e os métodos de upsert/update foram refinados para mapear explicitamente os campos no PostgreSQL, corrigindo bugs na listagem e quebras na atualização.
 

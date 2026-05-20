@@ -11,31 +11,31 @@ datasource db {
 }
 
 model Product {
-  id          String   @id
-  name        String
-  code        String?
-  price       Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id
+  name      String
+  code      String?
+  price     Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductionOrder {
-  id                String   @id
-  lote              String
-  productId         String?
-  productCode       String
+  id                 String    @id
+  lote               String
+  productId          String?
+  productCode        String
   productDescription String
-  quantity          Int
-  sectorId          String?
-  sectorName        String?
-  collaboratorId    String?
-  collaboratorName  String?
-  status            String
-  startDate         DateTime?
-  endDate           DateTime?
-  notes             String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  quantity           Int
+  sectorId           String?
+  sectorName         String?
+  collaboratorId     String?
+  collaboratorName   String?
+  status             String
+  startDate          DateTime?
+  endDate            DateTime?
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }
 
 model Goal {
@@ -64,7 +64,7 @@ model Collaborator {
   category  String?
   dailyGoal Int?
   status    String?  @default("active")
-  metrics   String?  // Store JSON as string
+  metrics   String? // Store JSON as string
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -105,14 +105,14 @@ model ProducedRecord {
 }
 
 model PlanningBatch {
-  id          String   @id
-  name        String
-  date        String
-  status      String
-  createdBy   String 
-  synced      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id
+  name      String
+  date      String
+  status    String
+  createdBy String
+  synced    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PlanningItem {
@@ -130,7 +130,7 @@ model PlanningItem {
 }
 
 model ProductionSchedule {
-  id          String   @id
+  id          String    @id
   productCode String
   description String
   quantity    Int?
@@ -138,7 +138,7 @@ model ProductionSchedule {
   sectorName  String?
   scheduledAt DateTime?
   notes       String?
-  synced      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  synced      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

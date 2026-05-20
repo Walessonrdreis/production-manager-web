@@ -20,11 +20,13 @@ export function useProductionSchedules() {
       setProductionSchedule(description, date, notes, productCode, quantity, sectorId, sectorName),
     onSuccess: (res) => {
       if (res.success) {
-        queryClient.invalidateQueries({ queryKey: ['production-schedules'] });
         success('Programação salva com sucesso.');
       } else {
         showError(res.error);
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['production-schedules'] });
     }
   });
 
@@ -32,11 +34,13 @@ export function useProductionSchedules() {
     mutationFn: (description: string) => removeProductionSchedule(description),
     onSuccess: (res) => {
       if (res.success) {
-        queryClient.invalidateQueries({ queryKey: ['production-schedules'] });
         success('Programação removida.');
       } else {
         showError(res.error);
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['production-schedules'] });
     }
   });
 

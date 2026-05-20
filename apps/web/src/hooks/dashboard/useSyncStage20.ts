@@ -11,13 +11,15 @@ export function useSyncStage20() {
     onSuccess: (result) => {
       if (result.success) {
         success('Sincronização concluída.', `Foram atualizados ${result.data.count} itens.`);
-        queryClient.invalidateQueries({ queryKey: ['stage20-totals'] });
       } else {
         error(result.error);
       }
     },
     onError: (err) => {
       error(err instanceof Error ? err.message : 'Erro na sincronização');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['stage20-totals'] });
     }
   });
 }

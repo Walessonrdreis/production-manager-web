@@ -11,13 +11,15 @@ export function useSyncCatalog() {
     onSuccess: (result) => {
       if (result.success) {
         success('Sincronização iniciada com sucesso.');
-        queryClient.invalidateQueries({ queryKey: ['products-raw'] });
       } else {
         error(result.error);
       }
     },
     onError: (err) => {
       error(err instanceof Error ? err.message : 'Erro ao sincronizar catálogo');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['products-raw'] });
     }
   });
 }
@@ -31,13 +33,15 @@ export function useSyncStock() {
     onSuccess: (result) => {
       if (result.success) {
         success('Estoque atualizado com sucesso.');
-        queryClient.invalidateQueries({ queryKey: ['products-raw'] });
       } else {
         error(result.error);
       }
     },
     onError: (err) => {
       error(err instanceof Error ? err.message : 'Erro ao atualizar estoque');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['products-raw'] });
     }
   });
 }

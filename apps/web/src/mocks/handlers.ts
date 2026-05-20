@@ -5,7 +5,7 @@ const BASE_URL = 'https://production-manager-api.onrender.com/v1';
 
 export const handlers = [
   // Mock Dashboard Totals
-  http.get(`${BASE_URL}${ENDPOINTS.DASHBOARD.STAGE20_TOTALS}`, () => {
+  http.get(`${BASE_URL}${ENDPOINTS.PRODUCTION_CONTROL.STAGE20_TOTALS}`, () => {
     return HttpResponse.json({
       data: [
         { description: 'Cadeira Ergonômica Pro', totalQuantity: 450 },

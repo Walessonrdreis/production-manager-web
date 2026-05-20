@@ -23,7 +23,7 @@ export class OrdersAdapter {
           }
         });
         const responseData = response.data || {};
-        const orders = responseData.enrichedOrders || responseData.data?.orders || responseData.orders || responseData.data || [];
+        const orders = Array.isArray(responseData) ? responseData : (responseData.enrichedOrders || responseData.data?.orders || responseData.orders || responseData.data || []);
         
         if (orders.length > 0) {
           allOrders = [...allOrders, ...orders];

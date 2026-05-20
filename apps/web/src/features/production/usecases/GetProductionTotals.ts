@@ -6,8 +6,12 @@ import { Result } from '../../../lib/Result';
 export async function getProductionTotals(): Promise<Result<DashboardTotalsResponse>> {
   try {
     const rawData = await ProductionRepository.getStage20Totals();
-    const aggregatedData = TrackingLogic.aggregateStage20Totals(rawData);
-    return Result.ok(aggregatedData);
+    // A API agora retorna os dados já agregados no formato correto
+    return Result.ok({
+      data: rawData.data || [],
+      totalItems: rawData.totalItems || 0,
+      lastUpdate: new Date().toISOString()
+    });
   } catch (err) {
     return Result.fail('Erro ao buscar totais de produção.');
   }

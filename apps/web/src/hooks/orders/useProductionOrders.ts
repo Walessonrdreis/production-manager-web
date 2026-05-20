@@ -28,7 +28,7 @@ export function useProductionOrders() {
       }
       return orderToSave;
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['production_orders'] });
     },
   });
@@ -41,7 +41,7 @@ export function useProductionOrders() {
       }
       return res;
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['production_orders'] });
     },
   });
@@ -54,7 +54,7 @@ export function useProductionOrders() {
       }
       return res;
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['production_orders'] });
     },
   });

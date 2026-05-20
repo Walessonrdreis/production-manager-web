@@ -15,11 +15,13 @@ export function useCollaborators() {
   const createMutation = useMutation({
     mutationFn: (collaborator: Omit<Collaborator, 'id'>) => CollaboratorsRepository.create(collaborator),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collaborators'] });
       success('Colaborador adicionado com sucesso!');
     },
     onError: () => {
       toastError('Falha ao adicionar colaborador.');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['collaborators'] });
     }
   });
 
@@ -27,22 +29,26 @@ export function useCollaborators() {
     mutationFn: ({ id, data }: { id: string; data: Partial<Collaborator> }) => 
       CollaboratorsRepository.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collaborators'] });
       success('Colaborador atualizado com sucesso!');
     },
     onError: () => {
       toastError('Falha ao atualizar colaborador.');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['collaborators'] });
     }
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => CollaboratorsRepository.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collaborators'] });
       success('Colaborador removido com sucesso!');
     },
     onError: () => {
       toastError('Falha ao remover colaborador.');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['collaborators'] });
     }
   });
 

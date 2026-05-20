@@ -4,7 +4,7 @@ import { ENDPOINTS } from '../../../services/api/endpoints';
 export const ProductionRepository = {
   async getStage20Totals(): Promise<any> {
     try {
-      const response = await apiClient.get(ENDPOINTS.DASHBOARD.STAGE20_TOTALS, {
+      const response = await apiClient.get(ENDPOINTS.PRODUCTION_CONTROL.STAGE20_TOTALS, {
         validateStatus: (status) => (status >= 200 && status < 300) || status === 404
       });
       if (response.status === 404) return { data: [] };
@@ -16,7 +16,7 @@ export const ProductionRepository = {
   },
 
   async syncStage20() {
-    const { data } = await apiClient.post(ENDPOINTS.DASHBOARD.SYNC_STAGE20, {});
+    const { data } = await apiClient.post(ENDPOINTS.PRODUCTION_CONTROL.SYNC_STAGE20, {});
     return data;
   }
 };

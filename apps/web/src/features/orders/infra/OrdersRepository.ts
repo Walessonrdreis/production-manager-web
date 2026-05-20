@@ -4,7 +4,7 @@ import { ENDPOINTS } from '../../../services/api/endpoints';
 export const OrdersRepository = {
   async syncWithOmie() {
     try {
-      const { data } = await apiClient.post(ENDPOINTS.DASHBOARD.SYNC_STAGE20, {});
+      const { data } = await apiClient.post(ENDPOINTS.PRODUCTION_CONTROL.SYNC_STAGE20, {});
       return data;
     } catch (apiError) {
       console.error('[OrdersRepository] Failed to sync orders:', apiError);

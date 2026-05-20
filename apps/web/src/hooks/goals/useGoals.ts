@@ -32,8 +32,11 @@ export function useGoals() {
     // Optimistic update
     queryClient.setQueryData(['goals'], (old: any) => [...(old || []), newGoal]);
 
-    await GoalsRepository.save(newGoal);
-    invalidate();
+    try {
+      await GoalsRepository.save(newGoal);
+    } finally {
+      invalidate();
+    }
   };
 
   const saveBulkGoals = async (goalsData: Omit<ProductionGoal, 'id' | 'synced' | 'lastModified' | 'version' | 'updatedAt'>[]) => {
@@ -53,8 +56,11 @@ export function useGoals() {
       await GoalsRepository.save(newGoal);
     });
     
-    await Promise.all(promises);
-    invalidate();
+    try {
+      await Promise.all(promises);
+    } finally {
+      invalidate();
+    }
   };
 
   const updateGoal = async (id: string, updates: Partial<ProductionGoal>) => {
@@ -64,8 +70,11 @@ export function useGoals() {
       return old.map((g: any) => g.id === id ? { ...g, ...updates } : g);
     });
 
-    await GoalsRepository.update(id, updates);
-    invalidate();
+    try {
+      await GoalsRepository.update(id, updates);
+    } finally {
+      invalidate();
+    }
   };
 
   const deleteGoal = async (id: string) => {
@@ -75,8 +84,11 @@ export function useGoals() {
       return old.filter((g: any) => g.id !== id);
     });
 
-    await GoalsRepository.delete(id);
-    invalidate();
+    try {
+      await GoalsRepository.delete(id);
+    } finally {
+      invalidate();
+    }
   };
 
   return {

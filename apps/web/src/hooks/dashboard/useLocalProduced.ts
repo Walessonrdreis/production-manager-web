@@ -32,8 +32,8 @@ export function useLocalProduced() {
     const res = await toggleProducedOrder(id, description, quantity, orderId, orderNumber);
     if (!res.success) {
       error(res.error);
-      queryClient.invalidateQueries({ queryKey: ['producedRecords'] });
     }
+    await queryClient.invalidateQueries({ queryKey: ['producedRecords'] });
     await refetch();
     return res;
   };
@@ -71,8 +71,8 @@ export function useLocalProduced() {
     const res = await toggleAllProduction(ordersContainingProduct, description);
     if (!res.success) {
       error(res.error);
-      queryClient.invalidateQueries({ queryKey: ['producedRecords'] });
     }
+    await queryClient.invalidateQueries({ queryKey: ['producedRecords'] });
     await refetch();
     return res;
   };
@@ -87,10 +87,10 @@ export function useLocalProduced() {
     const res = await removeLocalProduced(id);
     if (!res.success) {
       error(res.error);
-      queryClient.invalidateQueries({ queryKey: ['producedRecords'] });
     } else {
       success('Registro de produção removido.');
     }
+    await queryClient.invalidateQueries({ queryKey: ['producedRecords'] });
     await refetch();
     return res;
   };

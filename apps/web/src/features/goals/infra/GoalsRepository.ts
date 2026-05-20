@@ -1,17 +1,39 @@
 import { ProductionGoal } from '../domain/Goal';
 import { apiClient } from '../../../services/api/client';
 import { ENDPOINTS } from '../../../services/api/endpoints';
+import { goalRepository } from './GoalIndexedDBRepo';
 
 export const GoalsRepository = {
   async getAll(): Promise<ProductionGoal[]> {
     try {
       const response = await apiClient.get<{ success: boolean, data: ProductionGoal[] }>(ENDPOINTS.GOALS.BASE);
       if (response.data && response.data.success && response.data.data) {
-        return response.data.data;
+        const goals = response.data.data;
+        
+        // Cache local backup em background (silencioso)
+        setTimeout(() => {
+          goals.forEach((goal) => {
+            goalRepository.save({
+              ...goal,
+              synced: true,
+              lastModified: Date.now()
+            }).catch(() => {});
+          });
+        }, 0);
+
+        return goals;
       }
       return [];
     } catch (error) {
-      console.error('[GoalsRepository] Falha ao buscar dados da API:', error);
+      console.error('[GoalsRepository] Falha ao buscar dados da API, tentando Cache Local:', error);
+      try {
+        const localGoals = await goalRepository.getAll();
+        if (localGoals && localGoals.length > 0) {
+          return localGoals;
+        }
+      } catch (localErr) {
+        console.error('[GoalsRepository] Falha ao buscar dados do Cache Local:', localErr);
+      }
       return [];
     }
   },

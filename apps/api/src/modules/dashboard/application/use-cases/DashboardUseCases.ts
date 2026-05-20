@@ -1,8 +1,21 @@
-import { DashboardAdapter } from '../../infrastructure/integrations/dashboard.adapter.js';
+import { prisma } from '../../../../infra/prisma.js';
 
 export class GetStage20TotalsUseCase {
   static async execute() {
-    const data = await DashboardAdapter.fetchStage20Totals();
-    return { data };
+    try {
+      const orders = await prisma.order.findMany();
+      const parsedOrders = orders.map(o => {
+        try {
+          return JSON.parse(o.data);
+        } catch (e) {
+          return null;
+        }
+      }).filter(Boolean);
+
+      return { data: parsedOrders };
+    } catch (err: any) {
+      console.error('[GetStage20TotalsUseCase] Error reading from DB:', err.message);
+      return { data: [] };
+    }
   }
 }

@@ -4,7 +4,7 @@ import { catalogRouter } from '../modules/catalog/presentation/http/routes.js';
 import { stocksRouter } from '../modules/stocks/presentation/http/routes.js';
 import { ordersRouter } from '../modules/orders/presentation/http/routes.js';
 import { clientsRouter } from '../modules/clients/presentation/http/routes.js';
-import { dashboardRouter } from '../modules/dashboard/presentation/http/routes.js';
+import { productionControlRouter } from '../modules/production-control/presentation/http/routes.js';
 import { sectorsRouter } from '../modules/sectors/presentation/http/routes.js';
 import { planningRouter } from '../modules/planning/presentation/http/routes.js';
 import { goalsRouter } from '../modules/goals/presentation/http/routes.js';
@@ -22,7 +22,7 @@ export function buildApiRouter(): Router {
   router.use('/stocks', stocksRouter);
   router.use('/orders', ordersRouter);
   router.use('/clients', clientsRouter);
-  router.use('/dashboard', dashboardRouter);
+  router.use('/production-control', productionControlRouter);
   router.use('/sectors', sectorsRouter);
   router.use('/planning', planningRouter);
   router.use('/goals', goalsRouter);

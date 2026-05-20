@@ -3,6 +3,7 @@ import { CatalogRepository } from '../infra/CatalogRepository';
 import { findMetaTotal, findArray, normalizeProduct } from '../domain/CatalogNormalizer';
 import { Result } from '../../../lib/Result';
 import { validateOmieProducts } from '../../stocks/infra/ProductSchemas';
+import { productRepository } from '../infra/ProductIndexedDBRepo';
 
 /**
  * UseCase: Busca produtos no catálogo do Omie.
@@ -61,8 +62,46 @@ export async function getOmieProducts(): Promise<Result<Product[]>> {
       if (page > 300) hasMore = false; 
     }
     
+    // Save to local cache silently
+    setTimeout(() => {
+      productRepository.bulkSave(allProducts.map(p => ({
+        id: p.id,
+        code: p.code || '',
+        description: p.description || 'Produto sem nome',
+        unit: p.unit || 'UN',
+        family: p.family || '',
+        price: p.price || 0,
+        stock: p.stock || 0,
+        synced: true,
+        lastModified: Date.now(),
+        version: 1,
+        savedAt: new Date().toISOString(),
+        sectorIds: p.sectorIds || [],
+        category: p.category,
+        stockType: p.stockType
+      }))).catch(() => {});
+    }, 0);
+
     return Result.ok(allProducts);
   } catch (err) {
+    console.error('[Catalog] Falha na rede, tentando cache local', err);
+    try {
+      const localProducts = await productRepository.getAll();
+      if (localProducts && localProducts.length > 0) {
+        return Result.ok(localProducts.map(lp => ({
+          id: lp.id,
+          code: lp.code,
+          description: lp.description,
+          unit: lp.unit,
+          family: lp.family,
+          price: lp.price,
+          stock: lp.stock
+        } as Product)));
+      }
+    } catch (localErr) {
+      console.error('[Catalog] Erro ao carregar catálogo local:', localErr);
+    }
     return Result.fail(err instanceof Error ? err.message : 'Erro ao carregar catálogo da Omie.');
   }
 }
+

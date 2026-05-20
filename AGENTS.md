@@ -26,11 +26,12 @@ Princípios:
 
 ## 1. Regra de Comandos do Usuário (Palavras‑Chave de Controle)
 
-Perguntas que terminarem com "?":
+Toda interação qu commeçar com: Conversa:
 - É proibido codar
+- Pode ler arquivos somente isso
 - Responder somente via chat
 - Nenhum arquivo pode ser criado ou alterado
-
+- Mesmo que dê a entender que é para codar, não code quando tiver o Conversa: no inicio da mensagem
 Perguntas que terminarem com "documente!":
 - É proibido codar
 - Investigar o problema na aplicação
@@ -408,6 +409,15 @@ O comportamento do build e do mapeamento de arquivos gerados (artefatos) DEVE se
 ### Teste de Build
 - Se o agente alterar qualquer biblioteca de bundler (ex: vite, esbuild) ou manipular caminhos que refletem ao output, é OBRIGATÓRIO verificar a resiliência chamando o build. Se houver falha na geração dos artefatos (Artifacts array empty), a correção é emergencial antes de qualquer implementação.
 - Não quebre os scripts do `package.json`.
+
+## 19. Regra de Documentação e Versionamento de Páginas (docs/paginas)
+
+Toda vez que uma nova interface/página for criada, ou quando o fluxo de uma página existente sofrer refatoração pesada, a documentação relacionada em `docs/paginas/` DEVE ser obrigatoriamente criada ou atualizada.
+
+Diretrizes obrigatórias:
+- A documentação deve respeitar a estrutura do template base presente em `docs/paginas/README.md`.
+- É obrigatório o versionamento SemVer (v1.0.0, v1.1.0, etc.) em todos os arquivos de páginas, registrando a versão atual no título do arquivo (Ex: `# Production Control - v1.0`).
+- Ao realizar refatorações ou alterar uma página existente, a versão base (anterior à sua mudança) DEVE ser arquivada para um subdiretório de histórico (ex: `docs/paginas/historico_nomedapagina/vX.0.0.md`). Nunca sobreponha um arquivo importante de documentação de design/fluxo sem antes registrar sua forma anterior.
 
 ## Regra Final de Governança
 

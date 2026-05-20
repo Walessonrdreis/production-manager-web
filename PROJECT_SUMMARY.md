@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.18.2 (Atualizado em 20/05/2026 - Correção de Formato Array no Sync da Produção)
+**Versão:** v4.20.0 (Atualizado em 20/05/2026 - Agrupamento de Menu por Categorias UI)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,12 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 1.5. Agrupamento de Menu do Frontend (v4.20.0)
+- **Melhoria de UI/UX:** A barra lateral (Sidebar) foi reestruturada para exibir os links de navegação agrupados por categorias ("Visão Geral", "Produção", "Estoque", "Administração").
+- **Design Intuitivo:** Implementados títulos em formato `uppercase` que são exibidos dinamicamente de acordo com o estado do menu (expandido ou recolhido), e as categorias foram dispostas iterativamente usando aninhamento no React JSX. O agrupamento possui funcionalidade sanfona (accordion) que vem retraída por padrão, auto-expandindo apenas a categoria correspondente à página atual.
+- **Hierarquia Visual:** Realizado um recuo (indentação) com borda suave à esquerda nos links filhos de cada categoria, fornecendo a clara sensação de níveis e subníveis quando a barra de menu é expandida com hover.
+- **Correção de Largura (Truncamento):** Ajustada a largura máxima da Sidebar expandida (de `w-64` para `w-72`) para evitar que a nomenclatura de elementos filhos extensos (ex: "Controle de Produção") seja cortada na visualização, garantindo legibilidade total sem wrap de texto.
+
 ### 0.30. Correção de Formato Array no Sync da Produção (v4.18.2)
 - **Falha de Mapeamento Root Resolvida:** A interface `OrdersAdapter` falhava ao interagir com retornos Array base (sem formatação container objeto) enviados pelo upstream da Etapa 20. Tratar o retorno como fallback falho preenchia a sincronização zero, ativando erroneamente o wipe local que apagava os itens do motor de agregadores do banco. Inclusão da checagem de tipos e estabilização garantem sync transparente.
 

@@ -32,7 +32,13 @@ externalClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const config = error.config;
-    if (!config || !config.retry) {
+    
+    // If config is undefined (e.g. error thrown in request interceptor), we can't retry
+    if (!config) {
+      return Promise.reject(error);
+    }
+
+    if (!config.retry) {
       config.retry = {
         count: 0,
         maxRetries: 5,
@@ -41,7 +47,9 @@ externalClient.interceptors.response.use(
     }
     
     // Check if it's a 502, 503, 504 and we haven't exceeded retries
+    // Skip retry if the error was artificially thrown by DISABLE_EXTERNAL_SYNC
     if (
+      process.env.DISABLE_EXTERNAL_SYNC !== 'true' &&
       error.response && 
       [502, 503, 504].includes(error.response.status) && 
       config.retry.count < config.retry.maxRetries

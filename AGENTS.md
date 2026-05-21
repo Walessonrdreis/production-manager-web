@@ -418,6 +418,8 @@ Diretrizes obrigatórias:
 - A documentação deve respeitar a estrutura do template base presente em `docs/paginas/README.md`.
 - É obrigatório o versionamento SemVer (v1.0.0, v1.1.0, etc.) em todos os arquivos de páginas, registrando a versão atual no título do arquivo (Ex: `# Production Control - v1.0`).
 - Ao realizar refatorações ou alterar uma página existente, a versão base (anterior à sua mudança) DEVE ser arquivada para um subdiretório de histórico (ex: `docs/paginas/historico_nomedapagina/vX.0.0.md`). Nunca sobreponha um arquivo importante de documentação de design/fluxo sem antes registrar sua forma anterior.
+## 20 Migração Duas api's usando o mesmo banco Arquivo para sempre ler
+- AGENTS_MIGRATION.md
 
 ## Regra Final de Governança
 

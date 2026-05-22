@@ -8,7 +8,7 @@ export interface IntegrationResponse {
 }
 
 export class Api1IntegrationClient {
-  private static readonly TIMEOUT_MS = 2000;
+  private static readonly TIMEOUT_MS = 10000;
 
   static async createProductionOrder(
     command: CreateProductionOrderCommand

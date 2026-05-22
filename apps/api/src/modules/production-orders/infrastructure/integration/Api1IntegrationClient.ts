@@ -47,8 +47,12 @@ export class Api1IntegrationClient {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        return data;
+      if (response.status >= 400) {
+        return {
+          success: false,
+          error: data.error || "INTERNAL_ERROR",
+          message: data.message || "Unexpected error"
+        };
       }
 
       return data;

@@ -32,7 +32,8 @@ export class Api1IntegrationClient {
         productId: command.productId,
         quantity: command.quantity,
         scheduledDate: command.scheduledDate,
-        notes: command.notes
+        notes: command.notes,
+        externalRequestId: command.externalRequestId
       };
 
       console.log("[CALLING API 1]", payload);

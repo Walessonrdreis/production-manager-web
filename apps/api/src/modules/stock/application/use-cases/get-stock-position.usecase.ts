@@ -1,12 +1,13 @@
-import { Api1StockClient } from "../../infrastructure/integration/Api1StockClient.js";
+import { Api1StockIntegrationClient } from "../../infrastructure/integration/Api1StockIntegrationClient.js";
 
 export class GetStockPositionUseCase {
-  static async execute(command: {
+  async execute(command: {
     productId: string;
-    positionDateISO?: string;
     externalRequestId: string;
+    positionDateISO?: string;
   }) {
     console.log("[USECASE ENTRY - STOCK]", command);
-    return Api1StockClient.getPosition(command);
+    return Api1StockIntegrationClient.getPosition(command);
   }
 }
+

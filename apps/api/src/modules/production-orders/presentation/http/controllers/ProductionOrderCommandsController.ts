@@ -4,6 +4,7 @@ import { CreateProductionOrderCommand } from '../../../application/dtos/CreatePr
 
 export class ProductionOrderCommandsController {
   static async createOrder(req: Request, res: Response) {
+    console.log("[CONTROLLER ENTRY]", req.body);
     try {
       // 1. Verificar feature flag
       const commandsEnabled = process.env.COMMANDS_ENABLED === 'true';

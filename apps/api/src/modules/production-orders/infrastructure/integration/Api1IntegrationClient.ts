@@ -28,18 +28,22 @@ export class Api1IntegrationClient {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
 
+      const payload = {
+        productId: command.productId,
+        quantity: command.quantity,
+        scheduledDate: command.scheduledDate,
+        notes: command.notes
+      };
+
+      console.log("[CALLING API 1]", payload);
+
       const response = await fetch(`${baseUrl}/v1/integration/production-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-External-Request-Id': command.externalRequestId,
         },
-        body: JSON.stringify({
-          productId: command.productId,
-          quantity: command.quantity,
-          scheduledDate: command.scheduledDate,
-          notes: command.notes
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal as any,
       });
 

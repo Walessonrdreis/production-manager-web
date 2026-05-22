@@ -3,6 +3,7 @@ import { Api1IntegrationClient } from '../../infrastructure/integration/Api1Inte
 
 export class CreateProductionOrderUseCase {
   static async execute(command: CreateProductionOrderCommand) {
+    console.log("[USECASE ENTRY]", command);
     const integrationResponse = await Api1IntegrationClient.createProductionOrder(command);
 
     if (!integrationResponse.success) {

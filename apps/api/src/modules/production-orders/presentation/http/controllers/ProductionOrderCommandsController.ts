@@ -8,14 +8,14 @@ export class ProductionOrderCommandsController {
       // 1. Verificar feature flag
       const commandsEnabled = process.env.COMMANDS_ENABLED === 'true';
       if (!commandsEnabled) {
-        return res.status(501).json({ error: 'COMMANDS_DISABLED', message: 'Endpoint is not enabled' });
+        return res.status(501).json({ success: false, error: 'COMMANDS_DISABLED', message: 'Endpoint is not enabled' });
       }
 
       // 2. Extrair dados da requisição
       const { productId, quantity, scheduledDate, notes, externalRequestId } = req.body;
 
       if (!productId || typeof quantity !== 'number' || !externalRequestId) {
-        return res.status(400).json({ error: 'INVALID_PAYLOAD', message: 'Missing required fields' });
+        return res.status(400).json({ success: false, error: 'INVALID_PAYLOAD', message: 'Missing required fields' });
       }
 
       const command: CreateProductionOrderCommand = {
@@ -45,7 +45,7 @@ export class ProductionOrderCommandsController {
       return res.status(202).json(result);
     } catch (error: any) {
       console.error('[ProductionOrderCommandsController] Error:', error);
-      return res.status(500).json({ error: 'INTERNAL_ERROR', message: error.message });
+      return res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: error?.message || 'Unexpected error' });
     }
   }
 }

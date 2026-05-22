@@ -12,18 +12,22 @@ export class ProductionOrderCommandsController {
       }
 
       // 2. Extrair dados da requisição
-      const { productId, quantity, scheduledDate, notes, externalRequestId } = req.body;
+      const productId = req.body.productId?.toString();
+      const quantity = Number(req.body.quantity);
+      const scheduledDate = req.body.scheduledDate;
+      const notes = req.body.notes;
+      const externalRequestId = req.body.externalRequestId?.toString();
 
-      if (!productId || typeof quantity !== 'number' || !externalRequestId) {
-        return res.status(400).json({ success: false, error: 'INVALID_PAYLOAD', message: 'Missing required fields' });
+      if (!productId || isNaN(quantity) || quantity <= 0 || !externalRequestId) {
+        return res.status(400).json({ success: false, error: 'INVALID_PAYLOAD', message: 'Missing or invalid fields' });
       }
 
       const command: CreateProductionOrderCommand = {
-        productId: String(productId),
-        quantity: Number(quantity),
-        scheduledDate: scheduledDate ? String(scheduledDate) : undefined,
-        notes: notes ? String(notes) : undefined,
-        externalRequestId: String(externalRequestId),
+        productId,
+        quantity,
+        scheduledDate,
+        notes,
+        externalRequestId
       };
 
       // 3. Executar o UseCase

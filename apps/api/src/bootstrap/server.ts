@@ -4,6 +4,7 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { configureApp } from './app.js';
 import { startBackgroundJobs } from './plugins/jobs.js';
+import { validateConnections } from '../infra/prisma.js';
 
 export async function startServer() {
   const app = express();
@@ -16,6 +17,9 @@ export async function startServer() {
   process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error);
   });
+
+  // Validate Database Connections (Phase 1 Migration)
+  await validateConnections();
 
   // Configuring core API functionalities, routes, etc.
   configureApp(app);

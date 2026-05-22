@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.23.1 (Atualizado em 20/05/2026 - Backend: Correção Graceful para Integração API Omie Offline)
+**Versão:** v4.24.3 (Atualizado em 21/05/2026 - Backend: Migração Controlada de Stock - Fase 3 - Feature Flag e Fallback)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,17 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+### 1.16. Fase 3 - Migração Controlada Domínio Stock: Feature Flag de Segurança (v4.24.3)
+- **Leitura Distribuída via Feature Flag:** Introduzida flag `STOCK_READ_SOURCE` para modular a rota do schema de Stock no frontend. A rota direciona dados do banco Legado ou Oficial. Por segurança, se requisitado a fonte Primária (`core`) e sofrer queda, um Fallback resgata o payload JSON antigo mantendo a tela em pé sem queda de servidor. Nenhuma gravação acontece no banco do novo core para evitar corrupção durante transição.
+### 1.15. Fase 2.1 - Blindagem de Migração e Shadow Read (v4.24.2)
+- **Cooldown em Memória:** Incrementado um `debounce/throttle` em `StockShadowReadService` permitindo execuções de Shadow Read a cada 1 minuto (60000ms), prevenindo efeitos de DoS por alto tráfego. Adição de diretrizes rígidas (`AGENTS_MIGRATION.md`) isolando o consumo Legado (`legacyPrisma`) do consumo Oficial de Integrações (`prisma`) para evitar falhas `P2021` onde tabelas só existem em um lado.
+
+### 1.14. Fase 2 - Migração Controlada Domínio Stock: Shadow Read (v4.24.1)
+- **Leitura Comprovada:** Injeção de `StockShadowReadService` para execução paralena silenciada via `setTimeout` comparando integralmente divergências e volumes da tabela estática de integrações (`ProductStock`) contra objetos legados em JSONBlob (`Stock`). O objetivo foi não impactar Endpoints e manter monitoramento contínuo durante o isolamento entre camadas de arquitetura. O modelo prisma da API 1 também foi mapeado no client atual.
+
+### 1.13. Fase 1 - Migração Controlada Domínio Stock: Dual Database (v4.24.0)
+- **Infraestrutura Paralela (Dual Client):** Inclusão de `LEGACY_DATABASE_URL` e refatoramento de conexão nos módulos da API. O `server.ts` agora inicializa de forma não-bloqueante as conexões tanto para o Banco Principal (API 1), utilizando `prismaClient`, quanto para o Banco Legado (API 2), utilizando `legacyPrismaClient`. Todos os respositórios existentes foram mapeados temporariamente para consumir do `.legacyPrisma`.
+
 ### 1.12. Desligamento Transparente de API Externa (Omie) no Backend (v4.23.1)
 - **Circuit Breaker com Variável de Ambiente:** Implementado um interceptor no `external.client.ts` do backend que verifica a variável de ambiente `DISABLE_EXTERNAL_SYNC`. Quando essa flag está setada como `true` no Render/Hospedagem, o serviço bloqueia proativamente as chamadas de sincronização com a API legada (Omie), estourando um 503 HTTP controlado.
 - **Graceful Fallback:** Ao receberem a falha do Axios, as controllers e use cases do backend recuam pacificamente, evitando deletar cachês antigos ou corromper o PostgreSQL. No Frontend, os endpoints respondem falha devolvendo arrays vazios `[]`, estabilizando a performance perante inatividades do legado.

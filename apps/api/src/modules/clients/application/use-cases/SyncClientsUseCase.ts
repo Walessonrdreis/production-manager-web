@@ -1,5 +1,5 @@
 import { ClientsAdapter } from '../../infrastructure/integrations/clients.adapter.js';
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 
 export class SyncClientsUseCase {
   static async execute(page: number = 1, pageSize: number = 5000) {
@@ -15,7 +15,7 @@ export class SyncClientsUseCase {
         if (!clientId) continue;
         validClientIds.add(String(clientId));
         
-        await prisma.customer.upsert({
+        await legacyPrisma.customer.upsert({
           where: { id: String(clientId) },
           create: { id: String(clientId), data: JSON.stringify(client) },
           update: { data: JSON.stringify(client) }
@@ -25,11 +25,11 @@ export class SyncClientsUseCase {
 
       // Delete obsolete clients
       if (validClientIds.size > 0) {
-        const allClients = await prisma.customer.findMany({ select: { id: true } });
+        const allClients = await legacyPrisma.customer.findMany({ select: { id: true } });
         const docsToDelete = allClients.filter(c => !validClientIds.has(c.id)).map(c => c.id);
 
         if (docsToDelete.length > 0) {
-          await prisma.customer.deleteMany({
+          await legacyPrisma.customer.deleteMany({
             where: { id: { in: docsToDelete } }
           });
           console.log(`[SYNC CLIENTS] Successfully deleted ${docsToDelete.length} obsolete clients from Prisma.`);

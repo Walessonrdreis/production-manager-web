@@ -1,5 +1,5 @@
 import { ProductsAdapter } from '../../infrastructure/integrations/catalog.adapter.js';
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 
 export class SyncCatalogUseCase {
   static async execute(limit: number = 1000) {
@@ -15,7 +15,7 @@ export class SyncCatalogUseCase {
         if (!productId) continue;
         validProductIds.add(String(productId));
         
-        await prisma.catalog.upsert({
+        await legacyPrisma.catalog.upsert({
           where: { id: String(productId) },
           create: { id: String(productId), data: JSON.stringify(product) },
           update: { data: JSON.stringify(product) }
@@ -25,11 +25,11 @@ export class SyncCatalogUseCase {
 
       // Delete obsolete products
       if (validProductIds.size > 0) {
-        const allCatalog = await prisma.catalog.findMany({ select: { id: true } });
+        const allCatalog = await legacyPrisma.catalog.findMany({ select: { id: true } });
         const docsToDelete = allCatalog.filter(p => !validProductIds.has(p.id)).map(p => p.id);
 
         if (docsToDelete.length > 0) {
-          await prisma.catalog.deleteMany({
+          await legacyPrisma.catalog.deleteMany({
             where: { id: { in: docsToDelete } }
           });
           console.log(`[SYNC CATALOG] Successfully deleted ${docsToDelete.length} obsolete items from Prisma.`);

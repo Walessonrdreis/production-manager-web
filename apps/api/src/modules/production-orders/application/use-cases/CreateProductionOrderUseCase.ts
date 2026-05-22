@@ -1,20 +1,14 @@
-import { PrismaProductionOrderRepository } from '../../infrastructure/db/PrismaProductionOrderRepository.js';
-import { CreateProductionOrderDTO } from '../dtos/ProductionOrderDTO.js';
-import { v4 as uuidv4 } from 'uuid';
+import { CreateProductionOrderCommand } from '../dtos/CreateProductionOrderCommand.js';
+import { Api1IntegrationClient } from '../../infrastructure/integration/Api1IntegrationClient.js';
 
 export class CreateProductionOrderUseCase {
-  static async execute(data: CreateProductionOrderDTO) {
-    const repo = new PrismaProductionOrderRepository();
-    const now = new Date().toISOString();
-    
-    const newOrder = {
-      ...data,
-      id: uuidv4(),
-      createdAt: now,
-      updatedAt: now,
-    };
+  static async execute(command: CreateProductionOrderCommand) {
+    const integrationResponse = await Api1IntegrationClient.createProductionOrder(command);
 
-    const savedOrder = await repo.save(newOrder);
-    return { data: savedOrder };
+    if (!integrationResponse.success) {
+      return integrationResponse;
+    }
+
+    return integrationResponse;
   }
 }

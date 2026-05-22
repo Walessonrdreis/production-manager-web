@@ -1,21 +1,21 @@
 import { IProductionOrderRepository } from '../../application/ports/IProductionOrderRepository.js';
 import { ProductionOrderDTO } from '../../application/dtos/ProductionOrderDTO.js';
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 
 export class PrismaProductionOrderRepository implements IProductionOrderRepository {
   async getAll(): Promise<ProductionOrderDTO[]> {
-    const orders = await prisma.productionOrder.findMany();
+    const orders = await legacyPrisma.productionOrder.findMany();
     return orders.map(this.mapToDTO);
   }
 
   async getById(id: string): Promise<ProductionOrderDTO | null> {
-    const order = await prisma.productionOrder.findUnique({ where: { id } });
+    const order = await legacyPrisma.productionOrder.findUnique({ where: { id } });
     if (!order) return null;
     return this.mapToDTO(order);
   }
 
   async save(order: ProductionOrderDTO): Promise<ProductionOrderDTO> {
-    const saved = await prisma.productionOrder.create({
+    const saved = await legacyPrisma.productionOrder.create({
       data: {
         id: order.id,
         lote: order.lote,
@@ -37,7 +37,7 @@ export class PrismaProductionOrderRepository implements IProductionOrderReposito
   }
 
   async update(id: string, data: Partial<ProductionOrderDTO>): Promise<ProductionOrderDTO> {
-    const updated = await prisma.productionOrder.update({
+    const updated = await legacyPrisma.productionOrder.update({
       where: { id },
       data: {
         lote: data.lote,
@@ -59,7 +59,7 @@ export class PrismaProductionOrderRepository implements IProductionOrderReposito
   }
 
   async delete(id: string): Promise<void> {
-    await prisma.productionOrder.delete({ where: { id } });
+    await legacyPrisma.productionOrder.delete({ where: { id } });
   }
 
   private mapToDTO(model: any): ProductionOrderDTO {

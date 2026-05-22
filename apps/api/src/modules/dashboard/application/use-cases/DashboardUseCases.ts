@@ -1,9 +1,9 @@
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 
 export class GetStage20TotalsUseCase {
   static async execute() {
     try {
-      const orders = await prisma.order.findMany();
+      const orders = await legacyPrisma.order.findMany();
       const parsedOrders = orders.map(o => {
         try {
           return JSON.parse(o.data);

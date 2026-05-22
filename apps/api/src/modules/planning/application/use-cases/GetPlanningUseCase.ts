@@ -1,8 +1,8 @@
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 
 export class GetPlanningUseCase {
   static async execute() {
-    const rawData = await prisma.planningItem.findMany();
+    const rawData = await legacyPrisma.planningItem.findMany();
     return { data: rawData };
   }
 }

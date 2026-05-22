@@ -1,6 +1,6 @@
 import { OrdersAdapter } from '../../infrastructure/integrations/orders.adapter.js';
 import { OrderMapper } from '../mappers/OrderMapper.js';
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 import { randomUUID } from 'crypto';
 
 export class SyncOrdersUseCase {
@@ -18,7 +18,7 @@ export class SyncOrdersUseCase {
         if (!orderId) continue;
         validOrderIds.add(String(orderId));
         
-        await prisma.order.upsert({
+        await legacyPrisma.order.upsert({
           where: { id: String(orderId) },
           create: { id: String(orderId), data: JSON.stringify(order) },
           update: { data: JSON.stringify(order) }
@@ -27,7 +27,7 @@ export class SyncOrdersUseCase {
         // REVERT AUTO-COMPLETION FIX:
         // If the order came back to stage 20 (e.g., moved back by mistake),
         // we remove any automatically generated ProducedRecord entries for it.
-        await prisma.producedRecord.deleteMany({
+        await legacyPrisma.producedRecord.deleteMany({
           where: {
             orderId: String(orderId),
             id: { startsWith: 'auto-' } // Matches records created via obsolete removal logic
@@ -37,12 +37,12 @@ export class SyncOrdersUseCase {
       console.log(`[SYNC ORDERS] Successfully saved ${formattedOrders.length} orders to Prisma.`);
 
       // Process obsolete orders (they left stage 20, meaning they were produced)
-      const allOrders = await prisma.order.findMany({ select: { id: true } });
+      const allOrders = await legacyPrisma.order.findMany({ select: { id: true } });
       const docsToDelete = allOrders.filter(o => !validOrderIds.has(o.id)).map(o => o.id);
       
       if (docsToDelete.length > 0) {
         // Fetch full data of obsolete orders before deleting them
-        const obsoleteOrders = await prisma.order.findMany({
+        const obsoleteOrders = await legacyPrisma.order.findMany({
           where: { id: { in: docsToDelete } }
         });
 
@@ -58,7 +58,7 @@ export class SyncOrdersUseCase {
               const qty = Number(item.quantity || item.quantidade || 1);
 
               // Prevent duplicating manually produced items by checking for existing combination
-              const exists = await prisma.producedRecord.findFirst({
+              const exists = await legacyPrisma.producedRecord.findFirst({
                 where: {
                   orderId: orderIdStr,
                   description: desc
@@ -66,7 +66,7 @@ export class SyncOrdersUseCase {
               });
 
               if (!exists) {
-                await prisma.producedRecord.create({
+                await legacyPrisma.producedRecord.create({
                   data: {
                     id: `auto-${randomUUID()}`,
                     description: desc,
@@ -90,7 +90,7 @@ export class SyncOrdersUseCase {
         }
 
         // Finally, remove from local Orders stage 20 cache
-        await prisma.order.deleteMany({
+        await legacyPrisma.order.deleteMany({
           where: { id: { in: docsToDelete } }
         });
         console.log(`[SYNC ORDERS] Successfully deleted ${docsToDelete.length} obsolete orders from Prisma.`);

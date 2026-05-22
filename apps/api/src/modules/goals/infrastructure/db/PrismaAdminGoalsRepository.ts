@@ -1,11 +1,11 @@
 import { AppError } from '../../../../shared/errors/AppError.js';
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export class PrismaAdminGoalsRepository {
   static async getAll() {
     try {
-      const goals = await prisma.goal.findMany();
+      const goals = await legacyPrisma.goal.findMany();
       return goals.map(g => ({
         ...g,
         createdAt: g.createdAt.toISOString(),
@@ -18,7 +18,7 @@ export class PrismaAdminGoalsRepository {
 
   static async getById(id: string) {
     try {
-      const g = await prisma.goal.findUnique({ where: { id } });
+      const g = await legacyPrisma.goal.findUnique({ where: { id } });
       if (!g) return null;
       return {
         ...g,
@@ -33,7 +33,7 @@ export class PrismaAdminGoalsRepository {
   static async save(goal: any) {
     try {
       const id = goal.id || uuidv4();
-      const saved = await prisma.goal.upsert({
+      const saved = await legacyPrisma.goal.upsert({
         where: { id },
         update: {
           type: goal.type || 'product',
@@ -79,7 +79,7 @@ export class PrismaAdminGoalsRepository {
     try {
       const dataToUpdate: any = { ...goal };
       
-      const updated = await prisma.goal.update({
+      const updated = await legacyPrisma.goal.update({
         where: { id },
         data: dataToUpdate,
       });
@@ -95,7 +95,7 @@ export class PrismaAdminGoalsRepository {
 
   static async delete(id: string) {
     try {
-      await prisma.goal.delete({ where: { id } });
+      await legacyPrisma.goal.delete({ where: { id } });
     } catch (err: any) {
       throw new AppError(`Failed to delete goal from Prisma: ${err.message}`, 500);
     }

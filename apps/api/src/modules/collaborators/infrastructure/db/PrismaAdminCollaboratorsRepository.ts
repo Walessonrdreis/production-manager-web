@@ -1,11 +1,11 @@
 import { AppError } from '../../../../shared/errors/AppError.js';
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export class PrismaAdminCollaboratorsRepository {
   static async getAll() {
     try {
-      const collabs = await prisma.collaborator.findMany();
+      const collabs = await legacyPrisma.collaborator.findMany();
       return collabs.map(c => ({
         ...c,
         metrics: c.metrics ? JSON.parse(c.metrics) : undefined,
@@ -17,7 +17,7 @@ export class PrismaAdminCollaboratorsRepository {
 
   static async getById(id: string) {
     try {
-      const c = await prisma.collaborator.findUnique({ where: { id } });
+      const c = await legacyPrisma.collaborator.findUnique({ where: { id } });
       if (!c) return null;
       return {
         ...c,
@@ -31,7 +31,7 @@ export class PrismaAdminCollaboratorsRepository {
   static async save(collaborator: any) {
     try {
       const id = collaborator.id || uuidv4();
-      const saved = await prisma.collaborator.upsert({
+      const saved = await legacyPrisma.collaborator.upsert({
         where: { id },
         update: {
           name: collaborator.name,
@@ -73,7 +73,7 @@ export class PrismaAdminCollaboratorsRepository {
       if (collaborator.metrics !== undefined) dataToUpdate.metrics = JSON.stringify(collaborator.metrics);
       if (collaborator.dailyGoal !== undefined) dataToUpdate.dailyGoal = Number(collaborator.dailyGoal);
 
-      const updated = await prisma.collaborator.update({
+      const updated = await legacyPrisma.collaborator.update({
         where: { id },
         data: dataToUpdate,
       });
@@ -88,7 +88,7 @@ export class PrismaAdminCollaboratorsRepository {
 
   static async delete(id: string) {
     try {
-      await prisma.collaborator.delete({ where: { id } });
+      await legacyPrisma.collaborator.delete({ where: { id } });
     } catch (err: any) {
       throw new AppError(`Failed to delete collaborator from Prisma: ${err.message}`, 500);
     }

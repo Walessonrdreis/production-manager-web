@@ -1,22 +1,22 @@
-import { prisma } from '../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../infra/prisma.js';
 import { AppError } from '../../../../shared/errors/AppError.js';
 
 export class PrismaProductionRepository {
   // --- ProducedRecords ---
   static async getProducedRecords() {
-    const records = await prisma.producedRecord.findMany({
+    const records = await legacyPrisma.producedRecord.findMany({
       orderBy: { updatedAt: 'desc' }
     });
     return records;
   }
 
   static async getProducedRecord(id: string) {
-    const record = await prisma.producedRecord.findUnique({ where: { id } });
+    const record = await legacyPrisma.producedRecord.findUnique({ where: { id } });
     return record;
   }
 
   static async saveProducedRecord(data: any) {
-    const record = await prisma.producedRecord.upsert({
+    const record = await legacyPrisma.producedRecord.upsert({
       where: { id: data.id },
       update: {
         description: data.description,
@@ -38,7 +38,7 @@ export class PrismaProductionRepository {
   }
 
   static async updateProducedRecordSync(id: string, synced: boolean) {
-    const record = await prisma.producedRecord.update({
+    const record = await legacyPrisma.producedRecord.update({
       where: { id },
       data: { synced }
     });
@@ -47,7 +47,7 @@ export class PrismaProductionRepository {
 
   static async deleteProducedRecord(id: string) {
     try {
-      await prisma.producedRecord.delete({ where: { id } });
+      await legacyPrisma.producedRecord.delete({ where: { id } });
     } catch (error: any) {
       if (error.code === 'P2025') {
         throw new AppError('Record not found', 404);
@@ -58,19 +58,19 @@ export class PrismaProductionRepository {
 
   // --- ProductionSchedules ---
   static async getSchedules() {
-    const schedules = await prisma.productionSchedule.findMany({
+    const schedules = await legacyPrisma.productionSchedule.findMany({
       orderBy: { updatedAt: 'desc' }
     });
     return schedules;
   }
 
   static async getSchedule(id: string) {
-    const schedule = await prisma.productionSchedule.findUnique({ where: { id } });
+    const schedule = await legacyPrisma.productionSchedule.findUnique({ where: { id } });
     return schedule;
   }
 
   static async saveSchedule(data: any) {
-    const schedule = await prisma.productionSchedule.upsert({
+    const schedule = await legacyPrisma.productionSchedule.upsert({
       where: { id: data.id },
       update: {
         productCode: data.productCode,
@@ -99,7 +99,7 @@ export class PrismaProductionRepository {
 
   static async deleteSchedule(id: string) {
     try {
-      await prisma.productionSchedule.delete({ where: { id } });
+      await legacyPrisma.productionSchedule.delete({ where: { id } });
     } catch (error: any) {
       if (error.code === 'P2025') {
         throw new AppError('Record not found', 404);

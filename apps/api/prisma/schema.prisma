@@ -142,3 +142,12 @@ model ProductionSchedule {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+
+model ProductStock {
+  omieCode      String   @id @map("omieCode")
+  stockQuantity Decimal  @map("stockQuantity")
+  minimumStock  Decimal  @map("minimumStock")
+  updatedAt     DateTime @updatedAt @map("updatedAt")
+
+  @@map("product_stock")
+}

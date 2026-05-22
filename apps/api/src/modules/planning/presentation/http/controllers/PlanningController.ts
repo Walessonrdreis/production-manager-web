@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { GetPlanningUseCase } from '../../../application/use-cases/GetPlanningUseCase.js';
 import { HttpResponseBuilder } from '../../../../../shared/http/response.js';
-import { prisma } from '../../../../../infra/prisma.js';
+import { legacyPrisma } from '../../../../../infra/prisma.js';
 
 export class PlanningController {
   static async getPlanning(req: Request, res: Response, next: NextFunction) {
@@ -16,7 +16,7 @@ export class PlanningController {
   static async savePlanning(req: Request, res: Response, next: NextFunction) {
     try {
       const { lastModified, version, ...item } = req.body;
-      const created = await prisma.planningItem.upsert({
+      const created = await legacyPrisma.planningItem.upsert({
         where: { id: item.id },
         update: item,
         create: item
@@ -31,7 +31,7 @@ export class PlanningController {
     try {
       const { id } = req.params;
       const { lastModified, version, createdAt, ...item } = req.body;
-      const updated = await prisma.planningItem.update({
+      const updated = await legacyPrisma.planningItem.update({
         where: { id },
         data: item
       });
@@ -44,7 +44,7 @@ export class PlanningController {
   static async deletePlanning(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      await prisma.planningItem.delete({ where: { id } });
+      await legacyPrisma.planningItem.delete({ where: { id } });
       return HttpResponseBuilder.success(res, null, 204);
     } catch (err: any) {
       next(err);

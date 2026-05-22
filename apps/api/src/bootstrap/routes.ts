@@ -12,13 +12,18 @@ import { productionRouter } from '../modules/production/presentation/http/routes
 import { authRouter } from '../modules/auth/presentation/http/routes.js';
 import { collaboratorsRouter } from '../modules/collaborators/presentation/http/routes.js';
 import { productionOrdersRouter } from '../modules/production-orders/presentation/http/routes.js';
+import { ProductionOrderCommandsController } from '../modules/production-orders/presentation/http/controllers/ProductionOrderCommandsController.js';
 import { trelloRoutes } from '../modules/trello/presentation/http/routes.js';
 
 export function buildApiRouter(): Router {
   const router = Router();
 
+  // Rotas de comandos
+  router.post('/commands/production-order', ProductionOrderCommandsController.createOrder);
+
   // Rotas de domínios específicos
   router.use('/catalog', catalogRouter);
+
   router.use('/stocks', stocksRouter);
   router.use('/orders', ordersRouter);
   router.use('/clients', clientsRouter);

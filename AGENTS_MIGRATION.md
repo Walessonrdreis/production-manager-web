@@ -57,10 +57,16 @@ Executar exclusivamente a FASE 1 da migração do domínio de Stock:
 
 ### 1. Criar DUAL PRISMA CLIENT
 
-- Cliente principal → banco API 1
-- Cliente legado → banco antigo API 2
+- Cliente principal (`prisma`) → banco API 1
+- Cliente legado (`legacyPrisma`) → banco antigo API 2
 
 Deve permitir leitura independente em ambos.
+
+#### ⚠️ REGRA DE OURO DO DUAL CLIENT
+- Tudo que é domínio local legado (`Goal`, `Stock`, `Order`, `PlanningItem`, `ProducedRecord`, etc.) NUNCA pode ser acessado via `prisma` (banco novo). Sempre usar `legacyPrisma`.
+- Tudo que é integração nova/compartilhada (`ProductStock`, `OmieProduct`, etc.) NUNCA pode ser acessado via `legacyPrisma`. Sempre usar `prisma`.
+- Misturar os Clients causará erro 500 "Table does not exist", quebrando a aplicação.
+
 
 ---
 

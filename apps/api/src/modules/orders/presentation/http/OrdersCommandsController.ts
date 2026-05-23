@@ -14,6 +14,7 @@ export class OrdersCommandsController {
       const result = await useCase.execute(payload);
 
       if (!result?.success) {
+        // se tiver retryAfterSeconds, é rate limit / indisponibilidade
         if (result?.error === "INTEGRATION_UNAVAILABLE") {
           return res.status(503).json(result);
         }

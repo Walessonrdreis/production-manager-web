@@ -14,6 +14,7 @@ import { collaboratorsRouter } from '../modules/collaborators/presentation/http/
 import { productionOrdersRouter } from '../modules/production-orders/presentation/http/routes.js';
 import { ProductionOrderCommandsController } from '../modules/production-orders/presentation/http/controllers/ProductionOrderCommandsController.js';
 import { StockCommandsController } from '../modules/stock/presentation/http/StockCommandsController.js';
+import { OrdersCommandsController } from '../modules/orders/presentation/http/OrdersCommandsController.js';
 import { trelloRoutes } from '../modules/trello/presentation/http/routes.js';
 
 export function buildApiRouter(): Router {
@@ -22,6 +23,7 @@ export function buildApiRouter(): Router {
   // Rotas de comandos
   router.post('/commands/production-order', ProductionOrderCommandsController.createOrder);
   router.post('/commands/stock/position', StockCommandsController.getPosition);
+  router.post('/commands/orders/stage20', OrdersCommandsController.stage20);
 
   // Rotas de domínios específicos
   router.use('/catalog', catalogRouter);

@@ -4,12 +4,15 @@ import { GetOrdersStage20UseCase } from "../../application/use-cases/get-orders-
 
 const Schema = z.object({
   externalRequestId: z.string().min(1),
+  page: z.number().int().min(1).optional(),
+  pageSize: z.number().int().min(1).max(200).optional(),
+  q: z.string().trim().optional(),
 });
 
 export class OrdersCommandsController {
   static async stage20(req: Request, res: Response) {
     try {
-      const payload = Schema.parse(req.body);
+      const payload = Schema.parse(req.body ?? {});
       const useCase = new GetOrdersStage20UseCase();
       const result = await useCase.execute(payload);
 

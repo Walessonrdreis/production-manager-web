@@ -127,17 +127,17 @@ export class OrdersController {
         });
       }
 
-      // API 1 paginated() retorna: { data: [...], meta, links }
       const orders = Array.isArray(json?.data) ? json!.data : [];
       const meta = json?.meta ?? null;
       const links = json?.links ?? null;
 
       return res.status(200).json({
         success: true,
-        data: { orders },
+        data: orders,
         meta,
         links,
       });
+
     } catch (err: any) {
       return res.status(503).json({
         success: false,

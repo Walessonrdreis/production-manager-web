@@ -3,21 +3,26 @@ const prisma = new PrismaClient();
 
 async function main() {
   try {
-    const dbUrl = process.env.DATABASE_URL;
-    console.log("DATABASE_URL set:", !!dbUrl);
-    
-    // Check if the Order table exists/how many records
-    const orderCount = await prisma.order.count();
-    console.log(`Orders no banco principal: ${orderCount}`);
-    
-    const productionOrderCount = await prisma.productionOrder.count().catch(() => 'Erro ou tabela inexistente');
-    console.log(`ProductionOrder no banco principal: ${productionOrderCount}`);
+    const raw = await prisma.$queryRaw`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public'
+    `;
+    console.log("Tables in public schema:");
+    console.log(raw.map(r => r.table_name));
 
-    const customerCount = await prisma.customer.count().catch(() => 'Erro ou tabela inexistente');
-    console.log(`Customer no banco principal: ${customerCount}`);
+    // And specific counts:
+    try {
+      const c1 = await prisma.$queryRaw`SELECT count(*) FROM "Customer"`;
+      console.log("Customer count:", c1[0].count);
+    } catch(e) {}
+    try {
+      const c2 = await prisma.$queryRaw`SELECT count(*) FROM "clientes"`;
+      console.log("clientes count:", c2[0].count);
+    } catch(e) {}
 
   } catch (error) {
-    console.error("Erro ao consultar banco principal:", error.message);
+    console.error("Erro:", error.message);
   } finally {
     await prisma.$disconnect();
   }

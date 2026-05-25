@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,15 +7,110 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Catalog {
+  id        String   @id
+  data      String
+  updatedAt DateTime
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Collaborator {
+  id        String   @id
+  name      String
+  role      String?
+  metrics   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  category  String?
+  dailyGoal Int?
+  sectorId  String?
+  status    String?  @default("active")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Customer {
+  id        String   @id
+  data      String
+  updatedAt DateTime
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Goal {
+  id                 String   @id
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime
+  collaboratorId     String?
+  collaboratorName   String?
+  isActive           Boolean  @default(true)
+  lastModified       String?
+  period             String
+  productCode        String?
+  productDescription String?
+  sectorId           String?
+  sectorName         String?
+  synced             Boolean  @default(true)
+  targetQuantity     Int
+  type               String?
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Order {
+  id        String   @id
+  data      String
+  updatedAt DateTime
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model PlanningBatch {
+  id        String   @id
+  name      String
+  date      String
+  status    String
+  createdBy String
+  synced    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model PlanningItem {
+  id          String   @id
+  batchId     String
+  productCode String
+  description String
+  unit        String?
+  quantity    Int
+  sectorId    String?
+  sectorName  String?
+  synced      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model ProducedRecord {
+  id          String   @id
+  description String
+  quantity    Int
+  orderId     String?
+  orderNumber String?
+  synced      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Product {
   id        String   @id
   name      String
   code      String?
   price     Float?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model ProductionOrder {
   id                 String    @id
   lote               String
@@ -35,100 +127,10 @@ model ProductionOrder {
   endDate            DateTime?
   notes              String?
   createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  updatedAt          DateTime
 }
 
-model Goal {
-  id                 String   @id
-  type               String?
-  productCode        String?
-  productDescription String?
-  collaboratorId     String?
-  collaboratorName   String?
-  sectorId           String?
-  sectorName         String?
-  targetQuantity     Int
-  period             String
-  isActive           Boolean  @default(true)
-  synced             Boolean  @default(true)
-  lastModified       String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-}
-
-model Collaborator {
-  id        String   @id
-  name      String
-  role      String?
-  sectorId  String?
-  category  String?
-  dailyGoal Int?
-  status    String?  @default("active")
-  metrics   String? // Store JSON as string
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Order {
-  id        String   @id
-  data      String
-  updatedAt DateTime @updatedAt
-}
-
-model Customer {
-  id        String   @id
-  data      String
-  updatedAt DateTime @updatedAt
-}
-
-model Catalog {
-  id        String   @id
-  data      String
-  updatedAt DateTime @updatedAt
-}
-
-model Stock {
-  id        String   @id
-  data      String
-  updatedAt DateTime @updatedAt
-}
-
-model ProducedRecord {
-  id          String   @id
-  description String
-  quantity    Int
-  orderId     String?
-  orderNumber String?
-  synced      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model PlanningBatch {
-  id        String   @id
-  name      String
-  date      String
-  status    String
-  createdBy String
-  synced    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model PlanningItem {
-  id          String   @id
-  batchId     String
-  productCode String
-  description String
-  unit        String?
-  quantity    Int
-  sectorId    String?
-  sectorName  String?
-  synced      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model ProductionSchedule {
   id          String    @id
   productCode String
@@ -140,14 +142,12 @@ model ProductionSchedule {
   notes       String?
   synced      Boolean   @default(true)
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  updatedAt   DateTime
 }
 
-model ProductStock {
-  omieCode      String   @id @map("omieCode")
-  stockQuantity Decimal  @map("stockQuantity")
-  minimumStock  Decimal  @map("minimumStock")
-  updatedAt     DateTime @updatedAt @map("updatedAt")
-
-  @@map("product_stock")
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Stock {
+  id        String   @id
+  data      String
+  updatedAt DateTime
 }

@@ -1,4 +1,17 @@
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
+
+const envPath = path.join(process.cwd(), '.env');
+if (fs.existsSync(envPath)) {
+  const envConfig = dotenv.parse(fs.readFileSync(envPath));
+  for (const k in envConfig) {
+    if (k === 'DATABASE_URL' || k === 'LEGACY_DATABASE_URL') {
+      process.env[k] = envConfig[k];
+    }
+  }
+}
 
 let prismaClient: PrismaClient | null = null;
 let legacyPrismaClient: PrismaClient | null = null;
@@ -33,7 +46,9 @@ try {
 export const prisma = new Proxy({} as PrismaClient, {
   get(target, prop: keyof PrismaClient) {
     if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith('postgres') || !prismaClient) {
-      // Mock objects for models so app doesn't crash in preview environment without DB
+      if (typeof prop === 'string' && prop.startsWith('$')) {
+        return async () => [];
+      }
       return new Proxy({}, {
         get(t, p) {
           return async () => {
@@ -46,14 +61,20 @@ export const prisma = new Proxy({} as PrismaClient, {
         }
       });
     }
-    return prismaClient[prop];
+    const val = prismaClient[prop];
+    if (typeof val === 'function') {
+      return val.bind(prismaClient);
+    }
+    return val;
   }
 });
 
 export const legacyPrisma = new Proxy({} as PrismaClient, {
   get(target, prop: keyof PrismaClient) {
     if (!process.env.LEGACY_DATABASE_URL || !process.env.LEGACY_DATABASE_URL.startsWith('postgres') || !legacyPrismaClient) {
-      // Mock objects for models so app doesn't crash in preview environment without DB
+      if (typeof prop === 'string' && prop.startsWith('$')) {
+        return async () => [];
+      }
       return new Proxy({}, {
         get(t, p) {
           return async () => {
@@ -66,7 +87,11 @@ export const legacyPrisma = new Proxy({} as PrismaClient, {
         }
       });
     }
-    return legacyPrismaClient[prop];
+    const val = legacyPrismaClient[prop];
+    if (typeof val === 'function') {
+      return val.bind(legacyPrismaClient);
+    }
+    return val;
   }
 });
 

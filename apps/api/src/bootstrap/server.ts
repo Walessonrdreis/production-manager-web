@@ -1,7 +1,9 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.join(process.cwd(), '.env'), override: true });
+
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
-import path from 'path';
 import { configureApp } from './app.js';
 import { startBackgroundJobs } from './plugins/jobs.js';
 import { validateConnections } from '../infra/prisma.js';

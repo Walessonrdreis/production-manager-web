@@ -21,17 +21,15 @@ export class ProcessTrelloWebhookUseCase {
 
       if (parsedData) {
         try {
-          const dto: CreateProductionOrderDTO = {
+          const dto: any = {
             lote: parsedData.lot,
             quantity: parsedData.quantity,
-            productCode: parsedData.code || '',
-            productDescription: parsedData.name || 'Produto não identificado pelo Trello',
-            // O sistema base suporta pending, in_progress, completed, cancelled. 
-            // O requisito pede DRAFT / NEEDS_REVIEW. Usando pending para compatibilidade e adicionando nas notas.
-            status: 'pending',
+            productId: parsedData.code || '',
+            scheduledDate: new Date().toISOString(),
             notes: 'Origem: Trello. ' + (parsedData.code ? '' : 'NEEDS_REVIEW: Produto precisa ser revisado.'),
-            // Ignorando source nativamente pois DTO não possui suporte, mas forçando cast se necessário
-            ...({ source: 'TRELLO', trelloCardId: decision.cardId } as any)
+            externalRequestId: decision.cardId,
+            source: 'TRELLO', 
+            trelloCardId: decision.cardId
           };
 
           await CreateProductionOrderUseCase.execute(dto);

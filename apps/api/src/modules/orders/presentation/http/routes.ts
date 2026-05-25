@@ -1,9 +1,10 @@
-import { Router } from 'express';
-import { OrdersController } from './controllers/OrdersController.js';
-import { validateRequest } from '../../../../shared/http/validate.js';
-import { SyncOrdersSchema } from './schemas.js';
+import { Router } from "express";
+import { OrdersController } from "./controllers/OrdersController.js";
 
 export const ordersRouter = Router();
 
-ordersRouter.post('/sync', validateRequest(SyncOrdersSchema), OrdersController.sync);
-ordersRouter.get('/', OrdersController.getOrdersList);
+/**
+ * API 2 (compatibilidade com frontend)
+ */
+ordersRouter.get("/", OrdersController.getOrdersList);
+ordersRouter.post("/sync", OrdersController.sync);

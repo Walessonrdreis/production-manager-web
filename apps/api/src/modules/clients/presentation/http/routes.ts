@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { ClientsController } from './controllers/ClientsController.js';
-import { validateRequest } from '../../../../shared/http/validate.js';
-import { SyncClientsSchema } from './schemas.js';
+import { Router } from "express";
+import { ClientsController } from "./controllers/ClientsController.js";
 
 export const clientsRouter = Router();
 
-clientsRouter.post('/sync', validateRequest(SyncClientsSchema), ClientsController.sync);
-clientsRouter.get('/', ClientsController.getClientsList);
+/**
+ * API 2 (compatibilidade com frontend)
+ */
+clientsRouter.get("/", ClientsController.getClientsList);

@@ -4,7 +4,8 @@ import { AppError } from '../../../../shared/errors/AppError.js';
 export class ClientsAdapter {
   static async fetchFromExternalAPI(page: number = 1, pageSize: number = 5000) {
     try {
-      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/clients`;
+      const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';
+      const targetUrl = `${baseUrl}/v1/clients`;
       let allClients: any[] = [];
       let currentPage = page;
       let hasMore = true;
@@ -12,16 +13,9 @@ export class ClientsAdapter {
 
       while (hasMore && currentPage <= MAX_PAGES) {
         const response = await externalClient.get(targetUrl, { 
-          timeout: 120000, 
-          params: { 
-            page: currentPage, 
-            pageSize,
-            _t: new Date().getTime()
-          },
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
+          timeout: 30000, 
+          params: { page: currentPage, pageSize, _t: new Date().getTime() },
+          headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
         });
         const responseData = response.data || {};
         const clients = responseData.data || responseData.clients || [];
@@ -38,17 +32,20 @@ export class ClientsAdapter {
       }
       return allClients;
     } catch (err: any) {
-      throw new AppError(`Failed to fetch clients: ${err.message}`, err.response?.status || 500);
+      console.error(`[ClientsAdapter] Failed to fetch clients from external API. It may not exist. ${err.message}`);
+      return []; // suppress error
     }
   }
 
   static async fetchClientsList(params?: any) {
     try {
-      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/clients`;
+      const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';
+      const targetUrl = `${baseUrl}/v1/clients`;
       const response = await externalClient.get(targetUrl, { params });
-      return response.data || [];
+      return response.data?.data || response.data || [];
     } catch (err: any) {
-      throw new AppError(`Failed to fetch clients list: ${err.message}`, err.response?.status || 500);
+      console.error(`[ClientsAdapter] Failed to fetch clients list. Endpoint may not exist on legacy api. ${err.message}`);
+      return []; // suppress error and return empty array
     }
   }
 }

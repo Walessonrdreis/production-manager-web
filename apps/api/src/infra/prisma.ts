@@ -16,6 +16,7 @@ if (fs.existsSync(envPath)) {
 let prismaClient: PrismaClient | null = null;
 let legacyPrismaClient: PrismaClient | null = null;
 
+export let prismaInitError: any = null;
 try {
   // We only instantiate Prisma if it's implicitly needed, or if URL is somewhat valid.
   // Prisma will fail query if URL is bad, but initialization crash is ugly. 
@@ -27,7 +28,8 @@ try {
     }
   });
 } catch (e) {
-  console.warn('[Prisma] failed to initialize primary client, skipping...');
+  prismaInitError = e;
+  console.warn('[Prisma] failed to initialize primary client, skipping...', e);
 }
 
 try {

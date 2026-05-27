@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.24.3 (Atualizado em 21/05/2026 - Backend: Migração Controlada de Stock - Fase 3 - Feature Flag e Fallback)
+**Versão:** v4.24.6 (Atualizado em 27/05/2026 - Normalização de Product Code em Ordens)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,13 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+
+### 1.18. Normalização de Product Code para Criação de Ordens (v4.24.6)
+- **Desacoplamento e API de Fachada:** Implementada uma nova camada transparente na API 2 para o processo de criação de Ordem de Produção (`CreateProductionOrder`). A API passa a aceitar identificadores de domínio legíveis pelo negócio (`productCode`) e resolve o ID interno transacional e acoplado externo (`codigo_produto`) do Omie, para depois encaminhar de maneira limpa à API 1 (sem sofrer mutação).
+
+### 1.17. Correção Defensiva em Ordens de Produção (v4.24.5)
+- **Bloqueio de Crash:** Adicionada camada de validação (`Array.isArray()`) para prevenir crash ao renderizar o `ProductionOrdersTab`, após o endpoint de `useProductionOrders` falhar em devolver array. O ajuste estabiliza a UI contra o `productionOrders.filter is not a function`.
+
 ### 1.16. Fase 3 - Migração Controlada Domínio Stock: Feature Flag de Segurança (v4.24.3)
 - **Leitura Distribuída via Feature Flag:** Introduzida flag `STOCK_READ_SOURCE` para modular a rota do schema de Stock no frontend. A rota direciona dados do banco Legado ou Oficial. Por segurança, se requisitado a fonte Primária (`core`) e sofrer queda, um Fallback resgata o payload JSON antigo mantendo a tela em pé sem queda de servidor. Nenhuma gravação acontece no banco do novo core para evitar corrupção durante transição.
 ### 1.15. Fase 2.1 - Blindagem de Migração e Shadow Read (v4.24.2)

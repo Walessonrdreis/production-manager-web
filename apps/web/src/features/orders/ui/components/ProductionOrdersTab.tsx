@@ -29,7 +29,8 @@ export function ProductionOrdersTab() {
   const [selectedCollaboratorId, setSelectedCollaboratorId] = useState('');
   const [status, setStatus] = useState<ProductionOrderStatus>('pending');
 
-  const filteredOrders = productionOrders.filter(o => 
+  const ordersArray = Array.isArray(productionOrders) ? productionOrders : [];
+  const filteredOrders = ordersArray.filter(o => 
     (o.productDescription || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (o.lote || '').toLowerCase().includes(searchTerm.toLowerCase())
   );

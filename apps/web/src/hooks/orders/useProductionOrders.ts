@@ -60,7 +60,7 @@ export function useProductionOrders() {
   });
 
   return {
-    productionOrders: response?.data || [],
+    productionOrders: Array.isArray(response?.data) ? response.data : [],
     isLoading,
     isError,
     error,

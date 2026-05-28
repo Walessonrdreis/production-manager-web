@@ -3,7 +3,23 @@ import { prisma } from '../../../../infra/prisma.js';
 
 export class RefreshCatalogStockUseCase {
   static async execute() {
-    return await ProductsAdapter.fetchStockRefresh();
+    // Busca a fotografia mais recente dos estoques diretamente no banco
+    // A API 1 já popula/atualiza essa tabela product_stock em background
+    const stocks = await prisma.productStock.findMany({
+      select: {
+        omieCode: true,
+        stockQuantity: true,
+        minimumStock: true
+      }
+    });
+    
+    const mappedStocks = stocks.map(s => ({
+       code: s.omieCode,
+       stock: Number(s.stockQuantity),
+       minStock: Number(s.minimumStock)
+    }));
+
+    return { data: mappedStocks };
   }
 }
 

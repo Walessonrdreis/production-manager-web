@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.24.7 (Atualizado em 28/05/2026 - Catálogo via Shared Database)
+**Versão:** v4.24.8 (Atualizado em 28/05/2026 - Otimização de Sync de Estoque e Cache)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,10 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+
+### 1.20. Otimização Sync de Estoque Client-Side Direto (v4.24.8)
+- **Desacoplamento Completo do Refresh:** O botão UI "Atualizar Estoque" deixou de forçar jobs/atualizações na API 1 e engatilhar requisições em todo o catálogo. Baseando-se no fato que jobs já efetuam updates de estado em background no banco, a API 2 simplesmente carrega estoques da tabela de leitura (`product_stock`) via Prisma.
+- **Cache Local no React API:** Em vez de invalidar queries forçando downloads grandes via React Query (`products-raw`), utilizou-se mutação manual (`queryClient.setQueryData`) para ajustar apenas os campos `stock` e `minStock`, finalizando a responsabilidade da refatoração e agilizando as operações de tela de produtos.
 
 ### 1.19. Refatoração de Catálogo para Consumo via Postgres/Prisma (v4.24.7)
 - **Leitura Nativa API 2:** O endpoint de listagem de Catálogo (GetCatalogListUseCase) da API 2 foi refatorado para utilizar nativamente o Prisma (banco `OmieProduct` + `product_stock`), descartando o request HTTP demorado que batia na API 1 (`/v1/products`).

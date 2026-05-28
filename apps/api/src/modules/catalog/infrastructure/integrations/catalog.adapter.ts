@@ -38,19 +38,6 @@ export class ProductsAdapter {
     }
   }
 
-  static async fetchStockRefresh() {
-    try {
-      const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';
-      const targetUrl = `${baseUrl}/v1/admin/omie/products/stock/refresh`;
-      const response = await externalClient.post(targetUrl, {}, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-      return response.data;
-    } catch (err: any) {
-      throw new AppError(`Failed to refresh catalog stock: ${err.message}`, err.response?.status || 500);
-    }
-  }
-
   static async fetchAdminProducts() {
     try {
       const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';

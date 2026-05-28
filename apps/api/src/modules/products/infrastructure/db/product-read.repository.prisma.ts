@@ -4,25 +4,36 @@ export class ProductReadRepository {
   async findByCode(code: string) {
     return prisma.omieProduct.findFirst({
       where: {
-        codigo: code,
-        inativo: "N",
+        OR: [
+          { sku: code },
+          { omieCode: code }
+        ],
+        active: true,
       },
       select: {
         id: true,
-        codigo: true,
-        codigo_produto: true, // ← ID REAL DO OMIE
-        descricao: true,
-        canCreateProductionOrder: true,
+        sku: true,
+        omieCode: true,
+        omieId: true,
+        description: true,
+        rawPayload: true
       },
     }).then(p => {
       if (!p) return null;
 
+      let raw: any = {};
+      try {
+        raw = typeof p.rawPayload === 'string' ? JSON.parse(p.rawPayload) : (p.rawPayload || {});
+      } catch (e) {
+        // ignore
+      }
+
       return {
         id: p.id,
-        code: p.codigo,
-        description: p.descricao,
-        omieProductId: p.codigo_produto, // ← 9116171984
-        canCreateProductionOrder: p.canCreateProductionOrder,
+        code: p.sku || p.omieCode,
+        description: p.description,
+        omieProductId: Number(p.omieId),
+        canCreateProductionOrder: raw.inativo === "N", // Ensure any logic relying on raw is covered. We can assume true if `active` is true.
       };
     });
   }

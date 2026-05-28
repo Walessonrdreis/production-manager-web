@@ -61,47 +61,4 @@ export class ProductsAdapter {
       throw new AppError(`Failed to fetch admin catalog products: ${err.message}`, err.response?.status || 500);
     }
   }
-
-  static async fetchList() {
-    try {
-      const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';
-      const targetUrl = `${baseUrl}/v1/products`;
-      const firstResponse = await externalClient.get(targetUrl, { 
-        params: { page: 1, _t: new Date().getTime() },
-        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-      });
-      const { data: firstPageData, meta } = firstResponse.data;
-      
-      let allProducts = [...(firstPageData || [])];
-      
-      if (meta && meta.pageSize > 0 && meta.total > meta.pageSize) {
-        const totalPages = Math.ceil(meta.total / meta.pageSize);
-        for (let i = 2; i <= totalPages; i++) {
-          try {
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Respect rate limits
-            const res = await externalClient.get(targetUrl, { 
-              params: { page: i, _t: new Date().getTime() },
-              headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-            });
-            if (res.data && res.data.data) {
-              allProducts = [...allProducts, ...res.data.data];
-            }
-          } catch (err: any) {
-             console.warn('[CATALOG API fetchList] Partial fetch failure on page', i, ':', err.message);
-          }
-        }
-      }
-
-      return {
-        data: allProducts,
-        meta: {
-          page: 1,
-          pageSize: allProducts.length,
-          total: allProducts.length
-        }
-      };
-    } catch (err: any) {
-      throw new AppError(`Failed to fetch catalog products list: ${err.message}`, err.response?.status || 500);
-    }
-  }
 }

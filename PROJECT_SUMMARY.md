@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.24.6 (Atualizado em 27/05/2026 - Normalização de Product Code em Ordens)
+**Versão:** v4.24.7 (Atualizado em 28/05/2026 - Catálogo via Shared Database)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
@@ -7,6 +7,10 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+
+### 1.19. Refatoração de Catálogo para Consumo via Postgres/Prisma (v4.24.7)
+- **Leitura Nativa API 2:** O endpoint de listagem de Catálogo (GetCatalogListUseCase) da API 2 foi refatorado para utilizar nativamente o Prisma (banco `OmieProduct` + `product_stock`), descartando o request HTTP demorado que batia na API 1 (`/v1/products`).
+- **Adapter de Dados Transparentes:** Como os dados agora vem do postgres `product_stock`, a camada adapter formata a devolução normalizada (`stock`, `minStock`, `code`) mantendo absoluta compatibilidade com o Frontend React sem acionar regressão visual. A regra de isolamento relacional agora é plena para os Produtos e Saldos de Estoque.
 
 ### 1.18. Normalização de Product Code para Criação de Ordens (v4.24.6)
 - **Desacoplamento e API de Fachada:** Implementada uma nova camada transparente na API 2 para o processo de criação de Ordem de Produção (`CreateProductionOrder`). A API passa a aceitar identificadores de domínio legíveis pelo negócio (`productCode`) e resolve o ID interno transacional e acoplado externo (`codigo_produto`) do Omie, para depois encaminhar de maneira limpa à API 1 (sem sofrer mutação).

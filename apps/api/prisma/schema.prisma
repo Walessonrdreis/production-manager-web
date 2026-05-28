@@ -11,7 +11,7 @@ datasource db {
 model Catalog {
   id        String   @id
   data      String
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -21,7 +21,7 @@ model Collaborator {
   role      String?
   metrics   String?
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
   category  String?
   dailyGoal Int?
   sectorId  String?
@@ -32,14 +32,14 @@ model Collaborator {
 model Customer {
   id        String   @id
   data      String
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Goal {
   id                 String   @id
   createdAt          DateTime @default(now())
-  updatedAt          DateTime
+  updatedAt DateTime @updatedAt
   collaboratorId     String?
   collaboratorName   String?
   isActive           Boolean  @default(true)
@@ -58,7 +58,7 @@ model Goal {
 model Order {
   id        String   @id
   data      String
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -70,7 +70,7 @@ model PlanningBatch {
   createdBy String
   synced    Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -85,7 +85,7 @@ model PlanningItem {
   sectorName  String?
   synced      Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -97,7 +97,7 @@ model ProducedRecord {
   orderNumber String?
   synced      Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -107,7 +107,7 @@ model Product {
   code      String?
   price     Float?
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -127,7 +127,7 @@ model ProductionOrder {
   endDate            DateTime?
   notes              String?
   createdAt          DateTime  @default(now())
-  updatedAt          DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -142,12 +142,39 @@ model ProductionSchedule {
   notes       String?
   synced      Boolean   @default(true)
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime
+  updatedAt DateTime @updatedAt
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Stock {
   id        String   @id
   data      String
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
+}
+
+model OmieProduct {
+  id                String         @id
+  omieId            String
+  sku               String?
+  description       String
+  active            Boolean        @default(true)
+  rawPayload        Json
+  lastSyncAt        DateTime
+  omieCode          String         @unique
+  familyDescription String?
+
+  productStock      ProductStock?  
+}
+
+model ProductStock {
+  id             String       @id @db.Uuid
+  omieCode       String       @unique
+  stockQuantity  Decimal
+  minimumStock   Decimal
+  capturedAt     DateTime
+  updatedAt DateTime @updatedAt
+
+  product        OmieProduct? @relation(fields: [omieCode], references: [omieCode])
+
+  @@map("product_stock")
 }

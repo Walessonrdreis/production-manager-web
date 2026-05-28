@@ -7,10 +7,15 @@ const envPath = path.join(process.cwd(), '.env');
 if (fs.existsSync(envPath)) {
   const envConfig = dotenv.parse(fs.readFileSync(envPath));
   for (const k in envConfig) {
-    if (k === 'DATABASE_URL' || k === 'LEGACY_DATABASE_URL') {
+    if (k === 'DATABASE_FINAL_URL' || k === 'DATABASE_URL' || k === 'LEGACY_DATABASE_URL') {
       process.env[k] = envConfig[k];
     }
   }
+}
+
+// Fallback if the new variable is set but DATABASE_URL wasn't explicitly populated (schema.prisma still uses env("DATABASE_URL") by default, but we pass url via constructor anyway)
+if (process.env.DATABASE_FINAL_URL) {
+  process.env.DATABASE_URL = process.env.DATABASE_FINAL_URL;
 }
 
 let prismaClient: PrismaClient | null = null;
@@ -47,14 +52,14 @@ try {
 // Export a proxy so we can intercept calls if the client failed to initialize or URL is completely missing/invalid
 export const prisma = new Proxy({} as PrismaClient, {
   get(target, prop: keyof PrismaClient) {
-    if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith('postgres') || !prismaClient) {
+    if (!process.env.DATABASE_FINAL_URL || !process.env.DATABASE_FINAL_URL.startsWith('postgres') || !prismaClient) {
       if (typeof prop === 'string' && prop.startsWith('$')) {
         return async () => [];
       }
       return new Proxy({}, {
         get(t, p) {
           return async () => {
-            console.warn(`[Prisma Mock - Primary] DATABASE_URL invalid or missing. Mocking ${String(prop)}.${String(p)}`);
+            console.warn(`[Prisma Mock - Primary] DATABASE_FINAL_URL invalid or missing. Mocking ${String(prop)}.${String(p)}`);
             if (p === 'findMany') return [];
             if (p === 'findUnique' || p === 'findFirst') return null;
             if (p === 'count') return 0;
@@ -103,8 +108,8 @@ export const legacyPrisma = new Proxy({} as PrismaClient, {
 export async function validateConnections() {
   console.log('[Migration Phase 1] Validating database connections...');
   
-  if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith('postgres')) {
-    console.warn('[Migration Phase 1] Skipping primary connection validation (DATABASE_URL invalid or missing)');
+  if (!process.env.DATABASE_FINAL_URL || !process.env.DATABASE_FINAL_URL.startsWith('postgres')) {
+    console.warn('[Migration Phase 1] Skipping primary connection validation (DATABASE_FINAL_URL invalid or missing)');
   } else {
     try {
       if (prismaClient) {

@@ -72,6 +72,7 @@ export async function getOmieProducts(): Promise<Result<Product[]>> {
         family: p.family || '',
         price: p.price || 0,
         stock: p.stock || 0,
+        minStock: p.minStock || 0,
         synced: true,
         lastModified: Date.now(),
         version: 1,
@@ -95,7 +96,8 @@ export async function getOmieProducts(): Promise<Result<Product[]>> {
           unit: lp.unit,
           family: lp.family,
           price: lp.price,
-          stock: lp.stock
+          stock: lp.stock,
+          minStock: lp.minStock
         } as Product)));
       }
     } catch (localErr) {

@@ -428,3 +428,325 @@ Nenhuma entrega é válida sem documentação.
 Em caso de dúvida: parar e perguntar.
 
 
+# Como funciona nosso sistema api1, ap2 suando o mesmo banco de dados e suas devidas responsabilidades
+
+
+## ✅ Forma correta
+
+> **API 1 é o core de integração e consistência externa do sistema**
+
+Isso parece detalhe semântico, mas **evita decisões erradas depois**.
+
+***
+
+## 🧠 Papel real da API 1
+
+A API 1 é:
+
+* ✅ **Anti‑corruption layer**
+* ✅ **Adapter entre domínio interno e Omie**
+* ✅ **Dona do read‑model**
+* ✅ **Responsável por sincronização**
+* ✅ **Responsável por refletir mudanças no Omie**
+
+Ela **protege o sistema** das inconsistências, regras estranhas e contratos instáveis do ERP.
+
+***
+
+## 🔧 O que a API 1 faz (agora e no futuro)
+
+### ✅ Agora
+
+* Sync de produtos
+* Sync de estruturas (BOM)
+* Sync de pedidos
+* Backfill
+* Read‑model organizado
+* Endpoints de leitura
+
+### ✅ No futuro (como você descreveu)
+
+* Criar OP no Omie
+* Editar OP no Omie
+* Cancelar OP no Omie
+* Reconciliar divergências
+* Garantir idempotência
+* Traduzir comandos → payload Omie
+* Tratar erro externo
+* Retry, timeout, compensação
+
+👉 **Tudo isso é API 1**
+
+***
+
+## ✅ O que a API 1 **NÃO** é
+
+Isso é importante para não confundir:
+
+* ❌ Não é UI
+* ❌ Não é frontend
+* ❌ Não é onde nasce a regra de negócio
+* ❌ Não é onde o usuário “decide” algo
+* ❌ Não é onde o fluxo de domínio começa
+
+Ela **executa**, **traduz**, **sincroniza** — não decide.
+
+***
+
+## ✅ Onde está o “core de negócio” então?
+
+### ✅ Core de negócio = **API 2**
+
+A API 2 é quem:
+
+* decide *quando* criar OP
+* decide *se* pode criar OP
+* valida regras internas
+* orquestra o fluxo
+* entende o processo produtivo
+
+Mas…
+
+👉 **API 2 nunca fala com Omie direto**  
+👉 **API 2 nunca sabe nomes Omie**  
+👉 **API 2 nunca monta payload externo**
+
+Ela **manda intenção**, a API 1 **executa**.
+
+***
+
+## 🔁 Exemplo completo (futuro)
+
+### Usuário
+
+> “Quero editar uma ordem de produção”
+
+### Fluxo correto
+
+```
+UI
+ ↓
+API 2
+  - valida regra
+  - monta comando
+ ↓
+API 1
+  - traduz comando → Omie
+  - chama Omie
+  - trata erro
+  - garante idempotência
+ ↓
+Omie
+```
+
+✅ Exatamente como você descreveu.
+
+***
+
+## ✅ Por que sua intuição está certa
+
+Você já está pensando em:
+
+* consistência
+* impacto externo
+* isolamento
+* evolução futura
+* manutenção real
+
+Isso é **engenharia de sistema vivo**, não CRUD.
+
+***
+
+## ✅ Regra de ouro para guardar
+
+> **Toda interação com o Omie — presente ou futura — passa pela API 1.**
+>
+> **Toda decisão de negócio nasce fora dela (API 2).**
+
+Se você guardar isso, **não vai errar a arquitetura**.
+
+
+
+
+## ✅ Correção importante (alinhamento fino)
+
+Você **está certo** no que sempre pensou:
+
+> **Existe UM banco de dados compartilhado**, usado pelas duas APIs.  
+> O que muda **não é o banco**, é **quem é dono de cada tipo de dado**.
+
+Quando eu disse antes que *“o banco pertence à API 1”*, a frase correta seria:
+
+> **O banco de INTEGRAÇÃO pertence à API 1.**
+
+Isso é diferente de dizer que:
+
+* API 2 não grava nada ❌
+* API 2 não tem tabelas próprias ❌
+
+Vamos separar corretamente.
+
+***
+
+## ✅ Modelo correto (definitivo)
+
+### 🔹 Banco de dados: **único e compartilhado**
+
+✅ Sim, **é o mesmo banco físico**  
+✅ Sim, **ambas as APIs usam**  
+❌ Não é um banco “exclusivo” da API 1
+
+***
+
+## ✅ A divisão REAL é por **ownership de dados**
+
+### 🟦 API 1 — **Dona dos dados de integração**
+
+A API 1 é dona de tudo que:
+
+* vem do Omie
+* representa estado externo
+* precisa ser reconciliado
+* precisa de idempotência externa
+* é read‑model de integração
+
+**Exemplos:**
+
+* `omie_orders`
+* `omie_order_items`
+* `omie_products`
+* `omie_clients`
+* `omie_production_orders`
+* `sync_locks`
+* hashes, códigos Omie, payloads crus
+
+📌 **Só a API 1 pode escrever nesses dados.**
+
+***
+
+### 🟩 API 2 — **Dona dos dados de domínio**
+
+A API 2 é dona de tudo que:
+
+* nasce de decisão humana
+* representa regra de negócio
+* não existe no Omie
+* pode mudar sem Omie
+* pertence ao planejamento interno
+
+**Exemplos:**
+
+* metas
+* planos de produção
+* favoritos
+* agrupamentos
+* prioridades
+* status internos
+* auditorias de decisão
+* histórico de comandos
+
+📌 **A API 2 pode escrever diretamente no banco nessas tabelas.**
+
+***
+
+## ✅ Visual claro (guarde isso)
+
+```
+┌──────────────────────────┐
+│        MESMO BANCO       │
+│                          │
+│  ┌───────────────┐       │
+│  │  API 1 (ACL)  │──────▶│  Tabelas Omie / Integração
+│  └───────────────┘       │
+│                          │
+│  ┌───────────────┐       │
+│  │ API 2 (Dom.)  │──────▶│  Tabelas de Domínio
+│  └───────────────┘       │
+│                          │
+└──────────────────────────┘
+```
+
+ACL = Anti‑Corruption Layer
+
+***
+
+## ✅ Regras de ouro (não negociáveis)
+
+### ✅ API 1
+
+* ✅ escreve **dados Omie**
+* ✅ reconcilia
+* ✅ faz backfill
+* ✅ traduz payload
+* ✅ protege o domínio
+
+### ❌ API 1 NÃO
+
+* ❌ cria metas
+* ❌ cria planos internos
+* ❌ decide negócio
+* ❌ grava intenção humana
+
+***
+
+### ✅ API 2
+
+* ✅ cria metas
+* ✅ cria planos
+* ✅ cria comandos (OP)
+* ✅ grava decisões humanas
+* ✅ usa read‑model da API 1
+
+### ❌ API 2 NÃO
+
+* ❌ grava dados Omie
+* ❌ traduz payload Omie
+* ❌ chama Omie direto
+* ❌ conhece campos Omie
+
+***
+
+## ✅ Aplicando isso à sua pergunta (metas)
+
+> **Metas devem ser API 2?**  
+> ✅ **Sim. 100%.**
+
+> **Quem grava metas no banco?**  
+> ✅ **API 2 grava diretamente.**
+
+> **API 1 participa?**  
+> ❌ Não.
+
+***
+
+## ✅ Aplicando isso à OP (que vem agora)
+
+* API 2:
+  * valida regra
+  * decide criar OP
+  * grava intenção (se quiser)
+* API 1:
+  * traduz
+  * chama Omie
+  * grava retorno Omie
+
+✅ Cada uma grava **o que é sua responsabilidade**  
+✅ No **mesmo banco**, sem conflito
+
+***
+
+## ✅ Conclusão final (corrigindo a frase antiga)
+
+A frase correta para guardar é:
+
+> **O banco é compartilhado.  
+> A API 1 é dona dos dados de integração.  
+> A API 2 é dona dos dados de domínio.**
+
+
+
+
+
+
+
+

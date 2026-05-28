@@ -1,10 +1,8 @@
 import { ProductsAdapter } from '../../infrastructure/integrations/catalog.adapter.js';
-import { prisma, prismaInitError } from '../../../../infra/prisma.js';
 
 export class RefreshCatalogStockUseCase {
   static async execute() {
-    // Retorna mock indicando sucesso, pois os dados estão vindo do banco.
-    return { data: { success: true, message: "Dados sendo carregados diretamente do banco." } };
+    return await ProductsAdapter.fetchStockRefresh();
   }
 }
 
@@ -18,23 +16,24 @@ export class GetAdminCatalogUseCase {
 export class GetCatalogListUseCase {
   static async execute() {
     try {
-      const dbProducts = await prisma.$queryRaw<any[]>`SELECT * FROM "OmieProduct"`;
+      const response = await ProductsAdapter.fetchList();
       
-      const data = dbProducts.map((p) => {
-        return p.rawPayload;
-      });
-      return { 
+      const mappedData = response.data.map((p: any) => ({
+        ...p,
+        stock: Number(p.stockQuantity) || 0,
+        minStock: Number(p.minimumStock) || 0,
+        id: p.omieCode,
+        code: p.sku || p.omieCode
+      }));
+
+      return {
         data: {
-          data,
-          meta: {
-            page: 1,
-            pageSize: data.length,
-            total: data.length
-          }
-        } 
+          data: mappedData,
+          meta: response.meta
+        }
       };
     } catch (err: any) {
-      console.warn('[GetCatalogListUseCase] Falha ao consultar OmieProduct local', err);
+      console.warn('[GetCatalogListUseCase] Falha ao consultar API externa:', err);
       return { data: { data: [], meta: { page: 1, pageSize: 0, total: 0 } } };
     }
   }

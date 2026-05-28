@@ -4,7 +4,8 @@ import { AppError } from '../../../../shared/errors/AppError.js';
 export class ProductsAdapter {
   static async fetchFromExternalAPI(limit: number = 1000) {
     try {
-      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/products`;
+      const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';
+      const targetUrl = `${baseUrl}/v1/products`;
       const firstResponse = await externalClient.get(targetUrl, { 
         params: { page: 1, _t: new Date().getTime() },
         headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
@@ -39,7 +40,8 @@ export class ProductsAdapter {
 
   static async fetchStockRefresh() {
     try {
-      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/admin/omie/products/stock/refresh`;
+      const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';
+      const targetUrl = `${baseUrl}/v1/admin/omie/products/stock/refresh`;
       const response = await externalClient.post(targetUrl, {}, {
         headers: { 'Content-Type': 'application/json' }
       });
@@ -51,7 +53,8 @@ export class ProductsAdapter {
 
   static async fetchAdminProducts() {
     try {
-      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/admin/products`;
+      const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';
+      const targetUrl = `${baseUrl}/v1/admin/products`;
       const response = await externalClient.get(targetUrl);
       return response.data;
     } catch (err: any) {
@@ -61,7 +64,8 @@ export class ProductsAdapter {
 
   static async fetchList() {
     try {
-      const targetUrl = `${process.env.VITE_API_BASE_URL || 'https://production-manager-api.onrender.com/v1'}/products`;
+      const baseUrl = process.env.API1_BASE_URL || 'https://production-manager-api.onrender.com';
+      const targetUrl = `${baseUrl}/v1/products`;
       const firstResponse = await externalClient.get(targetUrl, { 
         params: { page: 1, _t: new Date().getTime() },
         headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }

@@ -1,12 +1,16 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.24.8 (Atualizado em 28/05/2026 - Otimização de Sync de Estoque e Cache)
+**Versão:** v4.25.0-plan (Atualizado em 28/05/2026 - Planejamento FSD Ordens de Produção)
 
 ## 🎯 Objetivo
-Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL).
+Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL) e Front-end em transição para Feature-Sliced Design (FSD).
 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+
+### 1.21. Planejamento FSD para Ordens de Produção (v4.25.0-plan)
+- **Adoção do Padrão FSD:** Planejado a adoção oficial metodológica e estrutural de Feature-Sliced Design no front-end, a se iniciar ativamente com as migrações arquiteturais de "Ordens de Produção" visando absorver as modernizações e persistências para a futura Database Relacional. O Documento central `Estrutura_Projeto.md` foi validado.
+- **Shadowing de Front-end:** As modificações de tela serão desenvolvidas 100% debaixo do escopo FSD em ambiente paralelo. Evitando qualquer "Destruição do Legado em Uso" e garantindo zero downtime.
 
 ### 1.20. Otimização Sync de Estoque Client-Side Direto (v4.24.8)
 - **Desacoplamento Completo do Refresh:** O botão UI "Atualizar Estoque" deixou de forçar jobs/atualizações na API 1 e engatilhar requisições em todo o catálogo. Baseando-se no fato que jobs já efetuam updates de estado em background no banco, a API 2 simplesmente carrega estoques da tabela de leitura (`product_stock`) via Prisma.

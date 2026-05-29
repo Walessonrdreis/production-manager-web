@@ -6,6 +6,7 @@ import { StocksPage } from '../pages/stocks/StocksPage';
 import { SectorsPage } from '../pages/sectors/SectorsPage';
 import { OrdersPage } from '../pages/orders/OrdersPage';
 import { ProductionOrdersPage } from '../pages/orders/ProductionOrdersPage';
+import { ProductionOrdersV2Page } from '../pages/orders/ProductionOrdersV2Page';
 import { PlanningPage } from '../pages/planner/PlanningPage';
 import { GoalsManagementPage } from '../features/goals/ui/GoalsManagementPage';
 import { CollaboratorsPage } from '../features/collaborators/ui/CollaboratorsPage';
@@ -28,6 +29,8 @@ export function AppRouter() {
         <Route path="/sectors" element={<SectorsPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/production-orders" element={<ProductionOrdersPage />} />
+        {/* Rota escondida para a nova feature isolada */}
+        <Route path="/v2/production-orders" element={<ProductionOrdersV2Page />} />
         <Route path="/planning" element={<PlanningPage />} />
         <Route path="/goals" element={<GoalsManagementPage />} />
         <Route path="/collaborators" element={<CollaboratorsPage />} />

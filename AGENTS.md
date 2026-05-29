@@ -183,6 +183,7 @@ O diretório `apps/web` é o local oficial e exclusivo do frontend da aplicaçã
 Toda a migração do frontend DEVE ocorrer exclusivamente dentro de `apps/web`,
 sem impactar o funcionamento do sistema existente até a conclusão de cada etapa.
 
+adotaremos o Feature-Sliced Design (FSD) e o usaremos sob o padrão de "Shadowing
 ### Princípios Obrigatórios
 
 - A migração deve ser progressiva (shadowing).
@@ -742,6 +743,9 @@ A frase correta para guardar é:
 > **O banco é compartilhado.  
 > A API 1 é dona dos dados de integração.  
 > A API 2 é dona dos dados de domínio.**
+
+DATABASE_FINAL_URL= Banco de dados final do projeto
+LEGACY_DATABASE_URL= Banco de dados que o frontend e api2 usam para criar e lidar com dados de dominio e etc, será organizado nele para no futuro termos a migração suave para o db final com tudo ja preparado.
 
 
 

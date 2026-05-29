@@ -422,6 +422,28 @@ Diretrizes obrigatórias:
 ## 20 Migração Duas api's usando o mesmo banco Arquivo para sempre ler
 - AGENTS_MIGRATION.md
 
+## 21. Regra de Simulação de Integrações e Arquitetura Modular no Frontend (Strategy & Gateways)
+
+Toda nova integração externa ou fluxo complexo de API no frontend (apps/web) DEVE suportar um modo de simulação (Fake) e um modo Real, alternáveis via variável de ambiente, e DEVE ser estruturada de forma modular seguindo o padrão de "Cargas de Trabalho" (Workloads) para evitar acoplamento e arquivos sobrecarregados.
+
+### Padrões Obrigatórios: Strategy, Adapter e Gateways
+
+- **Strategy Pattern & Adapter**: O código de frontend DEVE implementar qualquer integração externa via Strategy Pattern, possuindo uma interface comum (Contrato) assinada pelas implementações `Fake` e `Real`.
+- **Injeção via Gateway**: As implementações (Fake e Real) não devem ser instanciadas espalhadas nas views/components. Deve-se adotar um **Gateway Centralizador / Factory** para o módulo.
+- **Variáveis de Ambiente Específicas**: É expressamente proibido usar uma variável global única (ex: `VITE_USE_FAKE=true`) para todo o sistema. CADA módulo deve ter sua própria variável, garantindo o controle granular e transições isoladas para produção (ex: `VITE_USE_FAKE_OP_API=true`, `VITE_USE_FAKE_PRODUCTS_API=true`). O Gateway lê essa variável e devolve a instância correta (Fake ou Real).
+- **Ignorância da View**: A UI (Componentes React/Páginas) NUNCA deve saber se está utilizando o serviço Fake ou Real. Ela deve apenas consumir o Gateway chamando os métodos do contrato.
+
+### Arquitetura de "Carga de Trabalho" (Isolamento por Feature)
+
+- Para garantir que nenhuma camada fique inflada demais (Responsabilidade Única / SRP Global), a nova feature deve se organizar como uma "Carga de Trabalho" (Módulo).
+- Os arquivos devem estar divididos organicamente (ex: `api/`, `models/`, `views/`, `components/`) dentro de um diretório da feature (ex: `apps/web/src/features/production-order`).
+- **Nenhum arquivo pode ter responsabilidades demais**. Se houver buscas, normalização de dados, delegação de eventos e a interface num arquivo só, ele DEVE ser quebrado. Encaixe-os como blocos de Lego isolados usando os padrões acima.
+
+### Objetivo e Transição Suave
+
+- **Desacoplamento**: O objetivo central é permitir que o frontend evolua livre de bloqueios do backend, testando todos os limites da interface usando dados fictícios mas construído sobre a malha arquitetônica correta para produção.
+- **Virada de Chave Simples**: Quando a integração for a produção, bastará alterar a variável de ambiente. O frontend estará perfeitamente preparado para apontar para a API Real sem a necessidade de refatorar componentes visuais.
+
 ## Regra Final de Governança
 
 Nenhuma automação vale mais que a estabilidade.

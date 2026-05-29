@@ -42,6 +42,13 @@ const menuCategories = [
     ]
   },
   {
+    title: 'Nova UI (V2)',
+    icon: Activity,
+    items: [
+      { id: 'v2-production-orders', label: 'Ordens de Produção', path: '/v2/production-orders', icon: ClipboardList },
+    ]
+  },
+  {
     title: 'Inventário',
     icon: Box,
     items: [
@@ -72,6 +79,7 @@ export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
     const initialState: Record<string, boolean> = {
       'Visão Geral': false,
       'Produção': false,
+      'Nova UI (V2)': false,
       'Inventário': false,
       'Administração': false,
     };

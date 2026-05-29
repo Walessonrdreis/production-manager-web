@@ -129,10 +129,10 @@ export function ProductionOrdersHub() {
 
   // Visão em Modo Hub (Grid de Widgets)
   return (
-    <div className="p-6 max-w-7xl mx-auto h-full">
+    <div className="p-6 max-w-7xl mx-auto h-full text-slate-900 dark:text-slate-100">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Painel de Produção (V2)</h1>
-        <p className="text-gray-500">Selecione ou reordene os blocos de gestão.</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Painel de Produção (V2)</h1>
+        <p className="text-gray-500 dark:text-gray-400">Selecione ou reordene os blocos de gestão.</p>
       </div>
 
       <DndContext

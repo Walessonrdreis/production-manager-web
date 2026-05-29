@@ -56,17 +56,17 @@ export function OpenedOrdersView() {
   }, [orders, filters]);
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 relative">
-      <div className="bg-white p-4 border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative">
+      <div className="bg-white dark:bg-slate-900 p-4 border-b border-gray-200 dark:border-slate-800 sticky top-0 z-10 shadow-sm">
         <OrderFilterGrid filters={filters} onFilterChange={handleFilterChange} />
       </div>
       
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
         {isLoading ? (
           <div className="flex flex-col space-y-4">
-            <div className="h-24 bg-gray-200 animate-pulse rounded-lg"></div>
-            <div className="h-24 bg-gray-200 animate-pulse rounded-lg"></div>
-            <div className="h-24 bg-gray-200 animate-pulse rounded-lg"></div>
+            <div className="h-24 bg-gray-200 dark:bg-slate-800 animate-pulse rounded-lg"></div>
+            <div className="h-24 bg-gray-200 dark:bg-slate-800 animate-pulse rounded-lg"></div>
+            <div className="h-24 bg-gray-200 dark:bg-slate-800 animate-pulse rounded-lg"></div>
           </div>
         ) : error ? (
           <div className="p-4 bg-red-50 text-red-600 rounded">Erro ao carregar OPs em aberto.</div>
@@ -89,8 +89,8 @@ export function OpenedOrdersView() {
             ))}
           </AnimatePresence>
         ) : (
-           <div className="text-center p-12 bg-white rounded shadow-sm border border-gray-100">
-             <p className="text-gray-500">Nenhuma OP encontrada com estes filtros.</p>
+           <div className="text-center p-12 bg-white dark:bg-slate-900 rounded shadow-sm border border-gray-100 dark:border-slate-800">
+             <p className="text-gray-500 dark:text-gray-400">Nenhuma OP encontrada com estes filtros.</p>
            </div>
         )}
       </div>

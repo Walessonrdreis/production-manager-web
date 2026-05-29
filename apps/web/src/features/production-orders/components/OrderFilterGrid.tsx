@@ -37,14 +37,14 @@ export function OrderFilterGrid({ filters, onFilterChange }: OrderFilterGridProp
             placeholder="Buscar por nome do produto ou número da OP..." 
             value={filters.search}
             onChange={handleSearchChange}
-            className="w-full pl-10 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-colors" 
+            className="w-full pl-10 p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/50 focus:border-blue-400 dark:focus:border-blue-500 outline-none transition-colors" 
           />
         </div>
         
         <select 
           value={filters.status}
           onChange={(e) => onFilterChange({ status: e.target.value })}
-          className="p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none cursor-pointer transition-colors"
+          className="p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/50 focus:border-blue-400 dark:focus:border-blue-500 outline-none cursor-pointer transition-colors"
         >
           <option value="ALL">Status: Todos</option>
           <option value="OPENED">Aberto</option>
@@ -55,7 +55,7 @@ export function OrderFilterGrid({ filters, onFilterChange }: OrderFilterGridProp
         <select
           value={filters.dateRange}
           onChange={(e) => onFilterChange({ dateRange: e.target.value })}
-          className="p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none cursor-pointer transition-colors"
+          className="p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/50 focus:border-blue-400 dark:focus:border-blue-500 outline-none cursor-pointer transition-colors"
         >
           <option value="ALL">Data: Todas</option>
           <option value="TODAY">Hoje</option>
@@ -65,7 +65,7 @@ export function OrderFilterGrid({ filters, onFilterChange }: OrderFilterGridProp
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-gray-500 mr-2 font-medium">Filtros Rápidos:</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400 mr-2 font-medium">Filtros Rápidos:</span>
         {smartChips.map((chip) => {
           const isActive = filters.status === chip;
           return (
@@ -74,8 +74,8 @@ export function OrderFilterGrid({ filters, onFilterChange }: OrderFilterGridProp
               onClick={() => onFilterChange({ status: chip })}
               className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors border ${
                 isActive 
-                ? 'bg-blue-100 text-blue-800 border-blue-200' 
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800/50' 
+                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700'
               }`}
             >
               {chip === 'ALL' ? 'Todos' : chip === 'OPENED' ? 'Abertos' : chip === 'REVIEW' ? 'Em Revisão' : 'Cancelados'}
@@ -85,7 +85,7 @@ export function OrderFilterGrid({ filters, onFilterChange }: OrderFilterGridProp
         {hasActiveFilters && (
           <button 
             onClick={clearFilters}
-            className="ml-auto text-sm text-red-600 hover:text-red-700 font-medium"
+            className="ml-auto text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium"
           >
             Limpar Filtros
           </button>

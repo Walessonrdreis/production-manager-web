@@ -1,5 +1,5 @@
 # Resumo do Projeto: Production Manager
-**Versão:** v4.25.0-plan (Atualizado em 28/05/2026 - Planejamento FSD Ordens de Produção)
+**Versão:** v4.30.0 (Atualizado em 04/06/2026 - Planejamento Criação de Lote de OPs)
 
 ## 🎯 Objetivo
 Sistema de gerenciamento de produção industrial que integra dados da API Omie com funcionalidades locais de planejamento, rastreamento de progresso e gestão de metas. Aquitetura em transição para Relacional Nativo (PostgreSQL) e Front-end em transição para Feature-Sliced Design (FSD).
@@ -7,6 +7,78 @@ Sistema de gerenciamento de produção industrial que integra dados da API Omie 
 ---
 
 ## 🏗️ Arquitetura Técnica (ADR-004 & Guia Operacional)
+
+### 1.40. Área de Preparação e Criação de OPs em Lote (v4.30.0-plan)
+- **Staging Area e Smart Match:** Planejada a consolidação de "Copy & Paste" de dados vindos de planilhas. Implementará um sistema inteligente (Fuzzy Matcher) que tenta vincular o nome de produtos copiados com o banco do catálogo de modo suave, e checa duplicações baseado no Histórico.
+- **Resiliência e Progresso Otimizado:** Durante a emissão do grande volume de OPs ao backend (API 1), a interface não irá realizar congelamento global do estado. Utilizará uma barra de progresso individualizada onde possíveis falhas recebem status específico provendo um botão focal de retry, salvando o sucesso remanescente.
+- **Setor e Modificação em Fila:** Previsto seleção de "Setor" (API 2) tendo "Temperagem" como padrão. Ordens consolidadas poderão ter seu Lote e Setor flexivelmente reeditados e cancelados visualmente através da "Fila de Trabalho".
+
+### 1.39. Assistente Avançado de Formulação de Receitas (v4.29.0)
+- **Normalização Matemática:** Implementado o cálculo automatizado `RecipeCalculator` que converte receitas dinâmicas com rendimento e perda para a proporção equivalente a estritos `1 KG` faturáveis.
+- **Hook de Autocomplemento (useRecipeResolver):** O rascunho dos ingredientes preenchidos no frontend são automaticamente vinculados ao banco real de Produtos da Omie caso apresentem o mesmo nome.
+- **Interface Mista para BOM:** A view de edição da estrutura do produto agora possui abas focadas em `Adição Direta` e em `Assistente de Receita`, delegando responsabilidades em Módulos independentes sem sujar o Layout.
+
+### 1.38. Fluxo de Criação de BOM Direcionado e Segmentação (v4.28.14)
+- **Criação de OPs:** Ao selecionar um produto sem estrutura e aceitar a sugestão de criá-la, o sistema agora redireciona com parâmetros precisos (`?view=with-bom&expandProduct=ID`) para forçar a abertura exata da Visão de Gerenciamento de Estrutura acionando o Modal do produto problemático na tela.
+- **Filtro de Estado de Estrutura:** A view "Gerenciar Estruturas" recebeu Segmented Controls permitindo isolar a base inteira entre produtos "Com Estrutura" e "Sem Estrutura", evitando poluição massiva na grid de componentes.
+
+### 1.37. Desacoplamento de Visões e Abas de Estrutura no Catálogo (v4.28.13)
+- **Foco por Workload:** Remoção completa da navegação por abas "Detalhes/BOM" dentro do modal de produto. Se o usuário estiver no "Catálogo Geral" (`isBomView=false`), o card abre estritamente a visão detalhada de vendas e estoque. Se o usuário acessar "Gerenciar Estruturas" (`isBomView=true`), o card vai direto para a interface focada na montagem e visualização da Ficha Técnica (Sem metadados genéricos do produto).
+
+### 1.36. Cards de Estrutura Formato Tabela (v4.28.12)
+- **Compactação Visual:** Adaptação da Listagem de Produtos (`CatalogV2List`) para adotar a UI de Tabela Compacta/Linhas de Tabela (`isBomView` no Card) em desktop ao acessar "Gerenciar Estruturas", além de ocultar o botão de Criação de Produto para manter o foco em composições produtivas.
+
+### 1.35. Hub Dinâmico do Catálogo V2 (v4.28.11)
+- **Painel de Acesso Rápido:** Substituída a listagem densa ao entrar no catálogo por um layout de Hub baseado em "Blocos Moveis" (semelhante às OPs). Blocos como "Catálogo Completo", "Estoque Baixo", "Com Estrutura" e "Criar Produto" resumem dados e pré-parametrizam a listagem.
+- **Sub-pages:** A listagem tornou-se um componente interno `CatalogV2List.tsx` englobado por `BaseSubpageLayout.tsx`, implementando transições fluidas dentro da mesma rota.
+
+### 1.34. Ajuste de Título e Menu do Catálogo UI (v4.28.10)
+- **Simplificação de Nomenclatura:** Refinamento dos nomes nos menus e nos subtítulos, ressaltando o domínio do "Catálogo de Produtos" e removendo o texto referente unicamente a estruturas BOM, consolidando que produtos existem independente de suas composições de engenharia.
+
+### 1.33. Entrada Manual de Estoque (v4.28.9)
+- **Workload FSD de Movimentação de Saldo:** Introduzido um módulo autônomo acionável por dentro do modal de detalhes do Produto no Catálogo V2 ("Comandos Rápidos"). Esse módulo serve o trâmite de inserção manual de saldo (Data, Quantidade, Valor Unitário, Observação) a ser despachado ao Omie para produtos sem NF. Respeitando o Gateway Pattern (Regra 21), a operação pode ser falseada localmente usando a flag `VITE_USE_FAKE_MANUAL_STOCK_API` configurada nos environments.
+
+### 1.32. Criação de Produto (v4.28.8)
+- **Workload Isolado de Criação:** A criação nativa de produtos diretamente pelo Catálogo V2 foi construída embasada na Regra 21. Foram elaborados Gateways e a aplicação das Interfaces do Padrão "Resource Loading Strategy" (`FakeCreateProduct` e `RealCreateProduct`, injetados pelo `CreateProductGateway`). A alternância é feita por design flag via `VITE_USE_FAKE_CREATE_PRODUCT_API`, evitando bloqueios entre dependências não concluídas no Backend (API 1). Atualmente roda o modo Simulation por definição base.
+
+
+### 1.31. Confronto de Saldo na Estrutura BOM (v4.28.7)
+- **Comparativo Consumo vs Estoque:** A aba "Estrutura (BOM)" no Catálogo V2 agora correlaciona o componente exigido e seu respectivo estoque total presente na base. Através de um indicador bicolor de saúde (Verde/Vermelho), o operador consegue rapidamente observar se o saldo físico atende à quota a ser consumida daquele insumo, sem necessitar abrir detalhes separados para cada material da composição.
+
+### 1.30. Detalhes de Estoque no Modal V2 (v4.28.6)
+- **Indicadores Detalhados:** Incorporada a visualização direta de "Estoque Físico" e "Estoque Mínimo" dentro da aba de "Detalhes e Ações" presente no modal ampliado do Catálogo V2. A alteração utilizou um arranjo fluid (grid) que se adequa perfeitamente ao formato de leitura nos variados tamanhos de tela.
+
+### 1.29. Acesso Rápido a Indicadores no Catálogo V2 (v4.28.5)
+- **Painel Rápido de Estoque:** Adicionada a exposição destacada da quantidade em estoque juntamente com o preço, sem a necessidade de expansão da modal. Facilita a varredura visual sobre disponibilidade de material.
+
+### 1.28. Múltiplas Abas e No-Tables BOM Catalog V2 (v4.28.4)
+- **Modal Multifuncional:** Introdução de organização baseada em Abas ("Detalhes e Ações" e "Estrutura (BOM)") dentro do modal imersivo do Catálogo de Produtos da versão 2. O usuário não mais consome espaço horizontal/vertical por tabelas longas e desnecessárias quando a intenção envolve apenas consulta.
+- **Filtros e Fake Safety:** Implementação de paridade de regras de Filtragem com a V1 e bloqueio do Mocking na Camada Core (`GetOmieProducts`), resguardando dados "Fake" para exibição explícita exclusiva da interface V2 (`CatalogV2Page`). Substituiu-se de forma completa qualquer tag `<table />` na hierarquia da `BOM` por Listas Semânticas flexíveis (`Grid/Card-list`).
+
+### 1.27. Refatoração Visual e Expansão da Lista de Produtos do Catálogo V2 (v4.28.3)
+- **Foco Analítico:** A interface `/v2/catalog` foi simplificada removendo opções prematuras ("Nova Estrutura" na toolbar principal). O foco virou estritamente para busca e listagem de produtos.
+- **Detalhes de Produto Imersivos:** Alterada a mecânica do `ProductListCard`. Substituiu-se a expansão simples por uma **Modal Dinâmica/Drawer (Overlaid)** utilizando `createPortal`. Agora ao selecionar um produto, este sobrepõe a tela contendo um balanço detalhado com suas informações base, alertando grandes vazios com CTAs contextualizados para a construção assertiva do BOM no futuro, permitindo leitura limpa e totalmente paritária com o Dark Mode introduzido.
+
+
+### 1.26. Diretriz de Consistência Visual (Dark Mode) (v4.28.2)
+- **Implementação Obrigatória:** Adicionada a Regra 22 ao `AGENTS.md` exigindo que todas as novas interfaces de usuário e refatorações contemplem nativamente classes do Tailwind dedicadas ao modo escuro (Ex: `dark:bg-*`, `dark:text-*`, `dark:border-*`), promovendo padronização e paridade com a nova paleta do sistema.
+
+### 1.25. Interface e Bloqueio de Falta de BOM (v4.28.1)
+- **Integração Visual (Modal de Redirecionamento):** Concretizado o fluxo em que OPs perdem sentido ou são bloqueadas caso o item não disponha de uma BOM. Agora no momento da pré-seleção (`CreateOrderView.tsx`), caso o produto emita ausência de estrutura, uma Modal de alerta intercepta e questiona o usuário se ele deseja montar agora (redirecionando a `/v2/catalog`) ou abortar.
+
+### 1.24b. Documentação Gerenciador de Estruturas (BOM) (v4.28.0)
+- **Documentação Vivo:** Criada página documentacional `docs/paginas/bom-manager.md` descrevendo a visão arquitetural do catálogo unificado. O catálogo passará a agregar informações estruturais (BOM) no mesmo painel dos produtos e as alertará visualmente, guiado pela responsabilidade de ser a fonte da verdade para regras impeditivas de produção.
+
+### 1.24. Regras de Criação e Mock Centralizado (v4.28.0)
+- **Centralização:** Em conformidade com a refatoração do Front-end FSD, o Mock de OP's e o motor relacional fake foram aglutinados para `productionOrdersApi`. Agora, OPs criadas de fato vão para a fila temporária na sessão.
+- **Validações Impeditivas:** Para proteger o Back-end real e alinhar com regras de custo ERP, o formulário não avança se o produto não possuir BOM ou se seus insumos estiverem sem valor de custo (Simulação em frontend antes de deploy na API real).
+
+### 1.23. Design de UI da Fila de Trabalho (v4.27.0)
+- **Cards Tipo Tabela**: Em linha com a Regra 10 e foco em Mobile-First, a Fila de Trabalho para listagem de OPs adota o modelo de Cards colapsáveis (comportamento "Abordagem 2B") em substituição ao `<table>` estático. Detalhamento exposto apenas sob demanda no próprio fluxo do card (Accordion), evitando popups/modais problemáticos no mobile e concentrando Setor, Produto, Lote, Qtde, Data e Status na visão primária.
+
+### 1.22. Tela de OPs com Strategy Pattern e Factory Gateway (v4.26.0)
+- **Isolamento de UI**: Embasado na nova Regra 21, o frontend não possui mais amarras atreladas ao backend final que está sendo construído (API 2). Despachada nova rota `/v2/production-orders` implementada integralmente com Mock/Fake de chamadas via injeção (`getProductionOrderGateway`) em `useProductionOrders`.
+- **Desbloqueando o Desenvolvimento (FSD):** A funcionalidade possibilita atuar no Front-End paralelamente ao Back-end de forma estável. As rotas reais (`RealProductionOrderService`) já se encontram provisionadas como contratos. Quando finalizado na API, apenas a variável `VITE_USE_FAKE_OP_API=false` fará a virada de chave para produção.
 
 ### 1.21. Planejamento FSD para Ordens de Produção (v4.25.0-plan)
 - **Adoção do Padrão FSD:** Planejado a adoção oficial metodológica e estrutural de Feature-Sliced Design no front-end, a se iniciar ativamente com as migrações arquiteturais de "Ordens de Produção" visando absorver as modernizações e persistências para a futura Database Relacional. O Documento central `Estrutura_Projeto.md` foi validado.

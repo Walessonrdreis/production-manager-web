@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../../components/ui/DevBadge';
 import { Button } from '../../../../components/ui/Button';
 import { RefreshCw } from 'lucide-react';
 
@@ -13,7 +14,7 @@ export function MonitoringHeader({ isFetching, isSyncing, onSync, title, subtitl
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">{title || "Status de Produção"}</h1>
+        <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">{title || "Status de Produção"} <DevBadge id="monitoringheader.title" /></h1>
         <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">{subtitle || "Etapa 20 - Produtos e Vendas em Aberto"}</p>
       </div>
       <div className="flex items-center gap-4 w-full sm:w-auto">

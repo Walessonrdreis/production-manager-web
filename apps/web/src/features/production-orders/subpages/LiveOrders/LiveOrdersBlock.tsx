@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../../components/ui/DevBadge';
 import React from 'react';
 
 export function LiveOrdersBlock() {
@@ -9,7 +10,7 @@ export function LiveOrdersBlock() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           Em Execução
-        </h3>
+         <DevBadge id="card.liveordersblock" /></h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Sendo produzidas neste momento</p>
       </div>
       <div className="p-5 flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-white dark:bg-slate-900">

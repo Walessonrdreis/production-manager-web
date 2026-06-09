@@ -39,8 +39,17 @@ export function findArray(obj: any, depth = 0): any[] | null {
  * Normaliza um produto bruto da API para o formato de domínio
  */
 export function normalizeProduct(p: any): Product {
+  const normalizedId = String(p.omieCode || p.id || p.codigo_produto || p.codigo_produto_integracao || '');
+  
+  // MOCK: Injetar BOM para testes (simulando que alguns produtos têm estrutura e outros não)
+  const isEvenId = normalizedId && normalizedId.charCodeAt(0) % 2 === 0;
+  const mockBom = isEvenId ? [
+    { productId: 'mock-insumo-1', quantity: 2, cost: 5.50 },
+    { productId: 'mock-insumo-2', quantity: 0.5, cost: 12.00 }
+  ] : [];
+
   return {
-    id: String(p.omieCode || p.id || p.codigo_produto || p.codigo_produto_integracao || ''),
+    id: normalizedId,
     code: String(p.codigo || p.code || p.codigo_produto_integracao || p.codigo_produto || ''),
     description: String(p.descricao || p.description || p.descr_detalhada || 'Sem descrição'),
     family: String(p.descricao_familia || p.familyDescription || p.familia || p.family || ''),
@@ -48,6 +57,7 @@ export function normalizeProduct(p: any): Product {
     minStock: Number(p.estoque_minimo || p.minStock || 0),
     price: Number(p.valor_unitario || p.price || 0),
     unit: String(p.unidade || p.unit || 'UN'),
-    sectorIds: p.sectorIds || (p.sectorId ? [p.sectorId] : [])
+    sectorIds: p.sectorIds || (p.sectorId ? [p.sectorId] : []),
+    bom: mockBom
   };
 }

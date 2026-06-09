@@ -11,6 +11,12 @@ export interface DashboardTotalsResponse {
 
 export type StockType = 'Barras' | 'Confeitaria' | 'Chocolate Refinado' | 'Insumos' | 'Limpeza' | 'Maquinários';
 
+export interface BOMItem {
+  productId: string;
+  quantity: number;
+  cost: number;
+}
+
 export interface Product {
   id: string;
   code: string;
@@ -24,6 +30,7 @@ export interface Product {
   minStock?: number;
   sectorIds?: string[];
   stockType?: StockType;
+  bom?: BOMItem[];
 }
 
 export interface Sector {

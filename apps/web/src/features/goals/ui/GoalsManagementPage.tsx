@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../components/ui/DevBadge';
 import React, { useState } from 'react';
 import { Target, Package, Users, LayoutGrid } from 'lucide-react';
 import { ProductGoalsTab } from './components/ProductGoalsTab';
@@ -15,7 +16,7 @@ export function GoalsManagementPage() {
         <h1 className="text-3xl flex items-center font-bold text-gray-900 dark:text-gray-100 gap-3">
           <Target className="w-8 h-8 text-indigo-600" />
           Metas e Objetivos
-        </h1>
+         <DevBadge id="goalsmanagementpage.title" /></h1>
         <p className="text-gray-500 dark:text-gray-400 mt-2">Defina metas de produção por produto, colaborador ou setor para alimentar os indicadores de performance (Kpis).</p>
       </header>
 

@@ -45,6 +45,8 @@ const menuCategories = [
     title: 'Nova UI (V2)',
     icon: Activity,
     items: [
+      { id: 'v2-catalog', label: 'Produtos', path: '/v2/catalog', icon: Package },
+      { id: 'v2-stocks', label: 'Estoques', path: '/v2/stocks', icon: Layers },
       { id: 'v2-production-orders', label: 'Ordens de Produção', path: '/v2/production-orders', icon: ClipboardList },
     ]
   },

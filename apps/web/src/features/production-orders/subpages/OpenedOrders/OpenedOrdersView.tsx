@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { productionOrdersApi } from '../../api/productionOrdersApi';
-import { OrderCardCompact } from '../../components/OrderCardCompact';
+import { ProductionOrderCard } from '../../components/ProductionOrderCard';
 import { OrderFilterGrid, OrderFilterState } from '../../components/OrderFilterGrid';
 
 export function OpenedOrdersView() {
@@ -81,7 +81,7 @@ export function OpenedOrdersView() {
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <OrderCardCompact 
+                <ProductionOrderCard 
                   order={order} 
                   searchTerm={filters.search}
                 />

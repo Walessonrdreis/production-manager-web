@@ -6,6 +6,7 @@ import { useLocalProduced } from '../../../hooks/dashboard/useLocalProduced';
 import { useDashboardTotals } from '../../../hooks/dashboard/useDashboardTotals';
 import { isToday, isPast, parseISO, startOfDay } from 'date-fns';
 import { useMemo } from 'react';
+import { DevBadge } from '../../../components/ui/DevBadge';
 
 export function DashboardPage() {
   const { schedules } = useProductionSchedules();
@@ -48,7 +49,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">Painel Estratégico</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">Painel Estratégico <DevBadge id="dashboardpage.title" /></h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">Visão geral do desempenho da fábrica</p>
       </header>
 
@@ -56,7 +57,10 @@ export function DashboardPage() {
         <Card className="shadow-sm hover:shadow-md transition-shadow bg-[#2a4eff] border-[#2a4eff]">
           <div className="flex flex-col items-start p-6 text-white">
             <div className="flex items-center justify-between w-full mb-4">
-              <span className="text-xs font-bold text-white/90 tracking-wider uppercase">Produzidos (Hoje)</span>
+              <span className="text-xs font-bold text-white/90 tracking-wider uppercase flex items-center">
+                Produzidos (Hoje)
+                <DevBadge id="dashboard.producedToday" />
+              </span>
               <CheckCircle size={20} className="text-white" />
             </div>
             <div className="text-3xl font-bold text-white">{metrics.producedToday}</div>
@@ -67,7 +71,10 @@ export function DashboardPage() {
         <Card className="shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col items-start p-6">
             <div className="flex items-center justify-between w-full mb-4">
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">Programados (Hoje)</span>
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase flex items-center">
+                Programados (Hoje)
+                <DevBadge id="dashboard.scheduledToday" />
+              </span>
               <Clock size={20} className="text-blue-500" />
             </div>
             <div className="text-3xl font-bold text-zinc-900 dark:text-white">{metrics.scheduledToday}</div>
@@ -78,7 +85,10 @@ export function DashboardPage() {
         <Card className={`shadow-sm hover:shadow-md transition-shadow ${metrics.lateSchedules > 0 ? 'bg-red-50 dark:bg-rose-950/30 border-red-200 dark:border-rose-900/50' : ''}`}>
           <div className="flex flex-col items-start p-6">
             <div className="flex items-center justify-between w-full mb-4">
-              <span className={`text-xs font-bold tracking-wider uppercase ${metrics.lateSchedules > 0 ? 'text-red-600 dark:text-rose-400' : 'text-zinc-500 dark:text-zinc-400'}`}>Atrasos</span>
+              <span className={`text-xs font-bold tracking-wider uppercase flex items-center ${metrics.lateSchedules > 0 ? 'text-red-600 dark:text-rose-400' : 'text-zinc-500 dark:text-zinc-400'}`}>
+                Atrasos
+                <DevBadge id="dashboard.lateSchedules" />
+              </span>
               <AlertCircle size={20} className={metrics.lateSchedules > 0 ? 'text-red-500 dark:text-rose-400' : 'text-zinc-400'} />
             </div>
             <div className={`text-3xl font-bold ${metrics.lateSchedules > 0 ? 'text-red-700 dark:text-rose-300' : 'text-zinc-900 dark:text-white'}`}>
@@ -93,7 +103,10 @@ export function DashboardPage() {
         <Card className="shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col items-start p-6">
             <div className="flex items-center justify-between w-full mb-4">
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">Pendente Geral</span>
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase flex items-center">
+                Pendente Geral
+                <DevBadge id="dashboard.pendingOmie" />
+              </span>
               <LayoutDashboard size={20} className="text-amber-500" />
             </div>
             <div className="text-3xl font-bold text-zinc-900 dark:text-white">{metrics.pendingOmie}</div>

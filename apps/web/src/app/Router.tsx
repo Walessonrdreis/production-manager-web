@@ -2,7 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/dashboard/HomePage';
 import { CatalogPage } from '../pages/catalog/CatalogPage';
+import { CatalogV2Page } from '../pages/catalog/CatalogV2Page';
 import { StocksPage } from '../pages/stocks/StocksPage';
+import { StocksV2Page } from '../pages/stocks-v2/StocksV2Page';
+import { StockRoomViewPage } from '../pages/stocks-v2/StockRoomViewPage';
 import { SectorsPage } from '../pages/sectors/SectorsPage';
 import { OrdersPage } from '../pages/orders/OrdersPage';
 import { ProductionOrdersPage } from '../pages/orders/ProductionOrdersPage';
@@ -30,6 +33,9 @@ export function AppRouter() {
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/production-orders" element={<ProductionOrdersPage />} />
         {/* Rota escondida para a nova feature isolada */}
+        <Route path="/v2/catalog" element={<CatalogV2Page />} />
+        <Route path="/v2/stocks" element={<StocksV2Page />} />
+        <Route path="/v2/stocks/:roomId" element={<StockRoomViewPage />} />
         <Route path="/v2/production-orders" element={<ProductionOrdersV2Page />} />
         <Route path="/planning" element={<PlanningPage />} />
         <Route path="/goals" element={<GoalsManagementPage />} />

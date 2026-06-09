@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../components/ui/DevBadge';
 import { LoginForm } from '../../../components/auth/LoginForm';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../../../services/auth/authService';
@@ -31,7 +32,7 @@ export function LoginPage() {
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
             <Layers size={24} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Production Management</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">Production Management <DevBadge id="loginpage.title" /></h1>
         </div>
         
         <LoginForm />

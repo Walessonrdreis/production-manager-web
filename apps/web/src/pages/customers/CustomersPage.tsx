@@ -1,3 +1,4 @@
+import { DevBadge } from '../../components/ui/DevBadge';
 import React, { useState } from 'react';
 import { useCustomers } from '../../hooks/customers/useCustomers';
 import { Card } from '../../components/ui/Card';
@@ -68,7 +69,7 @@ export function CustomersPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Base de Clientes</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-slate-100">Base de Clientes <DevBadge id="customerspage.title" /></h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Gerencie os clientes para identificação em ordens de serviço.</p>
         </div>
         <div className="flex items-center gap-3">

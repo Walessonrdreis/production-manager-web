@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../../components/ui/DevBadge';
 import { Download } from 'lucide-react';
 import { Button } from '../../../../components/ui/Button';
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -23,7 +24,7 @@ export function PlanningHeader({
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Planejamento de Produção</h1>
+        <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Planejamento de Produção <DevBadge id="planningheader.title" /></h1>
         <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Selecione produtos para gerar ordens de fabricação</p>
       </div>
       <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">

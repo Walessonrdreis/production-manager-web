@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../components/ui/DevBadge';
 import { useSectors } from '../../../hooks/sectors/useSectors';
 import { useCreateSector } from '../../../hooks/sectors/useCreateSector';
 import { useUpdateSector } from '../../../hooks/sectors/useUpdateSector';
@@ -152,7 +153,7 @@ export function SectorsPage() {
     <div className="space-y-6 sm:space-y-8 pb-20">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Setores de Produção</h1>
+          <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Setores de Produção <DevBadge id="sectorspage.title" /></h1>
           <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Gerencie a organização física e lógica da fábrica</p>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">

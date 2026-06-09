@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../components/ui/DevBadge';
 import { ShoppingBag } from 'lucide-react';
 import { SalesOrdersTab } from './components/SalesOrdersTab';
 
@@ -8,7 +9,7 @@ export function OrdersPage() {
         <h1 className="text-3xl flex items-center font-bold text-gray-900 dark:text-gray-100 gap-3">
           <ShoppingBag className="w-8 h-8 text-blue-600" />
           Pedidos de Venda
-        </h1>
+         <DevBadge id="orderspage.title" /></h1>
         <p className="text-gray-500 dark:text-gray-400 mt-2">Gerencie pedidos de venda sincronizados com o Omie.</p>
       </header>
 

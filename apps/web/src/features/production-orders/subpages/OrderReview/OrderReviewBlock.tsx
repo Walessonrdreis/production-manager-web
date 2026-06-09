@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../../components/ui/DevBadge';
 import React from 'react';
 
 export function OrderReviewBlock() {
@@ -9,7 +10,7 @@ export function OrderReviewBlock() {
              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           Aguardando Revisão
-        </h3>
+         <DevBadge id="card.orderreviewblock" /></h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">OPs com pendências ou pausadas</p>
       </div>
       <div className="p-5 flex-1 flex flex-col items-center justify-center">

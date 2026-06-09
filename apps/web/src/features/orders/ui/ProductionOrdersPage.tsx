@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../components/ui/DevBadge';
 import { Settings2 } from 'lucide-react';
 import { ProductionOrdersTab } from './components/ProductionOrdersTab';
 
@@ -8,7 +9,7 @@ export function ProductionOrdersPage() {
         <h1 className="text-3xl flex items-center font-bold text-gray-900 dark:text-gray-100 gap-3">
           <Settings2 className="w-8 h-8 text-indigo-600" />
           Ordens de Produção
-        </h1>
+         <DevBadge id="productionorderspage.title" /></h1>
         <p className="text-gray-500 dark:text-gray-400 mt-2">Gerencie as Ordens de Produção (OPs) locais com seus respectivos lotes.</p>
       </header>
 

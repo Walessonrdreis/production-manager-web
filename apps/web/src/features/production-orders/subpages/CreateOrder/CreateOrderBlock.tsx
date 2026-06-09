@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../../components/ui/DevBadge';
 import React from 'react';
 
 export function CreateOrderBlock() {
@@ -9,7 +10,7 @@ export function CreateOrderBlock() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           Planejamento de OP
-        </h3>
+         <DevBadge id="card.createorderblock" /></h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Lançar ou programar nova ordem de produção</p>
       </div>
       <div className="p-5 flex-1 flex flex-col items-center justify-center">

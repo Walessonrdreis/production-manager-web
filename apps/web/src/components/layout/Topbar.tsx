@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Cloud, RefreshCw, Sun, Moon } from 'lucide-react';
+import { Menu, Cloud, RefreshCw, Sun, Moon, Terminal } from 'lucide-react';
 import { useSyncStatus } from '../../hooks/ui/useSyncStatus';
 import { PendingChangesModal } from '../modals/PendingChangesModal';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useDevMode } from '../../hooks/useDevMode';
 
 interface TopbarProps {
   onToggleSidebar: () => void;
@@ -11,9 +12,11 @@ interface TopbarProps {
 
 export function Topbar({ onToggleSidebar, title }: TopbarProps) {
   const { theme, toggleTheme } = useTheme();
+  const { isDevMode, toggleDevMode } = useDevMode();
   const { isSyncing, lastSync, triggerSync } = useSyncStatus();
   const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
   const [timeAgo, setTimeAgo] = useState('agora');
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -44,6 +47,18 @@ export function Topbar({ onToggleSidebar, title }: TopbarProps) {
       </div>
       
       <div className="flex items-center gap-2 sm:gap-4">
+        <button
+          onClick={toggleDevMode}
+          className={`p-2 rounded-full transition-colors ${
+            isDevMode 
+              ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-400' 
+              : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'
+          }`}
+          title="Modo Desenvolvedor (Fronteiras)"
+        >
+          <Terminal size={18} />
+        </button>
+
         <button
           onClick={toggleTheme}
           className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-800 rounded-full transition-colors"

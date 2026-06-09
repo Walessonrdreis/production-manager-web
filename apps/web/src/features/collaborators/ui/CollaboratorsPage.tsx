@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../components/ui/DevBadge';
 import React, { useState } from 'react';
 import { useCollaborators } from '../../../hooks/collaborators/useCollaborators';
 import { useSectors } from '../../../hooks/sectors/useSectors';
@@ -92,7 +93,7 @@ export function CollaboratorsPage() {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent flex items-center gap-2">
             <Users className="w-6 h-6 text-indigo-600" />
             Equipe / Colaboradores
-          </h1>
+           <DevBadge id="collaboratorspage.title" /></h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">Gerencie as pessoas e capacidade da sua fábrica</p>
         </div>
         <Button onClick={() => handleOpenModal()} className="shadow-md">

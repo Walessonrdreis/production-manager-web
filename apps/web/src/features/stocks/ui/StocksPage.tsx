@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../components/ui/DevBadge';
 import { useStocks } from '../../../hooks/stocks/useStocks';
 import { useOrders } from '../../../hooks/orders/useOrders';
 import { usePlanning } from '../../../hooks/planner/usePlanning';
@@ -177,7 +178,7 @@ export function StocksPage() {
           <h1 className="text-3xl flex items-center font-bold text-gray-900 dark:text-gray-100 gap-3">
             <Layers className="w-8 h-8 text-blue-600" />
             Estoques
-          </h1>
+           <DevBadge id="stockspage.title" /></h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">Gerencie categorias de produtos e visualização de seus estoques.</p>
         </div>
         <Button variant="outline" size="sm" onClick={() => setItemToDelete('ALL')} className="text-red-500 hover:text-red-600 hover:bg-red-50 border-red-100">

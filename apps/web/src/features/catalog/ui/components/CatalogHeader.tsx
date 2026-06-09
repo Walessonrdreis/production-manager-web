@@ -1,3 +1,4 @@
+import { DevBadge } from '../../../../components/ui/DevBadge';
 import { Button } from '../../../../components/ui/Button';
 import { RefreshCw, Package } from 'lucide-react';
 
@@ -14,7 +15,7 @@ export function CatalogHeader({ productsCount, isFetching, onSync, isSyncing, on
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Catálogo de Produtos</h1>
+        <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Catálogo de Produtos <DevBadge id="catalogheader.title" /></h1>
         <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm">
           {isFetching ? 'Atualizando catálogo...' : `Exibindo ${productsCount} produtos sincronizados`}
         </p>

@@ -1,3 +1,4 @@
+import { DevBadge } from '../../components/ui/DevBadge';
 import React from 'react';
 import {
   DndContext,
@@ -22,7 +23,6 @@ import { BaseSubpageLayout } from './components/BaseSubpageLayout';
 
 // Blocos
 import { OpenedOrdersBlock } from './subpages/OpenedOrders/OpenedOrdersBlock';
-import { OpenedOrdersView } from './subpages/OpenedOrders/OpenedOrdersView';
 import { CreateOrderBlock } from './subpages/CreateOrder/CreateOrderBlock';
 import { LiveOrdersBlock } from './subpages/LiveOrders/LiveOrdersBlock';
 import { OrderReviewBlock } from './subpages/OrderReview/OrderReviewBlock';
@@ -30,6 +30,8 @@ import { OrderHistoryBlock } from './subpages/OrderHistory/OrderHistoryBlock';
 import { OrderMetricsBlock } from './subpages/OrderMetrics/OrderMetricsBlock';
 
 import { CreateOrderView } from './subpages/CreateOrder/CreateOrderView';
+import { OpenedOrdersView } from './subpages/OpenedOrders/OpenedOrdersView';
+// Removed unused ProductionOrderListPage import
 
 const blockComponents: Record<Exclude<Subpage, 'none'>, React.FC> = {
   opened: OpenedOrdersBlock,
@@ -65,9 +67,6 @@ function SortableBlock({ id, onClick, children }: { id: string, onClick: () => v
         {...listeners} 
         className="cursor-grab active:cursor-grabbing hover:scale-[1.02] transition-transform" 
         onClick={(e) => {
-          // If the dragging logic starts, pointer up wouldn't be a simple click, but let's 
-          // add a prevention mechanism if we really drag. The `useSortable` handles simple 
-          // clicks to allow underlying elements to receive them if there is no drag.
           onClick();
         }}
       >
@@ -83,7 +82,7 @@ export function ProductionOrdersHub() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // Requires a 5px drag before it activates to ensure valid clicks aren't intercepted.
+        distance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -104,7 +103,7 @@ export function ProductionOrdersHub() {
   // Se houver uma subpágina ativa expandida, mostra ela em vez do grid de widgets
   if (activeSubpage === 'opened') {
     return (
-      <BaseSubpageLayout title="OPs em Aberto" onBack={closeSubpage}>
+      <BaseSubpageLayout title="Fila de Trabalho (OPs)" onBack={closeSubpage}>
         <OpenedOrdersView />
       </BaseSubpageLayout>
     );
@@ -113,7 +112,7 @@ export function ProductionOrdersHub() {
   if (activeSubpage === 'create') {
     return (
       <BaseSubpageLayout title="Nova OP" onBack={closeSubpage}>
-        <CreateOrderView />
+        <CreateOrderView onSuccess={() => openSubpage('opened')} />
       </BaseSubpageLayout>
     );
   }
@@ -131,7 +130,7 @@ export function ProductionOrdersHub() {
   return (
     <div className="p-6 max-w-7xl mx-auto h-full text-slate-900 dark:text-slate-100">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Painel de Produção (V2)</h1>
+        <h1 className="flex items-center gap-2 text-3xl font-bold text-gray-900 dark:text-white mb-2">Painel de Produção (V2) <DevBadge id="productionordershub.title" /></h1>
         <p className="text-gray-500 dark:text-gray-400">Selecione ou reordene os blocos de gestão.</p>
       </div>
 

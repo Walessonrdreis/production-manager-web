@@ -11,9 +11,10 @@ export const CatalogLogic = {
       familyFilter: string;
       sectorFilter: string;
       stockLevel: 'all' | 'low' | 'normal';
+      allowedFamilies?: string[];
     }
   ): Product[] {
-    const { search, familyFilter, sectorFilter, stockLevel } = filters;
+    const { search, familyFilter, sectorFilter, stockLevel, allowedFamilies } = filters;
     const searchLower = search.toLowerCase();
 
     return products.filter(p => {
@@ -24,11 +25,12 @@ export const CatalogLogic = {
         (p.family || '').toLowerCase().includes(searchLower);
       
       const matchesFamily = !familyFilter || familyFilter === 'Todas' || p.family === familyFilter;
+      const matchesAllowedFamily = !allowedFamilies || allowedFamilies.length === 0 || allowedFamilies.includes(p.family || '');
       const sectors = p.sectorIds || ((p as any).sectorId ? [(p as any).sectorId] : []);
       const matchesSector = !sectorFilter || (sectorFilter === 'none' ? sectors.length === 0 : sectors.includes(sectorFilter));
       const matchesStock = stockLevel === 'all' || (stockLevel === 'low' ? p.stock <= 10 : p.stock > 10);
       
-      return matchesSearch && matchesFamily && matchesSector && matchesStock;
+      return matchesSearch && matchesFamily && matchesAllowedFamily && matchesSector && matchesStock;
     });
   },
 

@@ -444,6 +444,66 @@ Toda nova integração externa ou fluxo complexo de API no frontend (apps/web) D
 - **Desacoplamento**: O objetivo central é permitir que o frontend evolua livre de bloqueios do backend, testando todos os limites da interface usando dados fictícios mas construído sobre a malha arquitetônica correta para produção.
 - **Virada de Chave Simples**: Quando a integração for a produção, bastará alterar a variável de ambiente. O frontend estará perfeitamente preparado para apontar para a API Real sem a necessidade de refatorar componentes visuais.
 
+## 22. Regra de Consistência de UI (Dark Mode)
+
+Toda e qualquer implementação de interface de usuário (UI) DEVE seguir obrigatoriamente os padrões definidos para o modo escuro (Dark Mode) já presentes na aplicação.
+
+### Princípios Obrigatórios:
+- As classes Tailwind devem prever sempre `dark:bg-*`, `dark:text-*`, `dark:border-*` em todas as opções de layout criadas.
+- O modo escuro não é opcional, é uma restrição de design. Nenhuma nova tela, componente, modal ou card pode ser introduzido sem suporte nativo ao dark mode em paridade com a paleta existente (ex: `dark:bg-slate-900`, `dark:text-slate-100`).
+
+## 24. Regra de Observabilidade de Fronteiras no Frontend (Developer Mode / Badges)
+
+Com a divisão estrita de responsabilidades entre **API 1 (Integração/ERP)** e **API 2 (Domínio Interno)**, é crucial que, durante o desenvolvimento, o desenvolvedor saiba exatamente a origem e o destino dos dados renderizados na interface.
+
+Para isso, adotamos o padrão de **Observabilidade de Fronteira Visual (Dev Mode)**:
+
+### Princípios Obrigatórios:
+
+- **Modo Desenvolvedor Estrito (Toggle)**: A UI pode conter indicadores visuais (badges) que mostram a qual domínio um bloco, campo ou página pertence. Esses indicadores só devem ser visíveis caso um "Modo Desenvolvedor" esteja ativo (via Variável de Ambiente `VITE_ENABLE_DEV_BOUNDARIES` ou um Toggle no Perfil do Usuário em ambiente não-produtivo). Em Produção, a UI não pode ter poluição visual técnica (Regra de Architectural Honesty).
+  
+- **Padrão de Cores (Semântica de Domínio)**:
+  - 🟦 **API 1 / ERP (Azul)**: Usado para campos e ações cujo owner é a API 1. (ex: Criação de OP no Omie, Listagem de Produtos vindos do Omie, Código de Barras).
+  - 🟩 **API 2 / Interno (Esmeralda)**: Usado para regras de negócio exclusivas do sistema interno. (ex: Lote de Rastreio Interno, Metas, Planejamento, Agrupadores de interface).
+  - 🟪 **Misto / Orquestrado (Roxo/Ambar)**: Usado para views, cards ou formulários que combinam e cruzam dados de ambos os mundos. Um bloco que internamente fará orquestração. (ex: Uma margem de perda que é visualizada internamente mas depois é enviada pro ERP; um painel de detalhes da OP que mescla ERP e Qualidade).
+  - ⚪ **Não Mapeado / Placeholder (Cinza Tracejado)**: Usado de forma transitória enquanto a UI está sendo prototipada e o desenvolvedor ainda não definiu a fronteira de domínio. Um lembrete visual de que o badge precisa ser tipado corretamente.
+
+### Prática de UI
+O projeto possui um componente centralizado para isso: `<DevBadge>`. Este componente deve ser adicionado aos rótulos (labels), cabeçalhos de formulários e cabeçalhos de página, bem como blocos, cards de navegação (hubs) e seções que façam parte da integração e limites do domínio.
+
+**Registro Centralizado (Mock TS):**
+Todos os domínios da interface DEVEM ser registrados em um arquivo TypeScript específico que funciona como um banco de dados local contendo apenas configurações de dev:
+`apps/web/src/config/devBadgeRegistry.ts`
+
+Esse registro usa IDs em formato de path (ex: `dashboard.producedToday`) mapeados para os domínios suportados (`api1`, `api2`, `mixed`, `unmapped`).
+
+**Uso Obrigatório Automático em Novas Telas/Componentes:**
+Sempre que você criar uma nova página, interface ou Card de Navegação (Hub) que leve a uma subpágina, você DEVE, AUTOMATICAMENTE e sem necessidade do usuário pedir, incorporar o `<DevBadge>`:
+- Ao lado do Titulo principal (`<h1>` ou equivalente) da página.
+- Dentro dos Cards de Navegação que representam subespaços.
+Passando um `id` único que DEVE ser simultaneamente cadastrado no `devBadgeRegistry.ts`.
+
+Exemplo de uso obrigatório no título da página:
+```tsx
+import { DevBadge } from '@/components/ui/DevBadge';
+
+// Em qualquer nova página criada:
+<h1 className="flex items-center gap-2 text-2xl font-bold">
+  Minha Nova Página
+  <DevBadge id="minhanovapagina.title" />
+</h1>
+```
+
+Domínios válidos para cadastro no registry:
+- `"api1"`: API de Integração com ERP (Omie).
+- `"api2"`: API de Domínio Interno.
+- `"mixed"`: Telas ou contextos que mesclam ambos ou a responsabilidade orquestrada.
+- `"unmapped"`: Placeholder visual para lembrar o desenvolvedor de definir o domínio corretamente (útil para prototipação).
+
+Caso um `id` seja passado mas não esteja cadastrado, ele assumirá o valor visual de `"unmapped"`.
+
+Isso garante que ao debugar, saibamos exatamente com qual banco/sistema aquele dado está interagindo, sem precisar adivinhar ou varrer o código. Como a configuração está centralizada em TypeScript simulando um banco (mas que depois não vai a build se removido, e não quebra a interface final), a alteração do domínio em toda a aplicação pode ser feita visualmente mexendo só no arquivo de config. O `DevBadge` gerencia automaticamente a visibilidade controlada pelo `useDevMode()`.
+
 ## Regra Final de Governança
 
 Nenhuma automação vale mais que a estabilidade.
@@ -768,6 +828,29 @@ A frase correta para guardar é:
 
 DATABASE_FINAL_URL= Banco de dados final do projeto
 LEGACY_DATABASE_URL= Banco de dados que o frontend e api2 usam para criar e lidar com dados de dominio e etc, será organizado nele para no futuro termos a migração suave para o db final com tudo ja preparado.
+
+## 23. Regra de Hierarquia e Densidade de Visualização (Cards de UI)
+
+O nível de profundidade e a densidade de detalhes exibidos em um Card/Visualização devem respeitar a intenção da hierarquia do componente na navegação do aplicativo. 
+
+### Padrões Obrigatórios
+
+Nível Zero (Painéis de Acesso Rápido / Dashboard):
+- **Onde se aplica**: Telas iniciais e dashboards de diretório (ex: `#/v2/catalog`). 
+- **O que deve conter**: Pode ser expressivo, ter chamadas rápidas para a ação (CTAs), mostrar métricas gerais e alertas estratégicos. 
+- **Intenção**: Sensação de painel (movimentável, tátil e convidativo à exploração ampla).
+
+Nível 1 (Listagem Primária / Master View / Index):
+- **Onde se aplica**: Feed e coleções para busca e navegação (ex. listas de produtos ou pedidos).
+- **O que deve conter**: Apenas o essencial para reconhecer o item de forma limpa e objetiva (Ex: Código, Nome, Status Principal).
+- **O que é PROIBIDO conter**: É expressamente proibido inundar o card primário com badges de "Alerta de status interno", ou exibir dezenas de valores financeiros (como preço de venda ou custos detalhados), a não ser que o escopo exclusivo do filtro atual exija.
+- **Intenção**: Identificação em milissegundos num feed rápido e escaneável. Acesso rápido e filtros fixos preferidos ao invés de encher de tags/chips não vitais.
+
+Nível 2 (Visão de Detalhes / Formulários Internos):
+- **Onde se aplica**: A tela, painel lateral ou sub-página aberta APÓS clicar em um item de Nível 1.
+- **O que deve conter**: A vista exaustiva do item. Todo o bloco de valores (preços de venda, composição de custos), mensagens informativas ricas e status profundos de anomalia (como "Sem Estrutura").
+- **Intenção**: Imersão completa e tomada de decisão sobre detalhes do registro.
+
 
 
 
